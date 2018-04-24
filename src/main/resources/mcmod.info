@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "mctester",
+    "name": "Mctester",
+    "description": "A framework for writing fully automated tests of Minecraft",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Aaron1011"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
