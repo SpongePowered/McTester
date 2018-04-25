@@ -27,7 +27,7 @@ public class ChatTest {
         game.getServer().getBroadcastChannel().send(Text.of("From a different thread!"), ChatTypes.SYSTEM);
 
         client.sendMessage("Hello, world!");
-        Preconditions.checkArgument(recievedMessage[0].equals(Text.of("Hello, world!")));
+        game.getServer().getBroadcastChannel().send(Text.of("Success: ", recievedMessage[0]), ChatTypes.SYSTEM);
     }
 
 }
