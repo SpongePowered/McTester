@@ -1,6 +1,7 @@
 package pw.aaron1011.mctester.framework;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.network.Message;
 import pw.aaron1011.mctester.McTester;
 import pw.aaron1011.mctester.OneShotEventListener;
@@ -8,6 +9,8 @@ import pw.aaron1011.mctester.framework.proxy.InvocationData;
 import pw.aaron1011.mctester.message.toserver.MessageAck;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TesterHandler {
 
@@ -16,13 +19,14 @@ public class TesterHandler {
     volatile ConcurrentLinkedQueue<OneShotEventListener> listeners = new ConcurrentLinkedQueue<>();
     volatile ConcurrentLinkedQueue<Message> outboundMessages = new ConcurrentLinkedQueue<>();
 
-    public static volatile Object lock = new Object();
+    public static ReentrantLock lock = new ReentrantLock();
+    public static volatile Condition condition = lock.newCondition();
 
     public void receiveAck(MessageAck ack) {
         this.ackQueue.add(ack);
     }
 
-    public <T> void addOneShot(OneShotEventListener<T> listener) {
+    public <T extends Event> void addOneShot(OneShotEventListener<T> listener) {
         this.listeners.add(listener);
     }
 
@@ -30,10 +34,19 @@ public class TesterHandler {
         this.outboundMessages.add(message);
     }
 
+    public void addInvocation(InvocationData data) {
+        this.invokeQueue.add(data);
+    }
+
 
     public void run() {
+        TesterThread thread = new TesterThread();
+        thread.start();
+
         Sponge.getScheduler().createTaskBuilder().name("Proxy executor").intervalTicks(1).execute((task) -> {
 
+
+            lock.lock();
 
             // First, check any listeners that finished
             MessageAck ack = ackQueue.poll();
@@ -45,7 +58,7 @@ public class TesterHandler {
                     Sponge.getEventManager().unregisterListeners(listener);
                 }
                 listeners.clear();
-                TesterHandler.lock.notify();
+                condition.signal();
             }
 
             Message outbound = outboundMessages.poll();
@@ -61,8 +74,10 @@ public class TesterHandler {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                TesterHandler.lock.notify();
+                condition.signal();
             }
+
+            lock.unlock();
 
 
         }).submit(McTester.INSTANCE);

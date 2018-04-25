@@ -20,8 +20,6 @@ public class InvocationData {
 
     public void execute() throws InvocationTargetException, IllegalAccessException {
         Object response = this.method.invoke(this.realObject, this.args);
-        if (McTester.shouldProxy(realObject)) {
-
-        }
+        this.response = McTester.proxy(response);
     }
 }

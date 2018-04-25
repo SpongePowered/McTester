@@ -6,6 +6,7 @@ import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
 import pw.aaron1011.mctester.TestUtils;
 import pw.aaron1011.mctester.framework.Client;
 
@@ -23,8 +24,9 @@ public class ChatTest {
             }
         });
 
-        client.sendMessage("Hello, world!");
+        game.getServer().getBroadcastChannel().send(Text.of("From a different thread!"), ChatTypes.SYSTEM);
 
+        client.sendMessage("Hello, world!");
         Preconditions.checkArgument(recievedMessage[0].equals(Text.of("Hello, world!")));
     }
 

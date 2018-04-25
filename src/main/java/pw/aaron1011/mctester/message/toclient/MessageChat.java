@@ -7,6 +7,8 @@ public class MessageChat implements Message {
 
     public String message;
 
+    public MessageChat() {}
+
     public MessageChat(String message) {
         this.message = message;
     }

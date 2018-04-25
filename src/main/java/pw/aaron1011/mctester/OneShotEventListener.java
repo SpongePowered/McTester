@@ -1,8 +1,9 @@
 package pw.aaron1011.mctester;
 
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 
-public class OneShotEventListener<T> implements EventListener<T> {
+public class OneShotEventListener<T extends Event> implements EventListener<T> {
 
     public Class<T> eventClass;
     public EventListener<? super T> listener;
