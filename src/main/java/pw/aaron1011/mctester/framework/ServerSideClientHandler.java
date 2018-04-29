@@ -3,9 +3,6 @@ package pw.aaron1011.mctester.framework;
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import pw.aaron1011.mctester.McTester;
-import pw.aaron1011.mctester.TestUtils;
-import pw.aaron1011.mctester.message.toclient.MessageChat;
 
 public class ServerSideClientHandler implements Client {
 

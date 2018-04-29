@@ -1,24 +1,14 @@
 package pw.aaron1011.mctester.framework.proxy;
 
-import static org.apache.commons.lang3.ArrayUtils.toArray;
-
-import com.google.common.util.concurrent.SettableFuture;
 import org.apache.commons.lang3.ClassUtils;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import pw.aaron1011.mctester.McTester;
-import pw.aaron1011.mctester.TestUtils;
-import pw.aaron1011.mctester.framework.TesterHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public abstract class BaseProxy implements InvocationHandler {
 

@@ -13,31 +13,21 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.MessageHandler;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import pw.aaron1011.mctester.framework.RealClientHandler;
-import pw.aaron1011.mctester.framework.TesterHandler;
 import pw.aaron1011.mctester.framework.TesterThread;
-import pw.aaron1011.mctester.framework.proxy.BaseProxy;
 import pw.aaron1011.mctester.framework.proxy.RemoteInvocationData;
 import pw.aaron1011.mctester.framework.proxy.RemoteInvocationDataBuilder;
 import pw.aaron1011.mctester.message.ClientDelegateHandler;
 import pw.aaron1011.mctester.message.ServerDelegateHandler;
-import pw.aaron1011.mctester.message.toclient.MessageChat;
 import pw.aaron1011.mctester.message.toclient.MessageRPCRequest;
-import pw.aaron1011.mctester.message.toserver.MessageAck;
 import pw.aaron1011.mctester.message.toserver.MessageRPCResponse;
 
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @Plugin(
         id = "mctester",
@@ -57,15 +47,9 @@ public class McTester {
     public SpongeExecutorService syncExecutor;
 
     public volatile ChannelBinding.IndexedMessageChannel channel;
-    //public volatile TesterHandler handler = new TesterHandler();
-    //public volatile TesterThread testerThread = new TesterThread();
 
     public McTester() {
         INSTANCE = this;
-    }
-
-    public static void ack() {
-        McTester.INSTANCE.channel.sendToServer(new MessageAck());
     }
 
 
@@ -79,8 +63,6 @@ public class McTester {
 
         this.channel.registerMessage(MessageRPCRequest.class, 0, Platform.Type.CLIENT, (MessageHandler) clientDelegateHandler);
         this.channel.registerMessage(MessageRPCResponse.class, 1, Platform.Type.SERVER, (MessageHandler) serverDelegateHandler);
-        //this.channel.registerMessage(MessageAck.class, 0, Platform.Type.SERVER, (MessageHandler) serverDelegateHandler);
-        //this.channel.registerMessage(MessageChat.class, 1, Platform.Type.CLIENT, (MessageHandler) clientDelegateHandler);
 
         if (Sponge.getPlatform().getExecutionType().equals(Platform.Type.CLIENT)) {
             Sponge.getDataManager().registerBuilder(RemoteInvocationData.class, new RemoteInvocationDataBuilder(ClientOnly.REAL_CLIENT_HANDLER));
