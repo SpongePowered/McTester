@@ -3,7 +3,9 @@ package pw.aaron1011.mctester.framework;
 import com.flowpowered.math.vector.Vector3d;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
+import net.minecraft.util.EnumHand;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import pw.aaron1011.mctester.message.toclient.MessageChat;
 
@@ -41,6 +43,6 @@ public class RealClientHandler implements Client {
 
     @Override
     public ItemStack getItemInHand(HandType type) {
-        return null;
+        return (ItemStack) (Object) Minecraft.getMinecraft().player.getHeldItem((EnumHand) (Object) type);
     }
 }

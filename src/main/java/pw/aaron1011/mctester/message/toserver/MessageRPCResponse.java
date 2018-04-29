@@ -52,7 +52,7 @@ public class MessageRPCResponse extends BaseServerMessage {
 
         if (this.type != void.class) {
             DataView view = buf.readDataView();
-            this.response = view.getView(RPCKeys.RESPONSE.getQuery()).flatMap(v -> Utils.dataToArbitrary(view, this.type))
+            this.response = view.getView(RPCKeys.RESPONSE.getQuery()).flatMap(v -> Utils.dataToArbitrary(v, this.type))
                     .orElseGet(() -> view.get(RPCKeys.RESPONSE.getQuery()).get());
         }
         //this.response = Utils.dataToArbitrary(view.getView(RPCKeys.RESPONSE.getQuery()).get(), this.type).orElse(view.get(RPCKeys.));

@@ -1,5 +1,8 @@
 package pw.aaron1011.mctester.framework.proxy;
 
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -45,6 +48,8 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
             Object rawParam = rawParams.get(i);
             if (rawParam instanceof DataView) {
                 finalParams.add(Utils.dataToArbitrary((DataView) rawParam, paramType));
+            } else if (CatalogType.class.isAssignableFrom(paramType)) {
+                finalParams.add(Sponge.getRegistry().getType((Class) paramType, (String) rawParam).get());
             } else {
                 finalParams.add(rawParam);
             }
