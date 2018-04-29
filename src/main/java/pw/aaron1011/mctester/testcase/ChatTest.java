@@ -12,11 +12,11 @@ import pw.aaron1011.mctester.framework.Client;
 
 public class ChatTest {
 
-    public void runTest(Game game, Client client) {
+    public void runTest(Game game, Client client, TestUtils testUtils) {
 
         final Text[] recievedMessage = new Text[1];
 
-        TestUtils.listenOneShot(MessageChannelEvent.Chat.class, new EventListener<MessageChannelEvent.Chat>() {
+        testUtils.listenOneShot(MessageChannelEvent.Chat.class, new EventListener<MessageChannelEvent.Chat>() {
 
             @Override
             public void handle(MessageChannelEvent.Chat event) throws Exception {

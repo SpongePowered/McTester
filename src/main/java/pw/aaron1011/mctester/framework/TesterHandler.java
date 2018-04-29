@@ -9,12 +9,12 @@ import pw.aaron1011.mctester.framework.proxy.InvocationData;
 import pw.aaron1011.mctester.message.toserver.MessageAck;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TesterHandler {
 
-    volatile ConcurrentLinkedQueue<InvocationData> invokeQueue = new ConcurrentLinkedQueue<>();
     volatile ConcurrentLinkedQueue<MessageAck> ackQueue = new ConcurrentLinkedQueue<>();
     volatile ConcurrentLinkedQueue<OneShotEventListener> listeners = new ConcurrentLinkedQueue<>();
     volatile ConcurrentLinkedQueue<Message> outboundMessages = new ConcurrentLinkedQueue<>();
@@ -26,7 +26,7 @@ public class TesterHandler {
         this.ackQueue.add(ack);
     }
 
-    public <T extends Event> void addOneShot(OneShotEventListener<T> listener) {
+    public <T extends Event> void addOneShotOld(OneShotEventListener<T> listener) {
         this.listeners.add(listener);
     }
 
@@ -35,7 +35,7 @@ public class TesterHandler {
     }
 
     public void addInvocation(InvocationData data) {
-        this.invokeQueue.add(data);
+        //this.invokeQueue.add(data);
     }
 
 
@@ -67,7 +67,7 @@ public class TesterHandler {
             }
 
             // Next, handle the latest method invocation, and wake up the thread
-            InvocationData data = invokeQueue.poll();
+            /*InvocationData data = invokeQueue.poll();
             if (data != null) {
                 try {
                     data.execute();
@@ -77,7 +77,7 @@ public class TesterHandler {
                 condition.signal();
             }
 
-            lock.unlock();
+            lock.unlock();*/
 
 
         }).submit(McTester.INSTANCE);

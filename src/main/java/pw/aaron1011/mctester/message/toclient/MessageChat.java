@@ -28,12 +28,7 @@ public class MessageChat extends BaseClientMessage {
 
     @Override
     public void process() {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        minecraft.displayGuiScreen(new GuiChat());
 
-        GuiChat chat = (GuiChat) minecraft.currentScreen;
-        chat.sendChatMessage(MessageChat.this.message);
-        minecraft.displayGuiScreen(null);
 
         McTester.ack();
     }

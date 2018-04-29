@@ -19,6 +19,6 @@ public class MessageAck extends BaseServerMessage {
 
     @Override
     public void process() {
-        McTester.INSTANCE.handler.receiveAck(this);
+        //McTester.INSTANCE.handler.receiveAck(this);
     }
 }

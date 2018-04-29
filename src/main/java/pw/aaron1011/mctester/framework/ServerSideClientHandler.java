@@ -7,12 +7,12 @@ import pw.aaron1011.mctester.McTester;
 import pw.aaron1011.mctester.TestUtils;
 import pw.aaron1011.mctester.message.toclient.MessageChat;
 
-public class IntegratedClientHandler implements Client {
+public class ServerSideClientHandler implements Client {
 
     @Override
     public void sendMessage(String text) {
-        McTester.INSTANCE.handler.addOutbound(new MessageChat(text));
-        this.waitForAck();
+        //McTester.INSTANCE.handler.addOutbound(new MessageChat(text));
+        //this.waitForAck();
     }
 
     @Override
@@ -41,6 +41,6 @@ public class IntegratedClientHandler implements Client {
     }
 
     private void waitForAck() {
-        TestUtils.waitForSignal();
+        //TestUtils.waitForSignal();
     }
 }

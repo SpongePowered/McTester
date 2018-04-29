@@ -1,25 +1,34 @@
 package pw.aaron1011.mctester.framework.proxy;
 
 import pw.aaron1011.mctester.McTester;
+import pw.aaron1011.mctester.message.toserver.MessageRPCResponse;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.concurrent.Callable;
 
-public class InvocationData {
+public class InvocationData implements Callable<Object>  {
 
     public Object realObject;
     public Method method;
-    public Object[] args;
+    public List<?> args;
     public Object response;
 
-    public InvocationData(Object realObject, Method method, Object[] args) {
+    public InvocationData(Object realObject, Method method, List<?> args) {
         this.realObject = realObject;
         this.method = method;
         this.args = args;
     }
 
-    public void execute() throws InvocationTargetException, IllegalAccessException {
-        Object response = this.method.invoke(this.realObject, this.args);
-        this.response = McTester.proxy(response);
+
+    @Override
+    public Object call() throws Exception {
+        this.response = this.method.invoke(this.realObject, this.args.toArray(new Object[this.args.size()]));
+        return this.response;
+    }
+
+    public MessageRPCResponse makeResponse() throws Exception {
+        this.response = this.call();
+        return new MessageRPCResponse(this.response, this.method.getReturnType());
     }
 }
