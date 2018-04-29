@@ -35,12 +35,34 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+def addGradleStart() {
+    project.logger.warn("Hacking forgegradle stuff")
+    def javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java")
+    def main = javaConv.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+    def test = javaConv.getSourceSets().getByName(SourceSet.TEST_SOURCE_SET_NAME)
+
+    main.setCompileClasspath(main.getCompileClasspath()
+                                     .plus(project.getConfigurations().getByName("forgeGradleGradleStart"))
+
+    )
+    test.setCompileClasspath(test.getCompileClasspath()
+                                     .plus(project.getConfigurations().getByName("forgeGradleGradleStart"))
+    )
+    test.setRuntimeClasspath(test.getRuntimeClasspath()
+                                     .plus(project.getConfigurations().getByName("forgeGradleGradleStart"))
+    )
+}
+
+addGradleStart()
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.googlecode.junit-toolbox:junit-toolbox:2.4'
 }
 
 processResources {

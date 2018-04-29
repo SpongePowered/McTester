@@ -11,6 +11,20 @@
       </configuration>
     </facet>
   </component>
+  <component name="McpModuleSettings">
+    <option name="mappingFiles">
+      <set>
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_stable/32/1.12.2/srgs/mcp-notch.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_stable/32/1.12.2/srgs/mcp.exc" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_stable/32/1.12.2/srgs/notch-srg.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_stable/32/1.12.2/srgs/srg.exc" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_stable/32/1.12.2/srgs/notch-mcp.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_stable/32/1.12.2/srgs/mcp-srg.srg" />
+      </set>
+    </option>
+    <option name="mcpVersion" value="stable_32" />
+    <option name="minecraftVersion" value="1.12.2" />
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -130,7 +144,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.yaml:snakeyaml:1.18" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: compileDummy" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: providedDummy" level="project" />
-    <orderEntry type="module-library" scope="RUNTIME">
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="file://$USER_HOME$/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.3.2655/start" />
@@ -140,6 +154,8 @@
       </library>
     </orderEntry>
     <orderEntry type="library" scope="TEST" name="Gradle: org.spongepowered:spongeapi:7.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.googlecode.junit-toolbox:junit-toolbox:2.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.inject:guice:4.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.spongepowered:plugin-meta:0.4.1" level="project" />
@@ -157,10 +173,15 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.flowpowered:flow-math:1.0.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.flowpowered:flow-noise:1.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.ow2.asm:asm:5.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-library:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: commons-io:commons-io:2.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:1.9.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.typesafe:config:1.3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.yaml:snakeyaml:1.18" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.objenesis:objenesis:1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: compileDummy" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: providedDummy" level="project" />
   </component>

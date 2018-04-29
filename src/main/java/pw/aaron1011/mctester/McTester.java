@@ -1,6 +1,7 @@
 package pw.aaron1011.mctester;
 
 import com.google.inject.Inject;
+import net.minecraftforge.gradle.GradleStartCommon;
 import org.slf4j.Logger;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
