@@ -17,7 +17,9 @@ public class MainThreadProxy extends BaseProxy {
     }
 
     public static boolean shouldProxy(Object object) {
-        return object.getClass().getName().startsWith("org.spongepowered") && !(object.getClass().getName().equals(BaseProxy.class.getName()));
+        return object != null
+                && (object.getClass().getName().startsWith("org.spongepowered") || object.getClass().getName().startsWith("net.minecraft")) // Proxy anything from Sponge or Minecraft...
+                && !(object.getClass().getName().equals(BaseProxy.class.getName())); // unless it's another proxy, because that would be dumb
     }
 
     public static <T> T newProxy(T object) {
