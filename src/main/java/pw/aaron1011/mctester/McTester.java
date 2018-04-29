@@ -27,6 +27,8 @@ import pw.aaron1011.mctester.framework.TesterThread;
 import pw.aaron1011.mctester.framework.proxy.SpongeProxy;
 import pw.aaron1011.mctester.message.BaseClientHandler;
 import pw.aaron1011.mctester.message.BaseServerHandler;
+import pw.aaron1011.mctester.message.ClientDelegateHandler;
+import pw.aaron1011.mctester.message.ServerDelegateHandler;
 import pw.aaron1011.mctester.message.toclient.MessageChat;
 import pw.aaron1011.mctester.message.toserver.MessageAck;
 
@@ -34,7 +36,6 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 
 @Plugin(
@@ -60,44 +61,21 @@ public class McTester {
         INSTANCE = this;
     }
 
+    public static void ack() {
+        McTester.INSTANCE.channel.sendToServer(new MessageAck());
+    }
+
 
     @Listener
     public void onInit(GameInitializationEvent event) {
         this.channel = Sponge.getChannelRegistrar().createChannel(this, "mctester");
 
-        this.channel.registerMessage(MessageAck.class, 0, Platform.Type.SERVER, new BaseServerHandler<MessageAck>() {
+        ClientDelegateHandler clientDelegateHandler = new ClientDelegateHandler();
+        ServerDelegateHandler serverDelegateHandler = new ServerDelegateHandler();
 
-            @Override
-            protected void properHandleMessage(MessageAck message, RemoteConnection connection, Platform.Type side) {
-                McTester.this.handler.receiveAck(message);
-            }
-        });
+        this.channel.registerMessage(MessageAck.class, 0, Platform.Type.SERVER, (MessageHandler) serverDelegateHandler);
 
-        this.channel.registerMessage(MessageChat.class, 1, Platform.Type.CLIENT, new BaseClientHandler<MessageChat>() {
-
-            @Override
-            protected void properHandleMessage(MessageChat message, RemoteConnection connection, Platform.Type side) {
-                try {
-                    Minecraft minecraft = Minecraft.getMinecraft();
-                    minecraft.addScheduledTask(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            minecraft.displayGuiScreen(new GuiChat());
-
-                            GuiChat chat = (GuiChat) minecraft.currentScreen;
-                            chat.sendChatMessage(message.message);
-                            minecraft.displayGuiScreen(null);
-
-                            McTester.this.channel.sendToServer(new MessageAck());
-                        }
-                    });
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        this.channel.registerMessage(MessageChat.class, 1, Platform.Type.CLIENT, (MessageHandler) clientDelegateHandler);
     }
 
     public static Player getThePlayer() {

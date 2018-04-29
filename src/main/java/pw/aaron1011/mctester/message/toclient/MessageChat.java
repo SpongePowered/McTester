@@ -1,9 +1,12 @@
 package pw.aaron1011.mctester.message.toclient;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
 import org.spongepowered.api.network.ChannelBuf;
-import org.spongepowered.api.network.Message;
+import pw.aaron1011.mctester.McTester;
+import pw.aaron1011.mctester.message.toserver.MessageAck;
 
-public class MessageChat implements Message {
+public class MessageChat extends BaseClientMessage {
 
     public String message;
 
@@ -21,5 +24,17 @@ public class MessageChat implements Message {
     @Override
     public void writeTo(ChannelBuf buf) {
         buf.writeString(this.message);
+    }
+
+    @Override
+    public void process() {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        minecraft.displayGuiScreen(new GuiChat());
+
+        GuiChat chat = (GuiChat) minecraft.currentScreen;
+        chat.sendChatMessage(MessageChat.this.message);
+        minecraft.displayGuiScreen(null);
+
+        McTester.ack();
     }
 }

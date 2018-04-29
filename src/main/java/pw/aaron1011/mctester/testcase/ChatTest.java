@@ -23,10 +23,10 @@ public class ChatTest {
                 recievedMessage[0] = event.getRawMessage();
             }
         });
+        client.sendMessage("Hello, world!");
 
         game.getServer().getBroadcastChannel().send(Text.of("From a different thread!"), ChatTypes.SYSTEM);
 
-        client.sendMessage("Hello, world!");
         game.getServer().getBroadcastChannel().send(Text.of("Success: ", recievedMessage[0]), ChatTypes.SYSTEM);
     }
 
