@@ -14,6 +14,8 @@ import pw.aaron1011.mctester.testcase.ChatTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 public class TesterThread extends Thread implements TestUtils, ProxyCallback {
 
@@ -43,6 +45,17 @@ public class TesterThread extends Thread implements TestUtils, ProxyCallback {
         OneShotEventListener oneShot = new OneShotEventListener(eventClass, listener);
         Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, oneShot);
         this.listeners.add(oneShot);
+    }
+
+    @Override
+    public void sleepTicks(int ticks) {
+        FutureTask<?> task = new FutureTask<>((() -> {}), null);
+        Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(task).submit(McTester.INSTANCE);
+        try {
+            task.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
