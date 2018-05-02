@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
 public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
-    private ErrorSlot errorSlot = new ErrorSlot();
 	private LCLBridge lclBridge;
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
@@ -124,7 +123,7 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	@Override
     protected Statement methodInvoker(FrameworkMethod method, Object test) {
-		return new InvokeMethodWrapper(method, test, this.errorSlot);
+		return new InvokeMethodWrapper(method, test, this.lclBridge.getErrorSlot());
 	}
 
 }

@@ -2,7 +2,13 @@ package org.spongepowered.mctester.main.appclass;
 
 public class ErrorSlot {
 
+    public ErrorSlot() {}
+
     private Throwable error;
+
+    public void clear() {
+        this.error = null;
+    }
 
     public void throwIfSet() throws Throwable {
         if (this.error != null) {

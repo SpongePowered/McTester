@@ -15,6 +15,7 @@ public class InvokeMethodWrapper extends InvokeMethod {
 
     @Override
     public void evaluate() throws Throwable {
+        this.errorSlot.clear();
         super.evaluate();
         errorSlot.throwIfSet();
     }
