@@ -1,3 +1,7 @@
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSet
+import org.gradle.plugins.ide.idea.model.IdeaModel
+
 buildscript {
     repositories {
         jcenter()
@@ -17,6 +21,7 @@ buildscript {
 
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.plugin"
+apply plugin: 'idea'
 
 version = modVersion
 group = modGroup
@@ -37,7 +42,11 @@ minecraft {
 
 def addGradleStart() {
     project.logger.warn("Hacking forgegradle stuff")
+
     def javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java")
+
+
+
     def main = javaConv.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME)
     def test = javaConv.getSourceSets().getByName(SourceSet.TEST_SOURCE_SET_NAME)
 
@@ -51,6 +60,9 @@ def addGradleStart() {
     test.setRuntimeClasspath(test.getRuntimeClasspath()
                                      .plus(project.getConfigurations().getByName("forgeGradleGradleStart"))
     )
+
+    def ideaConv= (IdeaModel) project.getExtensions().getByName("idea")
+    ideaConv.getModule().getScopes().get("COMPILE").get("plus").add(project.getConfigurations().getByName("forgeGradleGradleStart"));
 }
 
 addGradleStart()
@@ -83,3 +95,4 @@ processResources {
         exclude "mcmod.info"
     }
 }
+
