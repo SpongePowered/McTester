@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.main.framework.proxy;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.mctester.main.McTester;
 
@@ -28,14 +29,23 @@ public class MainThreadProxy extends BaseProxy {
     @Override
     Object dispatch(InvocationData data) {
 
-        SpongeExecutorService.SpongeFuture<Object> future = this.mainThreadExecutor.schedule(data, 0, TimeUnit.SECONDS);
-
-        // Blocking
         Object result;
-        try {
-            result = future.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        // If we're already on the main thread, don't bother using the scheduler
+        if (Sponge.getServer().isMainThread()) {
+            try {
+                result = data.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            SpongeExecutorService.SpongeFuture<Object> future = this.mainThreadExecutor.schedule(data, 0, TimeUnit.SECONDS);
+
+            // Blocking
+            try {
+                result = future.get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Object proxied = MainThreadProxy.newProxy(result, this.callback);

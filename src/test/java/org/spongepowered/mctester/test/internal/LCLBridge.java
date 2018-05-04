@@ -77,8 +77,10 @@ public class LCLBridge {
         try {
             // We want JUnit to shut down the VM, not Minecraft, so
             // we need to bypass FMLSecurityManager
-            // ForceShutdownHandler intercepts ExitTrappedException, and actually
-            // terminates the VM through our TerminateVM class
+
+            // ForceShutdownHandler intercepts ExitTrappedException that will eventually be thrown
+            // by JUnit attemping to shut down the VM. It forcible terminates the VM
+            // through our TerminateVM class, which bypasses FMLSecurityManager
             Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler());
             this.minecraftShutdown.invoke(this.minecraft);
         } catch (Exception e) {

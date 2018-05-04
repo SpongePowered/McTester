@@ -14,7 +14,10 @@ import org.spongepowered.mctester.main.framework.proxy.ProxyCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
@@ -52,7 +55,27 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
+    public <T> T batchActions(Callable<T> callable) throws Throwable {
+        try {
+            return McTester.INSTANCE.syncExecutor.schedule(callable, 0, TimeUnit.SECONDS).get();
+        } catch (ExecutionException e) {
+            throw e.getCause();
+        }
+    }
+
+    @Override
+    public void batchActions(Runnable runnable) throws Throwable {
+        this.batchActions(() -> {
+            runnable.run();
+            return null;
+        });
+    }
+
+    @Override
     public void sleepTicks(int ticks) {
+        if (Sponge.getServer().isMainThread()) {
+            throw new IllegalStateException("Can't call TestUtils.sleepTicks from the main thread!");
+        }
         FutureTask<?> task = new FutureTask<>((() -> {}), null);
         Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(task).submit(McTester.INSTANCE);
         try {

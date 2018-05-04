@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.main.framework.proxy;
 
+import joptsimple.internal.Strings;
 import org.spongepowered.mctester.main.message.toserver.MessageRPCResponse;
 
 import java.lang.reflect.Method;
@@ -29,5 +30,9 @@ public class InvocationData implements Callable<Object>  {
     public MessageRPCResponse makeResponse() throws Exception {
         this.response = this.call();
         return new MessageRPCResponse(this.response, this.method.getReturnType());
+    }
+
+    public String format() {
+        return this.method.toString();
     }
 }

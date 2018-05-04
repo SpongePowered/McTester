@@ -27,9 +27,15 @@ package org.spongepowered.mctester.main;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 
+import java.util.concurrent.Callable;
+
 public interface TestUtils {
 
     <T extends Event> void listenOneShot(Class<T> eventClass, EventListener<? super T> listener);
+
+    <T> T batchActions(Callable<T> callable) throws Throwable;
+
+    void batchActions(Runnable callable) throws Throwable;
 
     void sleepTicks(int ticks);
 }
