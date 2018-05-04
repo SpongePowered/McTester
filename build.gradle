@@ -85,7 +85,7 @@ repositories {
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0'
     compile 'org.spongepowered:mixin:0.7.4-SNAPSHOT'
-    testCompile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
 }
 
 mixin {
