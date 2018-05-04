@@ -1,5 +1,5 @@
 {
-  "package": "org.spongepowered.mctester.old.mixin",
+  "package": "org.spongepowered.mctester.internal.mixin",
   "refmap": "mctester.main.refmap.json",
   "target": "@env(DEFAULT)",
   "minVersion": "0.7",

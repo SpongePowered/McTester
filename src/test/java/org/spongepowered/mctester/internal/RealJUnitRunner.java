@@ -9,13 +9,9 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.api.Game;
-import org.spongepowered.mctester.ForceShutdownHandler;
-import org.spongepowered.mctester.InvokeMethodWrapper;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
-import org.spongepowered.mctester.old.TestUtils;
-import org.spongepowered.mctester.old.appclass.ErrorSlot;
-import org.spongepowered.mctester.old.framework.Client;
-import org.spongepowered.mctester.old.framework.TesterManager;
+import org.spongepowered.mctester.internal.framework.Client;
+import org.spongepowered.mctester.internal.framework.TesterManager;
 
 import java.util.Arrays;
 import java.util.List;

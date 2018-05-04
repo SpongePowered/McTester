@@ -24,12 +24,7 @@
  */
 package org.spongepowered.mctester.junit;
 
-import com.google.common.collect.Lists;
 import net.minecraft.launchwrapper.Launch;
-import org.spongepowered.mctester.InvokeMethodWrapper;
-import org.spongepowered.mctester.LCLBridge;
-import org.spongepowered.mctester.internal.RealJUnitRunner;
-import org.spongepowered.mctester.old.framework.Client;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.junit.runner.notification.RunNotifier;
@@ -37,13 +32,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 
-import org.spongepowered.api.Game;
-import org.spongepowered.mctester.old.TestUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JUnit Runner which runs tests inside the ClassLoader of the Minecraft Server.
