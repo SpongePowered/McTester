@@ -34,7 +34,7 @@ public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
         if (throwable instanceof FMLSecurityManager.ExitTrappedException) {
             // Try and stop us now, FML!
             System.err.println("FMLSecurityManager tried to stop VM from exiting, bypassing...");
-            // Unfortunately, we have no way of getting the real error code.
+            // Unfortunately, we have no way of getting the real fakeError code.
             // Since this class should only be used in a test environment, returing '0'
             // shouldn't be *too* bad - any test errors should have been recorded separately.
             TerminateVM.terminate("net.minecraftforge.fml", 0);

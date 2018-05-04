@@ -31,6 +31,15 @@ import java.util.concurrent.Callable;
 
 public interface TestUtils {
 
+    /**
+     * Registers a 'one-shot' listener. This behaves like a regular Sponge event listener,
+     * with the following differences:
+     *
+     *
+     * @param eventClass
+     * @param listener
+     * @param <T>
+     */
     <T extends Event> void listenOneShot(Class<T> eventClass, EventListener<? super T> listener);
 
     <T> T batchActions(Callable<T> callable) throws Throwable;

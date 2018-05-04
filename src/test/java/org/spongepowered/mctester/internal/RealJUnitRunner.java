@@ -9,6 +9,7 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.api.Game;
+import org.spongepowered.mctester.junit.IJunitRunner;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.mctester.internal.framework.TesterManager;
@@ -17,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RealJUnitRunner extends BlockJUnit4ClassRunner  {
+public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner {
 
     private TesterManager manager = new TesterManager();
 

@@ -49,7 +49,10 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     @Override
     public <T extends Event> void listenOneShot(Class<T> eventClass, EventListener<? super T> listener) {
-        OneShotEventListener oneShot = new OneShotEventListener(eventClass, listener, this.errorSlot);
+        AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
+        error.fillInStackTrace();
+
+        OneShotEventListener oneShot = new OneShotEventListener(eventClass, listener, this.errorSlot, error);
         Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, oneShot);
         this.listeners.add(oneShot);
     }
@@ -87,9 +90,12 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     @Override
     public void afterInvoke() throws Throwable {
+        // This runs after a Client method has returned
         for (OneShotEventListener listener: this.listeners) {
             if (!listener.handled) {
-                McTester.INSTANCE.logger.error("One shot listener didn't run: " + listener.listener);
+                throw new AssertionError("A one-shot listener failed to run in time!\n" +
+                                         "By the time this method call finished, a one-shot event listener should have been run - but it wasn't.\n"  +
+                                         "See the nested stacktrace for the location of the one-shot event handler.", listener.fakeError);
             }
             Sponge.getEventManager().unregisterListeners(listener);
         }

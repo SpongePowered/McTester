@@ -43,14 +43,11 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	// We deliberately don't set the type to RealJunitRunner, since we load it
 	// on the LaunchClassLoader
-	static BlockJUnit4ClassRunner realJUnitRunner;
+	static IJunitRunner realJUnitRunner;
 	static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
-	//private LCLBridge lclBridge;
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
 		super(initializeServer(testClass));
-		// Create the LCLBridge after the server is running
-		//this.lclBridge = new LCLBridge(this);
 	}
 
 	// This is done like this just so that we can run stuff before invoking the parent constructor
@@ -68,7 +65,7 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 
 				Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, Launch.classLoader);
-				MinecraftRunner.realJUnitRunner = (BlockJUnit4ClassRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
+				MinecraftRunner.realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 			}
 		} catch (Throwable e) {
 			throw new InitializationError(e);
@@ -83,34 +80,22 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	protected void validateConstructor(List<Throwable> errors) {
-		try {
-			realJUnitRunner.getClass().getMethod("validateConstructor", List.class).invoke(realJUnitRunner, errors);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		realJUnitRunner.validateConstructor(errors);
 	}
 
 	@Override
 	public TestClass createTestClass(Class<?> testClass) {
-		try {
-			return (TestClass) realJUnitRunner.getClass().getMethod("createTestClass", Class.class).invoke(realJUnitRunner, testClass);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return realJUnitRunner.createTestClass(testClass);
 	}
 
 	@Override
 	public Object createTest() throws Exception {
-		return realJUnitRunner.getClass().getMethod("createTest").invoke(realJUnitRunner);
+		return realJUnitRunner.createTest();
 	}
 
 	@Override
 	public Statement methodInvoker(FrameworkMethod method, Object test) {
-		try {
-			return (Statement) realJUnitRunner.getClass().getMethod("methodInvoker", FrameworkMethod.class, Object.class).invoke(realJUnitRunner, method, test);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return realJUnitRunner.methodInvoker(method, test);
 	}
 
 }

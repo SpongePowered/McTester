@@ -43,7 +43,7 @@ import java.lang.reflect.Method;
  * Copied from SpongeForge
  *
  * Really wish this wasn't necessary but unfortunately FML doesn't have any
- * mechanism to shut down the VM when a fatal error occurs.
+ * mechanism to shut down the VM when a fatal fakeError occurs.
  */
 public final class TerminateVM {
 

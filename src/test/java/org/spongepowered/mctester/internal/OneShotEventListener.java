@@ -33,13 +33,15 @@ public class OneShotEventListener<T extends Event> implements EventListener<T> {
     public Class<T> eventClass;
     public EventListener<? super T> listener;
     public boolean handled;
+    public AssertionError fakeError;
 
     private ErrorSlot errorSlot;
 
-    public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot) {
+    public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot, AssertionError fakeError) {
         this.eventClass = eventClass;
         this.listener = listener;
         this.errorSlot = errorSlot;
+        this.fakeError = fakeError;
     }
 
     @Override
