@@ -27,7 +27,6 @@ package org.spongepowered.mctester.test.internal;
 import com.google.common.collect.Lists;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
-import org.spongepowered.mctester.main.appclass.ErrorSlot;
 import org.spongepowered.mctester.test.internal.internal.MinecraftServerStarter;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -35,8 +34,8 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 
 import org.spongepowered.api.Game;
-import org.spongepowered.mctester.main.TestUtils;
-import org.spongepowered.mctester.main.framework.Client;
+import org.spongepowered.mctester.test.internal.old.TestUtils;
+import org.spongepowered.mctester.test.internal.old.framework.Client;
 
 import java.util.Arrays;
 import java.util.List;

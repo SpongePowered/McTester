@@ -22,37 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.test.internal;
+package org.spongepowered.mctester.test.internal.old;
 
-import net.minecraft.launchwrapper.ITweaker;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.Mixins;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.EventListener;
+import org.spongepowered.mctester.test.internal.old.appclass.ErrorSlot;
 
-import java.io.File;
-import java.util.List;
+public class OneShotEventListener<T extends Event> implements EventListener<T> {
 
-public class MinecraftRunnerTweaker implements ITweaker {
+    public Class<T> eventClass;
+    public EventListener<? super T> listener;
+    public boolean handled;
 
-    @Override
-    public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
+    private ErrorSlot errorSlot;
+
+    public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot) {
+        this.eventClass = eventClass;
+        this.listener = listener;
+        this.errorSlot = errorSlot;
     }
 
     @Override
-    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.test.internal");
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.test.internal.old.appclass");
-        MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.mctester.json");
-    }
-
-    @Override
-    public String getLaunchTarget() {
-        return null;
-    }
-
-    @Override
-    public String[] getLaunchArguments() {
-        return new String[0];
+    public void handle(T event) throws Exception {
+        this.handled = true;
+        try {
+            this.listener.handle(event);
+        } catch (Throwable e) {
+            this.errorSlot.setErrorIfUnset(e);
+            throw e;
+        }
     }
 }

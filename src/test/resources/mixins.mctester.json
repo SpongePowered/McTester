@@ -1,0 +1,10 @@
+{
+  "package": "org.spongepowered.mctester.test.internal.old.mixin",
+  "refmap": "mctester.main.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.7",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinMinecraft"
+  ]
+}

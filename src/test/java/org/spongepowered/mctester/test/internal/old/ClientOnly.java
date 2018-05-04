@@ -22,37 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.test.internal;
+package org.spongepowered.mctester.test.internal.old;
 
-import net.minecraft.launchwrapper.ITweaker;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.Mixins;
+import org.spongepowered.mctester.test.internal.old.framework.RealClientHandler;
 
-import java.io.File;
-import java.util.List;
+public class ClientOnly {
 
-public class MinecraftRunnerTweaker implements ITweaker {
+    public static final RealClientHandler REAL_CLIENT_HANDLER = new RealClientHandler();
 
-    @Override
-    public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-    }
-
-    @Override
-    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.test.internal");
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.test.internal.old.appclass");
-        MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.mctester.json");
-    }
-
-    @Override
-    public String getLaunchTarget() {
-        return null;
-    }
-
-    @Override
-    public String[] getLaunchArguments() {
-        return new String[0];
-    }
 }

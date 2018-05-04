@@ -2,7 +2,7 @@ package org.spongepowered.mctester.test.internal;
 
 import org.junit.internal.runners.statements.InvokeMethod;
 import org.junit.runners.model.FrameworkMethod;
-import org.spongepowered.mctester.main.appclass.ErrorSlot;
+import org.spongepowered.mctester.test.internal.old.appclass.ErrorSlot;
 
 public class InvokeMethodWrapper extends InvokeMethod {
 

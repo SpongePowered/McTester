@@ -22,37 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.test.internal;
+package org.spongepowered.mctester.test.internal.old;
 
-import net.minecraft.launchwrapper.ITweaker;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.Mixins;
+import org.spongepowered.mctester.test.internal.old.message.ResponseWrapper;
 
-import java.io.File;
-import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
-public class MinecraftRunnerTweaker implements ITweaker {
+public class ServerOnly {
 
-    @Override
-    public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-    }
+    public static final BlockingQueue<ResponseWrapper> INBOUND_QUEUE = new ArrayBlockingQueue(1);
 
-    @Override
-    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.test.internal");
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.test.internal.old.appclass");
-        MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.mctester.json");
-    }
-
-    @Override
-    public String getLaunchTarget() {
-        return null;
-    }
-
-    @Override
-    public String[] getLaunchArguments() {
-        return new String[0];
-    }
 }

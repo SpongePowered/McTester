@@ -26,8 +26,8 @@ package org.spongepowered.mctester.test.internal;
 
 import net.minecraft.client.Minecraft;
 import org.junit.runners.model.TestClass;
-import org.spongepowered.mctester.main.appclass.ErrorSlot;
-import org.spongepowered.mctester.main.framework.TesterManager;
+import org.spongepowered.mctester.test.internal.old.appclass.ErrorSlot;
+import org.spongepowered.mctester.test.internal.old.framework.TesterManager;
 
 import java.lang.reflect.Method;
 
