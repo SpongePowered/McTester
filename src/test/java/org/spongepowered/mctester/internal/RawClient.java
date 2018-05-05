@@ -1,11 +1,14 @@
-package org.spongepowered.mctester.internal.framework;
+package org.spongepowered.mctester.internal;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 
-public interface Client {
+import java.util.List;
+
+public interface RawClient {
 
     void sendMessage(String text);
 
@@ -19,6 +22,6 @@ public interface Client {
 
     ItemStack getItemInHand(HandType type);
 
-    PlayerInventory getInventory();
+    List<DataView> getRawInventory();
 
 }

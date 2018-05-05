@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.internal.framework.proxy;
 
+import org.spongepowered.mctester.internal.RawClient;
 import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.mctester.internal.McTester;
@@ -16,9 +17,9 @@ public class RemoteClientProxy extends BaseProxy {
         super(null, mainThreadExecutor, callback);
     }
 
-    public static Client newProxy(ProxyCallback callback) {
+    public static RawClient newProxy(ProxyCallback callback) {
         RemoteClientProxy proxy = new RemoteClientProxy(McTester.INSTANCE.syncExecutor, callback);
-        return proxy.makeProxy(Client.class);
+        return proxy.makeProxy(RawClient.class);
     }
 
     @Override

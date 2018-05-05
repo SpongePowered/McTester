@@ -22,7 +22,11 @@ public class InvocationData implements Callable<Object>  {
 
     @Override
     public Object call() throws Exception {
-        this.response = this.method.invoke(this.realObject, this.args.toArray(new Object[this.args.size()]));
+        try {
+            this.response = this.method.invoke(this.realObject, this.args.toArray(new Object[this.args.size()]));
+        } catch (Exception e) {
+            throw e;
+        }
         return this.response;
     }
 

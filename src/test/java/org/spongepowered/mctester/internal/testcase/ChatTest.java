@@ -20,7 +20,7 @@ public class ChatTest {
 
         ItemStack serverStack = ItemStack.of(ItemTypes.GOLD_INGOT, 5);
 
-        Hotbar hotbar = (Hotbar) McTester.getThePlayer().getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class));
+        Hotbar hotbar = (Hotbar) McTester.getThePlayer().getRawInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class));
         hotbar.set(new SlotIndex(hotbar.getSelectedSlotIndex()), serverStack);
 
         // We sleep two ticks to guarantee that the client has been updated.

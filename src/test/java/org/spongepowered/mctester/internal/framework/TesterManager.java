@@ -36,7 +36,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     public TesterManager() {
         Game realGame = Sponge.getGame();
         this.fakeGame = MainThreadProxy.newProxy(realGame, null);
-        this.client = RemoteClientProxy.newProxy(this);
+        this.client = new ServerSideClientHandler(RemoteClientProxy.newProxy(this));
     }
 
     /*@Override
@@ -102,5 +102,10 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         listeners.clear();
 
         this.errorSlot.throwIfSet();
+    }
+
+    @Override
+    public void waitForInventoryPropagation() {
+        this.sleepTicks(2);
     }
 }
