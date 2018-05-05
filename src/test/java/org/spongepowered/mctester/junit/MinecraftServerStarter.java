@@ -74,23 +74,6 @@ public class MinecraftServerStarter {
 	 */
 	public void waitForServerStartupCompletion() throws Throwable {
 		RunnerEvents.waitForPlayerJoin();
-/*		// we CANNOT use TestsRunnerPlugin.isServerStarted == true
-		// because the TestsRunnerPlugin will get loaded by a net.minecraft.launchwrapper.LaunchClassLoader,
-		// so it's static field won't be the same as the one in our current classloader,
-		// but we can work around this problem, like this:
-		ClassLoader minecraftLaunchClassLoader = internalGetMinecraftServerClassLoader();
-		Thread.currentThread().setContextClassLoader(minecraftLaunchClassLoader);
-
-		Class<?> testsRunnerPluginClassFromLaunchClassLoader = minecraftLaunchClassLoader.loadClass(TestsRunnerPlugin.class.getName());
-		Field isServerStartedField = testsRunnerPluginClassFromLaunchClassLoader.getDeclaredField("isServerStarted");
-		isServerStartedField.setAccessible(true);
-
-		// logger.info("waitForServerStartupCompletion: isServerStarted == true [{}]", testsRunnerPluginClassFromLaunchClassLoader.getClassLoader());
-		waiter.until(() -> Boolean.TRUE.equals(isServerStartedField.get(null)));
-
-		Field gameField = testsRunnerPluginClassFromLaunchClassLoader.getDeclaredField("game");
-		gameField.setAccessible(true);*/
-		//game = /* DO NOT (Game) */ gameField.get(null);
 	}
 
 	public ClassLoader getMinecraftServerClassLoader() {

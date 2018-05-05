@@ -9,10 +9,12 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.api.Game;
-import org.spongepowered.mctester.junit.IJunitRunner;
-import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.mctester.internal.framework.TesterManager;
+import org.spongepowered.mctester.junit.DefaultMinecraftRunnerOptions;
+import org.spongepowered.mctester.junit.IJunitRunner;
+import org.spongepowered.mctester.junit.MinecraftRunnerOptions;
+import org.spongepowered.mctester.junit.MinecraftServerStarter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,21 +23,29 @@ import java.util.stream.Collectors;
 public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner {
 
     private TesterManager manager = new TesterManager();
+    private MinecraftRunnerOptions options;
+    private Thread testThread = Thread.currentThread();
 
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
      *
      * @throws InitializationError if the test class is malformed.
      */
-    public RealJUnitRunner(Class<?> klass) throws InitializationError {
-        super(klass);
+    public RealJUnitRunner(Class<?> testClass) throws InitializationError {
+        super(testClass);
+        this.options = testClass.getAnnotation(MinecraftRunnerOptions.class);
+        if (this.options == null) {
+            this.options = new DefaultMinecraftRunnerOptions();
+        }
     }
 
 
     @Override
     public void run(RunNotifier notifier) {
         super.run(notifier);
-        this.shutDownMinecraft();
+        if (this.options.exitMinecraftOnFinish()) {
+            this.shutDownMinecraft();
+        }
     }
 
     private void shutDownMinecraft() {
@@ -56,15 +66,15 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     @Override
     public void validateConstructor(List<Throwable> errors) {
         super.validateOnlyOneConstructor(errors);
-        this.validateThreeArgConstructor(errors);
+        this.validateSingleArgConstructor(errors);
     }
 
-    private void validateThreeArgConstructor(List<Throwable> errors) {
+    private void validateSingleArgConstructor(List<Throwable> errors) {
         // This class is loaded by JUnit, which uses the AppClassLoader. However, our test
         // class is loaded using LaunchClassLoader. To avoid dealing with this, we just compare
         // the fully-qualified names of the classes.
         List<String> parameters = Arrays.stream(getTestClass().getOnlyConstructor().getParameterTypes()).map(Class::getName).collect(Collectors.toList());
-        List<String> expectedParameters = Lists.newArrayList(Game.class.getName(), Client.class.getName(), TestUtils.class.getName());
+        List<String> expectedParameters = Lists.newArrayList(TestUtils.class.getName());
         if (!parameters.equals(expectedParameters)) {
             errors.add(new Exception(String.format("Test class constructor has unexpected parameters: expected %s, but found %s",
                     expectedParameters, parameters)));
@@ -86,7 +96,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public Object createTest() throws Exception {
-        Object object = getTestClass().getOnlyConstructor().newInstance(this.manager.fakeGame, this.manager.client, this.manager);
+        Object object = getTestClass().getOnlyConstructor().newInstance(this.manager);
         return object;
     }
 

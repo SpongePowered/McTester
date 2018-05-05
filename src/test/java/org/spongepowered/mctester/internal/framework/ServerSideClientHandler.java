@@ -22,7 +22,7 @@ public class ServerSideClientHandler implements Client {
 
 
     @Override
-    public PlayerInventory getInventory() {
+    public PlayerInventory getClientInventory() {
         List<DataView> itemStacks = this.proxyClient.getRawInventory();
         InventoryPlayer inventory = new InventoryPlayer((EntityPlayer) McTester.getThePlayer());
 

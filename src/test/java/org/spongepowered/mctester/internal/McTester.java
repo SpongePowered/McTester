@@ -86,30 +86,20 @@ public class McTester {
         if (Sponge.getPlatform().getExecutionType().equals(Platform.Type.CLIENT)) {
             Sponge.getDataManager().registerBuilder(RemoteInvocationData.class, new RemoteInvocationDataBuilder(ClientOnly.REAL_CLIENT_HANDLER));
         }
-
-        /*Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new CommandExecutor() {
-
-                    @Override
-                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        TesterManager.runTestThread();
-                        src.sendMessage(Text.of(TextColors.GREEN, "Here we go!"));
-
-                        return CommandResult.success();
-                    }
-                }).build(),
-                "runTest");*/
-    }
-
-    public static Player getThePlayer() {
-        Collection<Player> players = Sponge.getServer().getOnlinePlayers();
-        if (players.size() != 1) {
-            throw new RuntimeException("Unexpected players: " + players);
-        }
-        return players.iterator().next();
     }
 
     public void sendToPlayer(MessageRPCRequest messageRPCRequest) {
-        this.channel.sendTo(McTester.getThePlayer(), messageRPCRequest);
+        // This is asynchronous, so it's okay that we don't
+        // get a stubbed player through TestUtils.getGame()
+        this.channel.sendTo(getThePlayer(), messageRPCRequest);
+    }
+
+    /**
+     * For internal use only
+     * @return
+     */
+    public static Player getThePlayer() {
+        return Sponge.getServer().getOnlinePlayers().iterator().next();
     }
 
     @Listener

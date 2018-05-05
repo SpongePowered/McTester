@@ -38,13 +38,14 @@ import java.util.List;
  * JUnit Runner which runs tests inside the ClassLoader of the Minecraft Server.
  *
  * @author Michael Vorburger
+ * @author Aaron1011
  */
 public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	// We deliberately don't set the type to RealJunitRunner, since we load it
 	// on the LaunchClassLoader
-	static IJunitRunner realJUnitRunner;
-	static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
+	private static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
+	private static IJunitRunner realJUnitRunner;
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
 		super(initializeServer(testClass));
@@ -62,11 +63,10 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 			if (!starter.isRunning()) {
 				starter.startServer();
 				starter.waitForServerStartupCompletion();
-
-
-				Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, Launch.classLoader);
-				MinecraftRunner.realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 			}
+
+			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, Launch.classLoader);
+			realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 		} catch (Throwable e) {
 			throw new InitializationError(e);
 		}

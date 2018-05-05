@@ -28,9 +28,6 @@ import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
-import org.spongepowered.mctester.internal.RealJUnitRunner;
-import org.spongepowered.mctester.junit.MinecraftRunner;
-import org.spongepowered.mctester.junit.TweakUtil;
 
 import java.io.File;
 import java.util.List;
