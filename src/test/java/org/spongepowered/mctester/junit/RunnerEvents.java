@@ -24,14 +24,15 @@
  */
 package org.spongepowered.mctester.junit;
 
-import com.google.common.util.concurrent.SettableFuture;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+
+import java.util.concurrent.CompletableFuture;
 
 public class RunnerEvents {
 
-    private static SettableFuture<Void> playerJoined = SettableFuture.create();
-    private static SettableFuture<Void> gameClosed = SettableFuture.create();
-    private static SettableFuture<LaunchClassLoader> launchClassLoaderFuture = SettableFuture.create();
+    private static CompletableFuture<Void> playerJoined = new CompletableFuture<>();
+    private static CompletableFuture<Void> gameClosed = new CompletableFuture<>();
+    private static CompletableFuture<LaunchClassLoader> launchClassLoaderFuture = new CompletableFuture<>();
 
     public static void waitForPlayerJoin() {
         try {
@@ -42,7 +43,7 @@ public class RunnerEvents {
     }
 
     public static void setPlayerJoined() {
-        playerJoined.set(null);
+        playerJoined.complete(null);
     }
 
     public static boolean hasPlayerJoined() {
@@ -58,7 +59,7 @@ public class RunnerEvents {
     }
 
     public static void setGameClosed() {
-        gameClosed.set(null);
+        gameClosed.complete(null);
     }
 
     public static LaunchClassLoader waitForLaunchClassLoaderFuture() {
@@ -70,7 +71,7 @@ public class RunnerEvents {
     }
 
     public static void setLaunchClassLoaderFuture(LaunchClassLoader launchClassLoader) {
-        launchClassLoaderFuture.set(launchClassLoader);
+        launchClassLoaderFuture.complete(launchClassLoader);
     }
 
 }
