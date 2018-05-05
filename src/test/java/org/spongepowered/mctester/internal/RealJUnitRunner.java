@@ -15,6 +15,7 @@ import org.spongepowered.mctester.junit.DefaultMinecraftRunnerOptions;
 import org.spongepowered.mctester.junit.IJunitRunner;
 import org.spongepowered.mctester.junit.MinecraftRunnerOptions;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
+import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner {
 
-    private TesterManager manager = new TesterManager();
+    public static TesterManager manager = new TesterManager();
     private MinecraftRunnerOptions options;
     private Thread testThread = Thread.currentThread();
 
@@ -43,20 +44,24 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     @Override
     public void run(RunNotifier notifier) {
         super.run(notifier);
+
+        // We want JUnit to shut down the VM, not Minecraft, so
+        // we need to bypass FMLSecurityManager
+
+        // ForceShutdownHandler intercepts ExitTrappedException that will eventually be thrown
+        // by JUnit attemping to shut down the VM. It forcible terminates the VM
+        // through our TerminateVM class, which bypasses FMLSecurityManager
+        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler());
+
         if (this.options.exitMinecraftOnFinish()) {
             this.shutDownMinecraft();
+        } else {
+            RunnerEvents.waitForGameClosed();
         }
     }
 
     private void shutDownMinecraft() {
         try {
-            // We want JUnit to shut down the VM, not Minecraft, so
-            // we need to bypass FMLSecurityManager
-
-            // ForceShutdownHandler intercepts ExitTrappedException that will eventually be thrown
-            // by JUnit attemping to shut down the VM. It forcible terminates the VM
-            // through our TerminateVM class, which bypasses FMLSecurityManager
-            Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler());
             Minecraft.getMinecraft().shutdown();
         } catch (Exception e) {
             throw new RuntimeException(e);

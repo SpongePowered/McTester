@@ -29,6 +29,7 @@ import com.google.common.util.concurrent.SettableFuture;
 public class RunnerEvents {
 
     private static SettableFuture<Void> playerJoined = SettableFuture.create();
+    private static SettableFuture<Void> gameClosed = SettableFuture.create();
 
     public static void waitForPlayerJoin() {
         try {
@@ -44,6 +45,18 @@ public class RunnerEvents {
 
     public static boolean hasPlayerJoined() {
         return playerJoined.isDone();
+    }
+
+    public static void waitForGameClosed() {
+        try {
+            gameClosed.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void setGameClosed() {
+        gameClosed.set(null);
     }
 
 }

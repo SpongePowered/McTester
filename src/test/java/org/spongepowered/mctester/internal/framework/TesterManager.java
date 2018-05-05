@@ -1,9 +1,11 @@
 package org.spongepowered.mctester.internal.framework;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 import org.spongepowered.mctester.internal.McTester;
-import org.spongepowered.mctester.internal.OneShotEventListener;
+import org.spongepowered.mctester.internal.event.ErrorPropagatingEventListener;
+import org.spongepowered.mctester.internal.event.OneShotEventListener;
 import org.spongepowered.mctester.internal.TestUtils;
 import org.spongepowered.mctester.internal.framework.proxy.MainThreadProxy;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteClientProxy;
@@ -17,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +41,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     public TesterManager() {
         Game realGame = Sponge.getGame();
-        this.fakeGame = MainThreadProxy.newProxy(realGame, null);
+        this.fakeGame = MainThreadProxy.newProxy(realGame, Game.class, null);
         this.client = new ServerSideClientHandler(RemoteClientProxy.newProxy(this));
     }
 
@@ -73,11 +77,61 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
         error.fillInStackTrace();
 
-        OneShotEventListener oneShot = new OneShotEventListener(eventClass, listener, this.errorSlot, error);
+        OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
         Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, oneShot);
         this.listeners.add(oneShot);
 
         return oneShot;
+    }
+
+    @Override
+    public <T extends Event> EventListener<T> listen(Class<T> eventClass, EventListener<? super T> listener) {
+        ErrorPropagatingEventListener<T> newListener = new ErrorPropagatingEventListener<>(eventClass, listener, this.errorSlot);
+        Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, newListener);
+        return newListener;
+    }
+
+    @Override
+    public <T extends Event> int listenTimeout(Class<T> eventClass, EventListener<? super T> listener, int ticks) throws Throwable {
+        AssertionError error = new AssertionError(String.format("The one shot event listener registered here failed to run in %s ticks!\n", ticks));
+        error.fillInStackTrace();
+
+        OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
+        Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, oneShot);
+
+        // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
+        // At the end of this method, we wait for handleFinished to ensure
+        // that we re-throw any exception that may have occured.
+        CompletableFuture<Long> handledFuture = oneShot.handleStarted;
+        CompletableFuture<Void> timeoutFuture = new CompletableFuture<>();
+        long startTime = System.currentTimeMillis();
+        Task task = Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(() -> timeoutFuture.complete(null)).submit(McTester.INSTANCE);
+
+        // Blocking
+        Object result = null;
+        try {
+            result = CompletableFuture.anyOf(handledFuture, timeoutFuture).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        task.cancel();
+
+        // If we don't get a Long result, we hit our timeout, which means that the maximum amount of time elapsed
+        int elapsedTicks = ticks;
+        if (result instanceof Long) {
+            elapsedTicks = (int) ((Long) result - startTime) / 50;
+        }
+
+        if (!handledFuture.isDone()) {
+            throw new AssertionError("A timed listener failed to run in the alloted number of ticks!\n" +
+                                     "A timed listener had " + ticks + " ticks to fire, but it didn't.\n" +
+                                     "See the nested stacktrace for the location of the timed event handler.", oneShot.fakeError);
+        }
+
+        oneShot.handleFinished.get();
+        this.errorSlot.throwIfSet();
+
+        return Math.max(ticks - elapsedTicks, 0);
     }
 
     @Override
@@ -121,9 +175,13 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     @Override
     public void afterInvoke() throws Throwable {
+
+        // Run this first, since it was
+        this.errorSlot.throwIfSet();
+
         // This runs after a Client method has returned
         for (OneShotEventListener listener: this.listeners) {
-            if (!listener.handled) {
+            if (!listener.handleFinished.isDone()) {
                 throw new AssertionError("A one-shot listener failed to run in time!\n" +
                                          "By the time this method call finished, a one-shot event listener should have been run - but it wasn't.\n"  +
                                          "See the nested stacktrace for the location of the one-shot event handler.", listener.fakeError);
@@ -131,12 +189,20 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
             Sponge.getEventManager().unregisterListeners(listener);
         }
         listeners.clear();
-
-        this.errorSlot.throwIfSet();
     }
 
     @Override
     public void waitForInventoryPropagation() {
+        this.sleepTicks(2);
+    }
+
+    @Override
+    public void waitForEntitySpawn() {
+        this.sleepTicks(2);
+    }
+
+    @Override
+    public void waitForAll() {
         this.sleepTicks(2);
     }
 }

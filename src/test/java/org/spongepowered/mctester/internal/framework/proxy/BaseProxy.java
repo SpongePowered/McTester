@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.IntFunction;
 
 public abstract class BaseProxy implements InvocationHandler {
 
@@ -33,6 +34,8 @@ public abstract class BaseProxy implements InvocationHandler {
         if (objects == null) {
             objects = new Object[0];
         }
+        this.unwrapProxied(objects);
+
         InvocationData data = new InvocationData(this.realObject, method, Arrays.asList(objects));
         Object result = this.dispatch(data);
 
@@ -43,17 +46,32 @@ public abstract class BaseProxy implements InvocationHandler {
         return result;
     }
 
-    <T> T makeProxy(Class<T> type) {
-        return (T) Proxy.newProxyInstance(McTester.class.getClassLoader(), getAllInterfaces(type), this);
+    /**
+     * If we're invoking a proxied method, we've already taken
+     * care of setting up the proper environemt (e.g running on the main thread)
+     * This allows us to unwrap any proxied objects that may have been passed as arguments.
+     * @param args
+     */
+    private void unwrapProxied(Object[] args) {
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            if (Proxy.isProxyClass(arg.getClass()) && Proxy.getInvocationHandler(arg) instanceof BaseProxy) {
+                args[i] = ((BaseProxy) Proxy.getInvocationHandler(arg)).realObject;
+            }
+        }
+    }
+
+    <T> T makeProxy(Class<T> type, Class<?>[] interfaces) {
+        return (T) Proxy.newProxyInstance(McTester.class.getClassLoader(), interfaces, this);
     }
 
 
-    private static Class<?>[] getAllInterfaces(Class<?> clazz) {
+    protected static Class<?>[] getAllInterfaces(Class<?> clazz) {
         List<Class<?>> interfaces = ClassUtils.getAllInterfaces(clazz);
         if (clazz.isInterface()) {
             interfaces.add(clazz);
         }
-        return interfaces.toArray(new Class[0]);
+        return interfaces.stream().filter(i -> !i.getName().startsWith("net.minecraft")).toArray(Class[]::new);
         /*List<Class<?>> interfaces = new ArrayList<>();
         while (!clazz.equals(Object.class)) {
             interfaces.addAll(Arrays.asList(clazz.getInterfaces()));

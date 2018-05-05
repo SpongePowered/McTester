@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.mctester.internal.McTester;
@@ -43,6 +44,11 @@ public class ServerSideClientHandler implements Client {
     @Override
     public void lookAt(Vector3d targetPos) {
         this.proxyClient.lookAt(targetPos);
+    }
+
+    @Override
+    public void lookAt(Entity entity) {
+        this.proxyClient.lookAt(entity.getUniqueId());
     }
 
     @Override

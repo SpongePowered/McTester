@@ -25,6 +25,14 @@
 package org.spongepowered.mctester.internal;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.monster.Creeper;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationData;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationDataBuilder;
@@ -47,6 +55,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 @Plugin(
         id = "mctester",
@@ -86,6 +95,29 @@ public class McTester {
         if (Sponge.getPlatform().getExecutionType().equals(Platform.Type.CLIENT)) {
             Sponge.getDataManager().registerBuilder(RemoteInvocationData.class, new RemoteInvocationDataBuilder(ClientOnly.REAL_CLIENT_HANDLER));
         }
+
+        Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new CommandExecutor() {
+
+            @Override
+            public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        McTester.getThePlayer().lookAt(McTester.getThePlayer().getLocation().getPosition());
+                        Iterator<Entity> creepers = McTester.getThePlayer().getNearbyEntities(e -> e instanceof Creeper).iterator();
+                        if (creepers.hasNext()) {
+                            Entity creeper = creepers.next();
+
+                            //RealJUnitRunner.manager.client.lookAt(McTester.getThePlayer());
+                        }
+                    }
+                };
+
+                thread.start();
+
+                return CommandResult.success();
+            }
+        }).build(), "creeper");
     }
 
     public void sendToPlayer(MessageRPCRequest messageRPCRequest) {

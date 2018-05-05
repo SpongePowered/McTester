@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.Random;
 
@@ -26,6 +27,10 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
     @Shadow public abstract void launchIntegratedServer(String folderName, String worldName, @Nullable WorldSettings worldSettingsIn);
 
     @Shadow private volatile boolean running;
+
+    @Shadow protected abstract void clickMouse();
+
+    @Shadow protected abstract void rightClickMouse();
 
     @Redirect(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;serverName:Ljava/lang/String;", ordinal = 0))
     public String onGetServerName(Minecraft minecraft) {
@@ -45,7 +50,9 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
 
     @Redirect(method = "shutdownMinecraftApplet", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/asm/transformers/TerminalTransformer$ExitVisitor;systemExitCalled(I)V"))
     public void onSystemExitCalled(int code) {
-        // Do nothing - we want to exit cleanly through JUnit
+        // Notify any listenres that the game has closed, but don't actually
+        // call System.exit here. We want to let JUnit exit cleanly.
+        RunnerEvents.setGameClosed();
     }
 
     @Inject(method = "stopIntegratedServer", at = @At("HEAD"), cancellable = true)
@@ -59,6 +66,16 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
     @Override
     public boolean isRunning() {
         return this.running;
+    }
+
+    @Override
+    public void leftClick() {
+        this.clickMouse();
+    }
+
+    @Override
+    public void rightClick() {
+        this.rightClickMouse();
     }
 
 }

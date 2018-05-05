@@ -2,6 +2,7 @@ package org.spongepowered.mctester.internal.framework;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
@@ -45,9 +46,19 @@ public interface Client {
      * <p>This is equivalent to the user moving their mouse
      * to look at the targeted block. Accordingly, it will cause
      * {@link MoveEntityEvent}s to be fired.</p>
-     * @param targetPos
+     * @param targetPos The position to look at
      */
     void lookAt(Vector3d targetPos);
+
+    /**
+     * Causes the client to look at the specified entity.
+     *
+     * <p>This is equivalent to the user moving their mouse
+     * to look at the targeted entity. Accordingly, it will cause
+     * {@link MoveEntityEvent}s to be fired.</p>
+     * @param entity The entity to look at
+     */
+    void lookAt(Entity entity);
 
     /**
      * Causes the client to select the given hotbar slot.

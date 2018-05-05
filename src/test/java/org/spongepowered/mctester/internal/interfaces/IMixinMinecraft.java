@@ -4,4 +4,8 @@ public interface IMixinMinecraft {
 
     boolean isRunning();
 
+    void leftClick();
+
+    void rightClick();
+
 }

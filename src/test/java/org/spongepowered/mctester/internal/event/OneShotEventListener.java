@@ -22,36 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.internal;
+package org.spongepowered.mctester.internal.event;
 
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 
-public class OneShotEventListener<T extends Event> implements EventListener<T> {
+import java.util.concurrent.CompletableFuture;
 
-    public Class<T> eventClass;
-    public EventListener<? super T> listener;
-    public boolean handled;
+public class OneShotEventListener<T extends Event> extends ErrorPropagatingEventListener<T> {
+
+    public CompletableFuture<Long> handleStarted = new CompletableFuture<>();
+    public CompletableFuture<Void> handleFinished = new CompletableFuture<>();
     public AssertionError fakeError;
 
-    private ErrorSlot errorSlot;
-
     public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot, AssertionError fakeError) {
-        this.eventClass = eventClass;
-        this.listener = listener;
-        this.errorSlot = errorSlot;
+        super(eventClass, listener, errorSlot);
         this.fakeError = fakeError;
     }
 
     @Override
     public void handle(T event) throws Exception {
-        this.handled = true;
+        this.handleStarted.complete(System.currentTimeMillis());
         try {
             this.listener.handle(event);
         } catch (Throwable e) {
             this.errorSlot.setErrorIfUnset(e);
             throw e;
+        } finally {
+            this.handleFinished.complete(null);
         }
     }
 }

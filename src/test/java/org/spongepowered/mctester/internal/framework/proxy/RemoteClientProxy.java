@@ -19,7 +19,7 @@ public class RemoteClientProxy extends BaseProxy {
 
     public static RawClient newProxy(ProxyCallback callback) {
         RemoteClientProxy proxy = new RemoteClientProxy(McTester.INSTANCE.syncExecutor, callback);
-        return proxy.makeProxy(RawClient.class);
+        return proxy.makeProxy(RawClient.class, BaseProxy.getAllInterfaces(RawClient.class));
     }
 
     @Override

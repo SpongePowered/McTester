@@ -46,7 +46,7 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
             Class<?> paramType = paramTypes[i];
             Object rawParam = rawParams.get(i);
             if (rawParam instanceof DataView) {
-                finalParams.add(Utils.dataToArbitrary((DataView) rawParam, paramType));
+                finalParams.add(Utils.dataToArbitrary((DataView) rawParam, paramType).get());
             } else if (CatalogType.class.isAssignableFrom(paramType)) {
                 finalParams.add(Sponge.getRegistry().getType((Class) paramType, (String) rawParam).get());
             } else {

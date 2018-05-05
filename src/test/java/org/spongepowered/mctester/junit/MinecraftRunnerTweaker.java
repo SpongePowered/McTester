@@ -48,6 +48,7 @@ public class MinecraftRunnerTweaker implements ITweaker {
         // which JUnit Framework classes were already loaded
         classLoader.addClassLoaderExclusion("junit.");
         classLoader.addClassLoaderExclusion("org.junit.");
+        classLoader.addClassLoaderExclusion("org.hamcrest");
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.mctester.json");
     }

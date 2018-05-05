@@ -102,6 +102,54 @@ public interface TestUtils {
     <T extends Event> EventListener<T> listenOneShot(Class<T> eventClass, EventListener<? super T> listener);
 
     /**
+     * Registers an event listener. This behaves like a regular Sponge event listener,
+     * with one difference
+     *
+     * - Any exceptions thrown by the handler are treated as a test failure. This
+     *   allows you to use {@link Assert} and friends as usual.
+     *
+     * It us usually preferrable to use either this method or {@link #listenOneShot(Class, EventListener)}
+     * instead of using {@link EventManager} directly. These methods ensure that any exceptions
+     * thrown by listeners result in a test failure. Any exceptions thrown
+     * by normal listeners are logged, but otherwise ignored.
+     *
+     * This method is useful for verifying that certain client interaction (e.g. clicking
+     * a block) causes a Sponge event to be fired.
+     *
+     * If you want to unregister this listener, make sure to use the returned {@link EventListener},
+     * **not** the oen you passed as a parameter.
+     *
+     * @param eventClass The event class to listen for
+     * @param listener The event listener to register
+     * @return The event listener that was registerd with Sponge. This is *not* the same
+     * as {@param listener}. If you want to unregister your listener, use the return
+     * value of this method with {@link EventManager#unregisterListeners(Object)}.
+     */
+    <T extends Event> EventListener<T> listen(Class<T> eventClass, EventListener<? super T> listener);
+
+    /**
+     * Registers the specified event listener, and waits at most {@param ticks} for it to fire.
+     *
+     * <p>This method can be though of as a combination of {@link #listenOneShot(Class, EventListener)}
+     * and {@link #sleepTicks(int)}. Like {@link #listenOneShot(Class, EventListener)},
+     * this method will cause a test failure if the provided listener does not execute.
+     * However, up to and including {@param ticks} ticks are allowed to elapse for the listener
+     * runs.</p>
+     *
+     * <p>If the listener executes before the specified number of ticks have elapsed,
+     * this method will return early. The number of remaining ticks will be returned.</p>
+     *
+     * <p>The specified listener is automatically unregistered before this method returns./p>
+     *
+     * @param eventClass The class of the event to listen for
+     * @param listener The listener to register
+     * @param ticks The maximum number of ticks to wait for the listener to fire
+     * @return The number of ticks remaining when the listener returned. This will be at most,
+     * {@param ticks}, and at least 0. Note that this is an estimate.
+     */
+    <T extends Event> int listenTimeout(Class<T> eventClass, EventListener<? super T> listener, int ticks) throws Throwable;
+
+    /**
      * Runs a {@link Callable} on the main thread, returning this result.
      *
      * <p>This method is provided as a performance optimization. It is completely optional:
@@ -179,4 +227,27 @@ public interface TestUtils {
      * </p>
      */
     void waitForInventoryPropagation();
+
+    /**
+     * Waits for any server-side entity spawns to propagate to the client.
+     *
+     * <p>This method should be used after </p>
+     * <p>See {@link #waitForInventoryPropagation()} for more details.</p>
+     */
+    void waitForEntitySpawn();
+
+    /**
+     * Waits for the longest-possible propagation to occur.
+     *
+     * <p>This method can be used when combining two actions
+     * that each have a corresponding 'wait' method.
+     *
+     * For example, setting an item in the player's inventory and
+     * spawning a cow would normally require two separate wait calls
+     * - one to {@link #waitForInventoryPropagation}, and one to
+     * {@link #waitForEntitySpawn()}. Instead, {@link #waitForAll()}}
+     * can be used to ensure that any pending updates have been
+     * sent to the client.</p>
+     */
+    void waitForAll();
 }
