@@ -25,6 +25,7 @@
 package org.spongepowered.mctester.junit;
 
 import net.minecraft.launchwrapper.ITweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
@@ -60,6 +61,7 @@ public class MinecraftRunnerTweaker implements ITweaker {
 
     @Override
     public String[] getLaunchArguments() {
+        RunnerEvents.setLaunchClassLoaderFuture(Launch.classLoader);
         return new String[0];
     }
 }

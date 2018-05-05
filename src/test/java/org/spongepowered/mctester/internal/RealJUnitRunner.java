@@ -13,6 +13,7 @@ import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.junit.DefaultMinecraftRunnerOptions;
 import org.spongepowered.mctester.junit.IJunitRunner;
+import org.spongepowered.mctester.junit.MinecraftRunner;
 import org.spongepowered.mctester.junit.MinecraftRunnerOptions;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.junit.RunnerEvents;
@@ -23,9 +24,16 @@ import java.util.stream.Collectors;
 
 public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner {
 
-    public static TesterManager manager = new TesterManager();
+    public static boolean shutdownMinecraftOnFinish = true;
+
+    private TesterManager manager;
     private MinecraftRunnerOptions options;
     private Thread testThread = Thread.currentThread();
+    private boolean initialized;
+
+    static {
+        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler());
+    }
 
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
@@ -38,6 +46,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         if (this.options == null) {
             this.options = new DefaultMinecraftRunnerOptions();
         }
+        RealJUnitRunner.shutdownMinecraftOnFinish &= this.options.exitMinecraftOnFinish();
     }
 
 
@@ -51,12 +60,18 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         // ForceShutdownHandler intercepts ExitTrappedException that will eventually be thrown
         // by JUnit attemping to shut down the VM. It forcible terminates the VM
         // through our TerminateVM class, which bypasses FMLSecurityManager
-        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler());
 
-        if (this.options.exitMinecraftOnFinish()) {
+        // We keep the game open if at least one test doesn't want to shut it down
+        /*if (this.options.exitMinecraftOnFinish()) {
             this.shutDownMinecraft();
-        } else {
-            RunnerEvents.waitForGameClosed();
+        }*/
+    }
+
+    private void performInit() {
+        if (!this.initialized) {
+            RunnerEvents.waitForPlayerJoin();
+            this.manager = new TesterManager();
+            this.initialized = true;
         }
     }
 
@@ -101,6 +116,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public Object createTest() throws Exception {
+        this.performInit();
         Object object = getTestClass().getOnlyConstructor().newInstance(this.manager);
         return object;
     }

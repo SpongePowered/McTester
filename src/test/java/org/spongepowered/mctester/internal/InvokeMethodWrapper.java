@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.internal;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 import org.junit.internal.runners.statements.InvokeMethod;
 import org.junit.runners.model.FrameworkMethod;
@@ -16,7 +17,11 @@ public class InvokeMethodWrapper extends InvokeMethod {
     @Override
     public void evaluate() throws Throwable {
         this.errorSlot.clear();
-        super.evaluate();
+        try {
+            super.evaluate();
+        } finally {
+            Sponge.getEventManager().unregisterPluginListeners(McTesterDummy.INSTANCE);
+        }
         errorSlot.throwIfSet();
     }
 }

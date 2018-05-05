@@ -25,11 +25,13 @@
 package org.spongepowered.mctester.junit;
 
 import com.google.common.util.concurrent.SettableFuture;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class RunnerEvents {
 
     private static SettableFuture<Void> playerJoined = SettableFuture.create();
     private static SettableFuture<Void> gameClosed = SettableFuture.create();
+    private static SettableFuture<LaunchClassLoader> launchClassLoaderFuture = SettableFuture.create();
 
     public static void waitForPlayerJoin() {
         try {
@@ -57,6 +59,18 @@ public class RunnerEvents {
 
     public static void setGameClosed() {
         gameClosed.set(null);
+    }
+
+    public static LaunchClassLoader waitForLaunchClassLoaderFuture() {
+        try {
+            return launchClassLoaderFuture.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void setLaunchClassLoaderFuture(LaunchClassLoader launchClassLoader) {
+        launchClassLoaderFuture.set(launchClassLoader);
     }
 
 }

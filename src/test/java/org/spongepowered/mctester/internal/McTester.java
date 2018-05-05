@@ -34,6 +34,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Creeper;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationData;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationDataBuilder;
 import org.spongepowered.mctester.internal.message.ClientDelegateHandler;
@@ -72,6 +73,8 @@ public class McTester {
     @Inject
     public volatile Logger logger;
 
+    @Inject
+    @SynchronousExecutor
     public SpongeExecutorService syncExecutor;
 
     public volatile ChannelBinding.IndexedMessageChannel channel;
@@ -83,7 +86,6 @@ public class McTester {
 
     @Listener
     public void onInit(GameInitializationEvent event) {
-        this.syncExecutor = Sponge.getScheduler().createSyncExecutor(this);
         this.channel = Sponge.getChannelRegistrar().createChannel(this, "mctester");
 
         ClientDelegateHandler clientDelegateHandler = new ClientDelegateHandler();

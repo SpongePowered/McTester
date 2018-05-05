@@ -25,6 +25,7 @@
 package org.spongepowered.mctester.junit;
 
 import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.junit.runner.notification.RunNotifier;
@@ -45,7 +46,7 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	// We deliberately don't set the type to RealJunitRunner, since we load it
 	// on the LaunchClassLoader
 	private static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
-	private static IJunitRunner realJUnitRunner;
+	private IJunitRunner realJUnitRunner;
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
 		super(initializeServer(testClass));
@@ -53,20 +54,9 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	// This is done like this just so that we can run stuff before invoking the parent constructor
 	private static Class<?> initializeServer(Class<?> testClass) throws InitializationError {
-		String existing = System.getProperty("fml.coreMods.load");
-		if (existing == null) {
-			existing = "";
-		}
-
-		System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
 		try {
-			if (!starter.isRunning()) {
-				starter.startServer();
-				starter.waitForServerStartupCompletion();
-			}
+			starter.startServer();
 
-			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, Launch.classLoader);
-			realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 		} catch (Throwable e) {
 			throw new InitializationError(e);
 		}
@@ -85,6 +75,14 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	public TestClass createTestClass(Class<?> testClass) {
+		try {
+			LaunchClassLoader classLoader = RunnerEvents.waitForLaunchClassLoaderFuture();
+			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, classLoader);
+			this.realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		return realJUnitRunner.createTestClass(testClass);
 	}
 

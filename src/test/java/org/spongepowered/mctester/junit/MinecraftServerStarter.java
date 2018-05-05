@@ -37,6 +37,7 @@ public class MinecraftServerStarter {
 	private LaunchClassLoader minecraftServerClassLoader;
 
 	private static MinecraftServerStarter INSTANCE = new MinecraftServerStarter();
+	private boolean started;
 
 	public static MinecraftServerStarter INSTANCE() {
 		return INSTANCE;
@@ -52,6 +53,18 @@ public class MinecraftServerStarter {
 	 * @throws Throwable
 	 */
 	public void startServer() throws Throwable {
+	    if (this.started) {
+	        return;
+        }
+
+	    this.started = true;
+        String existing = System.getProperty("fml.coreMods.load");
+        if (existing == null) {
+            existing = "";
+        }
+
+        System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
+
 		String[] args = new String[] { "--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir", "/home/aaron/repos/sponge/dev/run/mctester" };
 		// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
 		//new GradleStartTestServer().launch(args);
@@ -77,7 +90,7 @@ public class MinecraftServerStarter {
 	}
 
 	public ClassLoader getMinecraftServerClassLoader() {
-		checkIfStarted();
+	    RunnerEvents.waitForLaunchClassLoaderFuture();
 		return internalGetMinecraftServerClassLoader();
 	}
 
@@ -88,14 +101,13 @@ public class MinecraftServerStarter {
 		return minecraftServerClassLoader;
 	}
 
-	private void checkIfStarted() throws IllegalStateException {
-		if (!isRunning()) {
-			throw new IllegalStateException("Minecraft Server has not yet started (or already shut down)");
-		}
-	}
 
 	public boolean isRunning() {
 		return RunnerEvents.hasPlayerJoined();
 	}
+
+	public boolean hasStarted() {
+	    return this.started;
+    }
 
 }

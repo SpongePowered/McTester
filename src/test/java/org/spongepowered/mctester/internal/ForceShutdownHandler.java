@@ -26,6 +26,7 @@ package org.spongepowered.mctester.internal;
 
 import org.spongepowered.mctester.internal.TerminateVM;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
+import org.spongepowered.mctester.junit.RunnerEvents;
 
 public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
 
@@ -34,11 +35,18 @@ public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
         if (throwable instanceof FMLSecurityManager.ExitTrappedException) {
             // Try and stop us now, FML!
             System.err.println("FMLSecurityManager tried to stop VM from exiting, bypassing...");
+            if (!RealJUnitRunner.shutdownMinecraftOnFinish) {
+                System.err.println("Waiting for Minecraft to close...");
+                RunnerEvents.waitForGameClosed();
+            }
             // Unfortunately, we have no way of getting the real fakeError code.
             // Since this class should only be used in a test environment, returing '0'
             // shouldn't be *too* bad - any test errors should have been recorded separately.
             TerminateVM.terminate("net.minecraftforge.fml", 0);
             //this.doShutdown(0);
+        } else {
+            System.err.println("Uncaught exception!!!");
+            throwable.printStackTrace();
         }
     }
 

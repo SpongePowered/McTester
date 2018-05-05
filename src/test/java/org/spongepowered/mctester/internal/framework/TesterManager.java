@@ -2,6 +2,7 @@ package org.spongepowered.mctester.internal.framework;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.mctester.internal.McTesterDummy;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.event.ErrorPropagatingEventListener;
@@ -78,7 +79,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         error.fillInStackTrace();
 
         OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
-        Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, oneShot);
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, oneShot);
         this.listeners.add(oneShot);
 
         return oneShot;
@@ -87,7 +88,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     @Override
     public <T extends Event> EventListener<T> listen(Class<T> eventClass, EventListener<? super T> listener) {
         ErrorPropagatingEventListener<T> newListener = new ErrorPropagatingEventListener<>(eventClass, listener, this.errorSlot);
-        Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, newListener);
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, newListener);
         return newListener;
     }
 
@@ -97,7 +98,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         error.fillInStackTrace();
 
         OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
-        Sponge.getEventManager().registerListener(McTester.INSTANCE, eventClass, oneShot);
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, oneShot);
 
         // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
         // At the end of this method, we wait for handleFinished to ensure
@@ -105,7 +106,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         CompletableFuture<Long> handledFuture = oneShot.handleStarted;
         CompletableFuture<Void> timeoutFuture = new CompletableFuture<>();
         long startTime = System.currentTimeMillis();
-        Task task = Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(() -> timeoutFuture.complete(null)).submit(McTester.INSTANCE);
+        Task task = Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(() -> timeoutFuture.complete(null)).submit(McTesterDummy.INSTANCE);
 
         // Blocking
         Object result = null;
@@ -141,7 +142,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         }
 
         try {
-            return McTester.INSTANCE.syncExecutor.schedule(callable, 0, TimeUnit.SECONDS).get();
+            return McTesterDummy.INSTANCE.syncExecutor.schedule(callable, 0, TimeUnit.SECONDS).get();
         } catch (ExecutionException e) {
             throw e.getCause();
         }
@@ -165,7 +166,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
             throw new IllegalStateException("Can't call TestUtils.sleepTicks from the main thread!");
         }
         FutureTask<?> task = new FutureTask<>((() -> {}), null);
-        Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(task).submit(McTester.INSTANCE);
+        Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(task).submit(McTesterDummy.INSTANCE);
         try {
             task.get();
         } catch (Exception e) {
