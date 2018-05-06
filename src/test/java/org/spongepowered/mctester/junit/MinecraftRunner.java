@@ -38,6 +38,25 @@ import java.util.List;
 /**
  * JUnit Runner which runs tests inside the ClassLoader of the Minecraft Server.
  *
+ * The {@link MinecraftRunnerOptions} can be used to configure
+ * the runner
+ *
+ * The follow system properties affect the behavior of all MinecraftRunners:
+ *
+ * - 'mctester.gamedir' - sets the base directory for running the client. Equivalent
+ *   to the '~/.minecraft' directory. Defaults to /tmp/mctester/gamedir
+ *
+ * - 'mctester.shutdownOnSuccess' - whether or not to shut down Minecraft
+ *   automatically if all MinecraftRunner tests pass. Defaults to 'true'
+ *
+ * - 'mctester.shutdownOnFailure' - whether or not to shut down Minecraft
+ *   automatically if at least one MinecraftRunner test failed. Defaults to 'true'
+ *
+ * - 'mctester.shutdownOnError' - whether ot not to shut down Minecraft
+ *   automatically if JUnit did not complete normally due to an unexpected error.
+ *   Defaults to 'true'
+ *
+ *
  * @author Michael Vorburger
  * @author Aaron1011
  */

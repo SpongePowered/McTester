@@ -30,34 +30,47 @@ import org.spongepowered.mctester.junit.RunnerEvents;
 
 public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
 
+    private final FailureDetector failureDetector;
+
+    public ForceShutdownHandler(FailureDetector failureDetector) {
+        this.failureDetector = failureDetector;
+    }
+
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
         if (throwable instanceof FMLSecurityManager.ExitTrappedException) {
             // Try and stop us now, FML!
             System.err.println("FMLSecurityManager tried to stop VM from exiting, bypassing...");
-            if (!RealJUnitRunner.shutdownMinecraftOnFinish) {
-                System.err.println("Waiting for Minecraft to close...");
-                RunnerEvents.waitForGameClosed();
+
+            if (failureDetector.succeeded.orElse(false)) { // If we succeeded
+                if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnSuccess()) {
+                    this.waitForClose("tests succeeded");
+                }
+                this.doShutdown(0);
+            } else if (!failureDetector.succeeded.orElse(true)) { // If we failed
+                if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnFailure()) {
+                    this.waitForClose("tests failed");
+                }
+                this.doShutdown(-1);
+            } else { // If we errored
+                if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnError()) {
+                    this.waitForClose("JUnit unexpecetedly errored");
+                }
+                this.doShutdown(-2);
             }
-            // Unfortunately, we have no way of getting the real fakeError code.
-            // Since this class should only be used in a test environment, returing '0'
-            // shouldn't be *too* bad - any test errors should have been recorded separately.
-            TerminateVM.terminate("net.minecraftforge.fml", 0);
-            //this.doShutdown(0);
         } else {
             System.err.println("Uncaught exception!!!");
             throwable.printStackTrace();
         }
     }
 
+    private void waitForClose(String message) {
+        System.err.println("Waiting for Minecraft to close because " + message);
+        RunnerEvents.waitForGameClosed();
+    }
+
     private void doShutdown(int code) {
-        try {
-            Class.forName("java.lang.Shutdown").getDeclaredMethod("exit", int.class).invoke(null, code);
-        } catch (Exception e) {
-            // what can i do
-            System.err.println("Unable to forcibly shutdown the VM. Giving up and throwing ThreadDeath");
-            e.printStackTrace();
-            throw new ThreadDeath();
-        }
+        // Unfortunately, we have no way of getting the real fakeError code.
+        TerminateVM.terminate("net.minecraftforge.fml", code);
     }
 }

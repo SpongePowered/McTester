@@ -26,6 +26,7 @@ package org.spongepowered.mctester.junit;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.spongepowered.mctester.internal.RealJUnitRunner;
 
 /**
  * Helper to programmatically manage a Minecraft server.
@@ -65,7 +66,7 @@ public class MinecraftServerStarter {
 
         System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
 
-		String[] args = new String[] { "--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir", "/home/aaron/repos/sponge/dev/run/mctester" };
+		String[] args = new String[] { "--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir", RealJUnitRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
 		// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
 		//new GradleStartTestServer().launch(args);
 		Class clazz = Class.forName("GradleStart");
@@ -80,15 +81,6 @@ public class MinecraftServerStarter {
 		wrapperThread.start();
 	}
 
-	/**
-	 * Waits for Minecraft Server to have successfully fully started.
-	 *
-	 * @throws Throwable
-	 */
-	public void waitForServerStartupCompletion() throws Throwable {
-		RunnerEvents.waitForPlayerJoin();
-	}
-
 	public ClassLoader getMinecraftServerClassLoader() {
 	    RunnerEvents.waitForLaunchClassLoaderFuture();
 		return internalGetMinecraftServerClassLoader();
@@ -100,14 +92,5 @@ public class MinecraftServerStarter {
 		}
 		return minecraftServerClassLoader;
 	}
-
-
-	public boolean isRunning() {
-		return RunnerEvents.hasPlayerJoined();
-	}
-
-	public boolean hasStarted() {
-	    return this.started;
-    }
 
 }

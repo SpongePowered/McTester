@@ -30,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class RunnerEvents {
 
+    private static CompletableFuture<Void> clientInitialized = new CompletableFuture<>();
     private static CompletableFuture<Void> playerJoined = new CompletableFuture<>();
     private static CompletableFuture<Void> gameClosed = new CompletableFuture<>();
     private static CompletableFuture<LaunchClassLoader> launchClassLoaderFuture = new CompletableFuture<>();
@@ -44,6 +45,13 @@ public class RunnerEvents {
 
     public static void setPlayerJoined() {
         playerJoined.complete(null);
+    }
+
+    public static void resetPlayerJoined() {
+        if (!playerJoined.isDone()) {
+            return;
+        }
+        playerJoined = new CompletableFuture<>();
     }
 
     public static boolean hasPlayerJoined() {
@@ -72,6 +80,18 @@ public class RunnerEvents {
 
     public static void setLaunchClassLoaderFuture(LaunchClassLoader launchClassLoader) {
         launchClassLoaderFuture.complete(launchClassLoader);
+    }
+
+    public static void waitForClientInit() {
+        try {
+            clientInitialized.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void setClientInit() {
+        clientInitialized.complete(null);
     }
 
 }

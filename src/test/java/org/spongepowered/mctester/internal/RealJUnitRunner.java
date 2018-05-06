@@ -1,39 +1,46 @@
 package org.spongepowered.mctester.internal;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.Futures;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.world.GameType;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
-import org.spongepowered.api.Game;
-import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.junit.DefaultMinecraftRunnerOptions;
 import org.spongepowered.mctester.junit.IJunitRunner;
-import org.spongepowered.mctester.junit.MinecraftRunner;
 import org.spongepowered.mctester.junit.MinecraftRunnerOptions;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.junit.RunnerEvents;
+import org.spongepowered.mctester.junit.UseSeparateWorld;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner {
 
-    public static boolean shutdownMinecraftOnFinish = true;
+    public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
 
     private TesterManager manager;
     private MinecraftRunnerOptions options;
     private Thread testThread = Thread.currentThread();
     private boolean initialized;
-
-    static {
-        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler());
-    }
+    private File gamedir;
+    private String currentWorld;
+    private FailureDetector failureDetector = new FailureDetector();
 
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
@@ -42,17 +49,86 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
      */
     public RealJUnitRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
+
         this.options = testClass.getAnnotation(MinecraftRunnerOptions.class);
         if (this.options == null) {
             this.options = new DefaultMinecraftRunnerOptions();
         }
-        RealJUnitRunner.shutdownMinecraftOnFinish &= this.options.exitMinecraftOnFinish();
+    }
+
+    public void joinNewWorld() {
+        this.exitToMainMenu();
+
+        try {
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+
+                @Override
+                public void run() {
+                    long seed = new Random().nextLong();
+                    RealJUnitRunner.this.currentWorld = "MCTestWorld-" + String.valueOf(seed).substring(0, 5);
+
+                    WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
+                    Minecraft.getMinecraft().launchIntegratedServer(RealJUnitRunner.this.currentWorld, RealJUnitRunner.this.currentWorld, worldsettings);
+                }
+            }).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void exitToMainMenu() {
+        // We deliberately avoid using Minecraft.addScheduledTask here.
+        //
+        // When we call World.sendQuittingDisconnectingPacket,
+        // the client thread will block waiting for the Netty channel
+        // to close.
+        //
+        // The client controls all access to its scheduledTasks list -
+        // both adding and executing tasks - with
+        // a synchronized(Minecraft.scheduledTasks) block
+        //
+        // If we call sendQuittingDisconnectingPacket in a scheduled
+        // task, we'll end up blcoking on the channel closure while
+        // in a synchronized(Minecraft.scheduledTasks). However, the
+        // Netty client thread can also enter a synchronized(Minecraft.scheduledTasks)
+        // block, since it schedulers packet handlers on the main thread.
+        // This means that we can very easily end up with a deadlock
+        // if the Netty thread tries to process a packet while we're
+        // waiting for the channel to close
+        //
+        // To avoid the deadlock, we do what Vanilla does - call
+        // sendQuittingDisconnectingPacket from a GUI.
+        // In Vanilla, this is either a GuiGameOver or a GuiInGameOMenu
+        // Here, we create a simple GuiScreen subclass to run our code
+        // on the client thread.
+        CompletableFuture<Void> atMainMenu = new CompletableFuture<>();
+        Minecraft.getMinecraft().displayGuiScreen(new GuiScreen() {
+            @Override
+            public void updateScreen() {
+
+                if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
+                    Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
+                    Minecraft.getMinecraft().loadWorld((WorldClient) null);
+                }
+
+                Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
+                atMainMenu.complete(null);
+            }
+        });
+
+        Futures.getUnchecked(atMainMenu);
+        RunnerEvents.resetPlayerJoined();
     }
 
 
     @Override
     public void run(RunNotifier notifier) {
+        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.failureDetector));
+        notifier.addListener(this.failureDetector);
+
         super.run(notifier);
+        this.exitToMainMenu();
 
         // We want JUnit to shut down the VM, not Minecraft, so
         // we need to bypass FMLSecurityManager
@@ -69,7 +145,11 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     private void performInit() {
         if (!this.initialized) {
+            RunnerEvents.waitForClientInit();
+
+            this.joinNewWorld();
             RunnerEvents.waitForPlayerJoin();
+
             this.manager = new TesterManager();
             this.initialized = true;
         }
@@ -123,6 +203,10 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public Statement methodInvoker(FrameworkMethod method, Object test) {
+        if (method.getAnnotation(UseSeparateWorld.class) != null) {
+            System.err.println("Creating new world for: " + method.getMethod());
+            this.joinNewWorld();
+        }
         return new InvokeMethodWrapper(method, test, this.manager.errorSlot);
     }
 }

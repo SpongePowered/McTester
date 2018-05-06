@@ -5,11 +5,6 @@ import java.lang.annotation.Annotation;
 public class DefaultMinecraftRunnerOptions implements MinecraftRunnerOptions {
 
     @Override
-    public boolean exitMinecraftOnFinish() {
-        return true;
-    }
-
-    @Override
     public boolean deleteWorldOnSuccess() {
         return true;
     }

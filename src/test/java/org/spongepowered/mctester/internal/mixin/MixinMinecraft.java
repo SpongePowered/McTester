@@ -3,10 +3,7 @@ package org.spongepowered.mctester.internal.mixin;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,8 +11,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.mctester.junit.RunnerEvents;
-
-import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +27,12 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
 
     @Shadow protected abstract void rightClickMouse();
 
-    @Redirect(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;serverName:Ljava/lang/String;", ordinal = 0))
+    @Inject(method = "init", at = @At(value = "RETURN"))
+    public void onInitDone(CallbackInfo ci) {
+        RunnerEvents.setClientInit();
+    }
+
+    /*@Redirect(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;serverName:Ljava/lang/String;", ordinal = 0))
     public String onGetServerName(Minecraft minecraft) {
         return "blah";
     }
@@ -46,7 +46,7 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
 
         WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
         this.launchIntegratedServer(folderName, folderName, worldsettings);
-    }
+    }*/
 
     @Redirect(method = "shutdownMinecraftApplet", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/asm/transformers/TerminalTransformer$ExitVisitor;systemExitCalled(I)V"))
     public void onSystemExitCalled(int code) {
