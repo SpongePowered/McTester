@@ -2,7 +2,7 @@ package org.spongepowered.mctester.junit;
 
 import java.lang.annotation.Annotation;
 
-public class DefaultMinecraftRunnerOptions implements MinecraftRunnerOptions {
+public class DefaultWorldOptions implements WorldOptions {
 
     @Override
     public boolean deleteWorldOnSuccess() {
@@ -16,6 +16,6 @@ public class DefaultMinecraftRunnerOptions implements MinecraftRunnerOptions {
 
     @Override
     public Class<? extends Annotation> annotationType() {
-        return MinecraftRunnerOptions.class;
+        return WorldOptions.class;
     }
 }

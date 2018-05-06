@@ -24,16 +24,27 @@
  */
 package org.spongepowered.mctester.internal;
 
-import org.spongepowered.mctester.internal.TerminateVM;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 import org.spongepowered.mctester.junit.RunnerEvents;
 
+
+// We want JUnit to shut down the VM, not Minecraft, so
+// we need to bypass FMLSecurityManager
+
+// ForceShutdownHandler intercepts ExitTrappedException that will eventually be thrown
+// by JUnit attemping to shut down the VM. It forcible terminates the VM
+// through our TerminateVM class, which bypasses FMLSecurityManager
+
+// We keep the game open if at least one test doesn't want to shut it down
+        /*if (this.options.exitMinecraftOnFinish()) {
+            this.shutDownMinecraft();
+        }*/
 public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
 
-    private final FailureDetector failureDetector;
+    private final TestStatus testStatus;
 
-    public ForceShutdownHandler(FailureDetector failureDetector) {
-        this.failureDetector = failureDetector;
+    public ForceShutdownHandler(TestStatus testStatus) {
+        this.testStatus = testStatus;
     }
 
     @Override
@@ -42,22 +53,23 @@ public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
             // Try and stop us now, FML!
             System.err.println("FMLSecurityManager tried to stop VM from exiting, bypassing...");
 
-            if (failureDetector.succeeded.orElse(false)) { // If we succeeded
+            if (testStatus.succeeded()) {
                 if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnSuccess()) {
                     this.waitForClose("tests succeeded");
                 }
                 this.doShutdown(0);
-            } else if (!failureDetector.succeeded.orElse(true)) { // If we failed
+            } else if (testStatus.failed()) {
                 if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnFailure()) {
                     this.waitForClose("tests failed");
                 }
                 this.doShutdown(-1);
-            } else { // If we errored
+            }
+            /*} else if (testStatus.errored()) {
                 if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnError()) {
                     this.waitForClose("JUnit unexpecetedly errored");
                 }
                 this.doShutdown(-2);
-            }
+            }*/
         } else {
             System.err.println("Uncaught exception!!!");
             throwable.printStackTrace();

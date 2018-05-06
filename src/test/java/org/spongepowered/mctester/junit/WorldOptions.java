@@ -7,9 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Inherited
-public @interface MinecraftRunnerOptions {
+public @interface WorldOptions {
 
     /**
      * Whether or not to delete the temporary world if all tests run successfully

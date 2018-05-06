@@ -22,4 +22,8 @@ public class ErrorSlot {
         }
     }
 
+    public Throwable getStored() {
+        return this.error;
+    }
+
 }

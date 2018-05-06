@@ -24,6 +24,7 @@
  */
 package org.spongepowered.mctester.junit;
 
+import com.google.common.util.concurrent.Futures;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.util.concurrent.CompletableFuture;
@@ -36,11 +37,7 @@ public class RunnerEvents {
     private static CompletableFuture<LaunchClassLoader> launchClassLoaderFuture = new CompletableFuture<>();
 
     public static void waitForPlayerJoin() {
-        try {
-            playerJoined.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Futures.getUnchecked(playerJoined);
     }
 
     public static void setPlayerJoined() {
@@ -59,11 +56,7 @@ public class RunnerEvents {
     }
 
     public static void waitForGameClosed() {
-        try {
-            gameClosed.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Futures.getUnchecked(gameClosed);
     }
 
     public static void setGameClosed() {
@@ -71,11 +64,7 @@ public class RunnerEvents {
     }
 
     public static LaunchClassLoader waitForLaunchClassLoaderFuture() {
-        try {
-            return launchClassLoaderFuture.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return Futures.getUnchecked(launchClassLoaderFuture);
     }
 
     public static void setLaunchClassLoaderFuture(LaunchClassLoader launchClassLoader) {
@@ -83,11 +72,7 @@ public class RunnerEvents {
     }
 
     public static void waitForClientInit() {
-        try {
-            clientInitialized.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Futures.getUnchecked(clientInitialized);
     }
 
     public static void setClientInit() {

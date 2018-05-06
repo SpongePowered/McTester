@@ -24,7 +24,6 @@
  */
 package org.spongepowered.mctester.junit;
 
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -38,7 +37,7 @@ import java.util.List;
 /**
  * JUnit Runner which runs tests inside the ClassLoader of the Minecraft Server.
  *
- * The {@link MinecraftRunnerOptions} can be used to configure
+ * The {@link WorldOptions} can be used to configure
  * the runner
  *
  * The follow system properties affect the behavior of all MinecraftRunners:

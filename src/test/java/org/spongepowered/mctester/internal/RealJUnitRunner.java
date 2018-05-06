@@ -1,14 +1,7 @@
 package org.spongepowered.mctester.internal;
 
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.world.GameType;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -16,31 +9,37 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.internal.framework.TesterManager;
-import org.spongepowered.mctester.junit.DefaultMinecraftRunnerOptions;
+import org.spongepowered.mctester.internal.world.CurrentWorld;
+import org.spongepowered.mctester.junit.DefaultWorldOptions;
 import org.spongepowered.mctester.junit.IJunitRunner;
-import org.spongepowered.mctester.junit.MinecraftRunnerOptions;
+import org.spongepowered.mctester.junit.WorldOptions;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.junit.RunnerEvents;
 import org.spongepowered.mctester.junit.UseSeparateWorld;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner {
+public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner, InvokerCallback, StatusCallback {
 
     public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
 
     private TesterManager manager;
-    private MinecraftRunnerOptions options;
+    private WorldOptions options;
     private Thread testThread = Thread.currentThread();
     private boolean initialized;
     private File gamedir;
-    private String currentWorld;
-    private FailureDetector failureDetector = new FailureDetector();
+    private CurrentWorld currentWorld;
+    private TestStatus testStatus = new TestStatus(this);
+    private List<CurrentWorld> tempWorlds = new ArrayList<>();
+    private boolean inTempWorld;
+
+    private static final String MCTESTER_WORLD_BASE = "MCTester-";
+    private static final String NORMAL_WORLD_PREFIX = MCTESTER_WORLD_BASE + "Normal-";
+    private static final String CUSTOM_WORLD_PREFIX = MCTESTER_WORLD_BASE + "Custom-";
 
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
@@ -50,97 +49,39 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     public RealJUnitRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
 
-        this.options = testClass.getAnnotation(MinecraftRunnerOptions.class);
+        this.options = testClass.getAnnotation(WorldOptions.class);
         if (this.options == null) {
-            this.options = new DefaultMinecraftRunnerOptions();
+            this.options = new DefaultWorldOptions();
         }
-    }
-
-    public void joinNewWorld() {
-        this.exitToMainMenu();
-
-        try {
-            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-
-                @Override
-                public void run() {
-                    long seed = new Random().nextLong();
-                    RealJUnitRunner.this.currentWorld = "MCTestWorld-" + String.valueOf(seed).substring(0, 5);
-
-                    WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
-                    Minecraft.getMinecraft().launchIntegratedServer(RealJUnitRunner.this.currentWorld, RealJUnitRunner.this.currentWorld, worldsettings);
-                }
-            }).get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    private void exitToMainMenu() {
-        // We deliberately avoid using Minecraft.addScheduledTask here.
-        //
-        // When we call World.sendQuittingDisconnectingPacket,
-        // the client thread will block waiting for the Netty channel
-        // to close.
-        //
-        // The client controls all access to its scheduledTasks list -
-        // both adding and executing tasks - with
-        // a synchronized(Minecraft.scheduledTasks) block
-        //
-        // If we call sendQuittingDisconnectingPacket in a scheduled
-        // task, we'll end up blcoking on the channel closure while
-        // in a synchronized(Minecraft.scheduledTasks). However, the
-        // Netty client thread can also enter a synchronized(Minecraft.scheduledTasks)
-        // block, since it schedulers packet handlers on the main thread.
-        // This means that we can very easily end up with a deadlock
-        // if the Netty thread tries to process a packet while we're
-        // waiting for the channel to close
-        //
-        // To avoid the deadlock, we do what Vanilla does - call
-        // sendQuittingDisconnectingPacket from a GUI.
-        // In Vanilla, this is either a GuiGameOver or a GuiInGameOMenu
-        // Here, we create a simple GuiScreen subclass to run our code
-        // on the client thread.
-        CompletableFuture<Void> atMainMenu = new CompletableFuture<>();
-        Minecraft.getMinecraft().displayGuiScreen(new GuiScreen() {
-            @Override
-            public void updateScreen() {
-
-                if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
-                    Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
-                    Minecraft.getMinecraft().loadWorld((WorldClient) null);
-                }
-
-                Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
-                atMainMenu.complete(null);
-            }
-        });
-
-        Futures.getUnchecked(atMainMenu);
-        RunnerEvents.resetPlayerJoined();
+        this.currentWorld = new CurrentWorld();
     }
 
 
     @Override
     public void run(RunNotifier notifier) {
-        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.failureDetector));
-        notifier.addListener(this.failureDetector);
-
+        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.testStatus));
+        notifier.addListener(this.testStatus);
         super.run(notifier);
-        this.exitToMainMenu();
+    }
 
-        // We want JUnit to shut down the VM, not Minecraft, so
-        // we need to bypass FMLSecurityManager
+    @Override
+    public void onFinished() {
+        if (this.shouldDeleteWorld()) {
+            this.currentWorld.deleteWorld();
+        }
 
-        // ForceShutdownHandler intercepts ExitTrappedException that will eventually be thrown
-        // by JUnit attemping to shut down the VM. It forcible terminates the VM
-        // through our TerminateVM class, which bypasses FMLSecurityManager
+    }
 
-        // We keep the game open if at least one test doesn't want to shut it down
-        /*if (this.options.exitMinecraftOnFinish()) {
-            this.shutDownMinecraft();
-        }*/
+    private boolean shouldDeleteWorld() {
+        return (this.options.deleteWorldOnSuccess() && this.testStatus.succeeded()) || (this.options.deleteWorldOnFailure() && this.testStatus.failed());
+    }
+
+    private boolean shouldDeleteTempWorld(FrameworkMethod method, boolean success) {
+        WorldOptions options = method.getAnnotation(WorldOptions.class);
+        if (options == null) {
+            return this.shouldDeleteWorld();
+        }
+        return (success && options.deleteWorldOnSuccess()) || (!success && options.deleteWorldOnFailure());
     }
 
     private void performInit() {
@@ -153,6 +94,14 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
             this.manager = new TesterManager();
             this.initialized = true;
         }
+    }
+
+    private void joinNewWorld() {
+        this.joinNewWorld(this.getWorldName());
+    }
+
+    private void joinNewWorld(String base) {
+        this.currentWorld.joinNewWorld(base);
     }
 
     private void shutDownMinecraft() {
@@ -203,10 +152,32 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public Statement methodInvoker(FrameworkMethod method, Object test) {
+        return new InvokeMethodWrapper(method, test, this.manager.errorSlot, this);
+    }
+
+    private String getWorldName() {
+        return NORMAL_WORLD_PREFIX + getTestClass().getJavaClass().getSimpleName() + "-";
+    }
+
+    @Override
+    public void beforeInvoke(FrameworkMethod method) {
         if (method.getAnnotation(UseSeparateWorld.class) != null) {
             System.err.println("Creating new world for: " + method.getMethod());
-            this.joinNewWorld();
+
+            CurrentWorld tempWorld = new CurrentWorld();
+            tempWorld.joinNewWorld(CUSTOM_WORLD_PREFIX + this.getWorldName() + method.getName() + "-");
+
+            this.tempWorlds.add(tempWorld);
+            this.inTempWorld = true;
         }
-        return new InvokeMethodWrapper(method, test, this.manager.errorSlot);
+    }
+
+    @Override
+    public void afterInvoke(FrameworkMethod method, Throwable throwable) {
+        boolean success = throwable == null;
+        if (this.inTempWorld && this.shouldDeleteTempWorld(method, success)) {
+            CurrentWorld tempWorld = this.tempWorlds.remove(this.tempWorlds.size() - 1);
+            tempWorld.deleteWorld();
+        }
     }
 }
