@@ -85,6 +85,7 @@ public class CurrentWorld {
             public void updateScreen() {
 
                 if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
+                    // This seems completely uncessary, and is just asking for race conditions
                     //Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
                     Minecraft.getMinecraft().loadWorld((WorldClient) null);
                 }

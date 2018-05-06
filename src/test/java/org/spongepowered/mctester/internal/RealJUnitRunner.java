@@ -62,13 +62,17 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.testStatus));
         notifier.addListener(this.testStatus);
         super.run(notifier);
+
+        if (this.shouldDeleteWorld()) {
+            this.currentWorld.deleteWorld();
+        }
     }
 
     @Override
     public void onFinished() {
-        if (this.shouldDeleteWorld()) {
+        /*if (this.shouldDeleteWorld()) {
             this.currentWorld.deleteWorld();
-        }
+        }*/
 
     }
 
