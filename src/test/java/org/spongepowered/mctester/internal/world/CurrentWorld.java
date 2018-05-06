@@ -21,6 +21,8 @@ public class CurrentWorld {
     public void joinNewWorld(String baseName) {
         this.exitToMainMenu();
 
+        RunnerEvents.resetPlayerJoined();
+
         long seed = new Random().nextLong();
         this.name = baseName + String.valueOf(seed).substring(0, 5);
         System.err.println("Creating world " + this.name);
@@ -34,6 +36,8 @@ public class CurrentWorld {
                 Minecraft.getMinecraft().launchIntegratedServer(CurrentWorld.this.name, CurrentWorld.this.name, worldsettings);
             }
         }));
+
+        RunnerEvents.waitForPlayerJoin();
     }
 
     public void deleteWorld() {
@@ -86,8 +90,9 @@ public class CurrentWorld {
 
                 if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
                     // This seems completely uncessary, and is just asking for race conditions
-                    //Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
-                    Minecraft.getMinecraft().loadWorld((WorldClient) null);
+                    Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
+                    Minecraft.getMinecraft().loadWorld(null);
+
                 }
 
                 Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());

@@ -93,7 +93,6 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
             RunnerEvents.waitForClientInit();
 
             this.joinNewWorld();
-            RunnerEvents.waitForPlayerJoin();
 
             this.manager = new TesterManager();
             this.initialized = true;
@@ -101,7 +100,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     }
 
     private void joinNewWorld() {
-        this.joinNewWorld(this.getWorldName());
+        this.joinNewWorld(NORMAL_WORLD_PREFIX + this.getWorldName());
     }
 
     private void joinNewWorld(String base) {
@@ -160,7 +159,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     }
 
     private String getWorldName() {
-        return NORMAL_WORLD_PREFIX + getTestClass().getJavaClass().getSimpleName() + "-";
+        return getTestClass().getJavaClass().getSimpleName() + "-";
     }
 
     @Override
