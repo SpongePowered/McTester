@@ -33,6 +33,10 @@ import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
 public class Utils {
@@ -61,6 +65,26 @@ public class Utils {
             return ClassUtils.getClass(name); // Handles primitives
         } catch (ClassNotFoundException e) {
             throw new InvalidDataException(e);
+        }
+    }
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+
+    public static File getTimestampedPNGFileForDirectory(String baseName, File gameDirectory)
+    {
+        String s = baseName + DATE_FORMAT.format(new Date()).toString();
+        int i = 1;
+
+        while (true)
+        {
+            File file1 = new File(gameDirectory, s + (i == 1 ? "" : "_" + i) + ".png");
+
+            if (!file1.exists())
+            {
+                return file1;
+            }
+
+            ++i;
         }
     }
 }

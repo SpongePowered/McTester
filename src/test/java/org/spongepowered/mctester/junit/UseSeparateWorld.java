@@ -14,4 +14,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Inherited
 public @interface UseSeparateWorld {
+
+    WorldOptions worldOptions() default @WorldOptions();
 }

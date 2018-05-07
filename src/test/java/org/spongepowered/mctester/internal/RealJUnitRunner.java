@@ -10,15 +10,16 @@ import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.internal.world.CurrentWorld;
+import org.spongepowered.mctester.junit.DefaultScreenshotOptions;
 import org.spongepowered.mctester.junit.DefaultWorldOptions;
 import org.spongepowered.mctester.junit.IJunitRunner;
-import org.spongepowered.mctester.junit.WorldOptions;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.junit.RunnerEvents;
+import org.spongepowered.mctester.junit.ScreenshotOptions;
 import org.spongepowered.mctester.junit.UseSeparateWorld;
+import org.spongepowered.mctester.junit.WorldOptions;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,15 +28,21 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
 
-    private TesterManager manager;
-    private WorldOptions options;
+    private TesterManager testerManager;
     private Thread testThread = Thread.currentThread();
     private boolean initialized;
     private File gamedir;
     private CurrentWorld currentWorld;
-    private TestStatus testStatus = new TestStatus(this);
-    private List<CurrentWorld> tempWorlds = new ArrayList<>();
-    private boolean inTempWorld;
+    private CurrentWorld tempWorld = null;
+    private RunNotifier runNotifier;
+
+    private TestStatus globalTestStatus = new TestStatus(this);
+    private TestStatus currentTestStatus;
+
+    private WorldOptions worldOptions;
+    private ScreenshotOptions screenshotOptions;
+
+    private TestActions testActions;
 
     private static final String MCTESTER_WORLD_BASE = "MCTester-";
     private static final String NORMAL_WORLD_PREFIX = MCTESTER_WORLD_BASE + "Normal-";
@@ -49,44 +56,39 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     public RealJUnitRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
 
-        this.options = testClass.getAnnotation(WorldOptions.class);
-        if (this.options == null) {
-            this.options = new DefaultWorldOptions();
+        this.worldOptions = testClass.getAnnotation(WorldOptions.class);
+        if (this.worldOptions == null) {
+            this.worldOptions = new DefaultWorldOptions();
         }
+
+        this.screenshotOptions = testClass.getAnnotation(ScreenshotOptions.class);
+        if (this.screenshotOptions == null) {
+            this.screenshotOptions = new DefaultScreenshotOptions();
+        }
+
         this.currentWorld = new CurrentWorld();
     }
 
 
     @Override
     public void run(RunNotifier notifier) {
-        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.testStatus));
-        notifier.addListener(this.testStatus);
+        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.globalTestStatus));
+        notifier.addListener(this.globalTestStatus);
+        this.runNotifier = notifier;
         super.run(notifier);
 
-        if (this.shouldDeleteWorld()) {
-            this.currentWorld.deleteWorld();
-        }
+        this.testActions.tryDeleteWorldGlobal(this.currentWorld);
+        this.testActions.tryTakeScreenShotGlobal(this.getWorldName());
     }
 
     @Override
     public void onFinished() {
-        /*if (this.shouldDeleteWorld()) {
+        /*if (this.shouldDeleteWorldGlobal()) {
             this.currentWorld.deleteWorld();
         }*/
 
     }
 
-    private boolean shouldDeleteWorld() {
-        return (this.options.deleteWorldOnSuccess() && this.testStatus.succeeded()) || (this.options.deleteWorldOnFailure() && this.testStatus.failed());
-    }
-
-    private boolean shouldDeleteTempWorld(FrameworkMethod method, boolean success) {
-        WorldOptions options = method.getAnnotation(WorldOptions.class);
-        if (options == null) {
-            return this.shouldDeleteWorld();
-        }
-        return (success && options.deleteWorldOnSuccess()) || (!success && options.deleteWorldOnFailure());
-    }
 
     private void performInit() {
         if (!this.initialized) {
@@ -94,7 +96,8 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
             this.joinNewWorld();
 
-            this.manager = new TesterManager();
+            this.testerManager = new TesterManager();
+            this.testActions = new TestActions(this.testerManager, this.worldOptions, this.screenshotOptions, this.globalTestStatus);
             this.initialized = true;
         }
     }
@@ -149,13 +152,13 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     @Override
     public Object createTest() throws Exception {
         this.performInit();
-        Object object = getTestClass().getOnlyConstructor().newInstance(this.manager);
+        Object object = getTestClass().getOnlyConstructor().newInstance(this.testerManager);
         return object;
     }
 
     @Override
     public Statement methodInvoker(FrameworkMethod method, Object test) {
-        return new InvokeMethodWrapper(method, test, this.manager.errorSlot, this);
+        return new InvokeMethodWrapper(method, test, this.testerManager.errorSlot, this);
     }
 
     private String getWorldName() {
@@ -167,20 +170,24 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         if (method.getAnnotation(UseSeparateWorld.class) != null) {
             System.err.println("Creating new world for: " + method.getMethod());
 
-            CurrentWorld tempWorld = new CurrentWorld();
-            tempWorld.joinNewWorld(CUSTOM_WORLD_PREFIX + this.getWorldName() + method.getName() + "-");
-
-            this.tempWorlds.add(tempWorld);
-            this.inTempWorld = true;
+            this.tempWorld = new CurrentWorld();
+            this.tempWorld.joinNewWorld(CUSTOM_WORLD_PREFIX + this.getWorldName() + method.getName() + "-");
         }
+
+        this.currentTestStatus = new TestStatus(null);
     }
 
     @Override
     public void afterInvoke(FrameworkMethod method, Throwable throwable) {
-        boolean success = throwable == null;
-        if (this.inTempWorld && this.shouldDeleteTempWorld(method, success)) {
-            CurrentWorld tempWorld = this.tempWorlds.remove(this.tempWorlds.size() - 1);
-            tempWorld.deleteWorld();
+
+
+        if (this.tempWorld != null) {
+            this.testActions.tryDeleteTempWorld(method, this.currentTestStatus, this.tempWorld);
+            this.tempWorld = null;
         }
+
+        this.testActions.tryTakeScreenShotCustom(method, this.currentTestStatus);
+
+        this.currentTestStatus = null;
     }
 }

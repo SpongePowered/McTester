@@ -23,7 +23,9 @@ public class TestStatus extends RunListener {
 
     @Override
     public void testFinished(Description description) throws Exception {
-        this.statusCallback.onFinished();
+        if (this.statusCallback != null) {
+            this.statusCallback.onFinished();
+        }
     }
 
     /*@Override
