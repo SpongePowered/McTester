@@ -28,6 +28,8 @@ apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.plugin"
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'idea'
+apply plugin: "maven"
+
 
 version = modVersion
 group = modGroup
