@@ -84,19 +84,41 @@ public class CurrentWorld {
         // Here, we create a simple GuiScreen subclass to run our code
         // on the client thread.
         CompletableFuture<Void> atMainMenu = new CompletableFuture<>();
-        Minecraft.getMinecraft().displayGuiScreen(new GuiScreen() {
+        Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+
             @Override
-            public void updateScreen() {
+            public void run() {
+                Minecraft.getMinecraft().displayGuiScreen(new GuiScreen() {
 
-                if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
-                    // This seems completely uncessary, and is just asking for race conditions
-                    Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
-                    Minecraft.getMinecraft().loadWorld(null);
+                    private int ticks;
 
-                }
+                    @Override
+                    public void updateScreen() {
+                        // Let a few ticks go by, to ensure that the game is actually paused
+                        // when we shut down the server. If the game isn't actually
+                        // paused, we'll run into a nasty race condition
+                        if (ticks++ != 5) {
+                            return;
+                        }
 
-                Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
-                atMainMenu.complete(null);
+                        // We could forcibly pause the game ourselves, but it's better
+                        // to mimic Vanilla as closely as possible, to minimize any
+                        // unforseen problems.
+                        if (!Minecraft.getMinecraft().isGamePaused()) {
+                            throw new IllegalStateException("The game didn't pause for some reason");
+                        }
+
+                        if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
+                            // This seems completely uncessary, and is just asking for race conditions
+                            Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
+                            Minecraft.getMinecraft().loadWorld(null);
+
+                        }
+
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
+                        atMainMenu.complete(null);
+                    }
+                });
             }
         });
 
