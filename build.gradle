@@ -46,7 +46,7 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/Aaron1011/McTester'
         version {
-            name = '0.1.0'
+            name = '0.2.0'
         }
     }
 }

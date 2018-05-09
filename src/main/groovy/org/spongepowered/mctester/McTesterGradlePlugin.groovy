@@ -43,7 +43,7 @@ class McTesterGradlePlugin implements Plugin<Project> {
 
     private void addDependency(Project project) {
         project.getLogger().warn("Adding dependency on McTester!");
-        project.getDependencies().add("testCompile", "org.spongepowered:mctester:1.0-SNAPSHOT");
+        project.getDependencies().add("testCompile", "org.spongepowered:mctester:0.2.0");
     }
 
     private void setupTestEnvironment(Project project) {
