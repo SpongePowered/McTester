@@ -2,13 +2,14 @@ const imgurUploader = require('imgur-uploader');
 const GitHub = require('github-api');
 const fs = require('fs');
 
-class ImageWrapper {
+
+module.exports.ImageWrapper = class ImageWrapper {
     constructor(raw, title) {
         this.raw = raw;
         this.title = title;
     }
 
-}
+};
 
 function postComment(message) {
 	let gh = new GitHub({token: process.env.GITHUB_TOKEN});
@@ -21,7 +22,7 @@ function uploadImages(images) {
     return Promise.all(images.map(image => imgurUploader(image.raw, {token: process.env.IMGUR_TOKEN, title: image.title})));
 }
 
-function uploadAndComment(images) {
+module.exports.uploadAndComment= function(images) {
     if (images.length === 0) {
         return;
     }
@@ -37,7 +38,7 @@ function uploadAndComment(images) {
     });
 }
 
-uploadAndComment([new ImageWrapper(fs.readFileSync('test1.png'), "First title"), new ImageWrapper(fs.readFileSync('test2.png'), "Second title")]).then(() => console.log("All done!"));
+//uploadAndComment([new ImageWrapper(fs.readFileSync('test1.png'), "First title"), new ImageWrapper(fs.readFileSync('test2.png'), "Second title")]).then(() => console.log("All done!"));
 
 //result = uploadImages();
 //result.then(links => console.log("Got links: " + links));
