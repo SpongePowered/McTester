@@ -31,6 +31,23 @@ public class TestActions {
         this.globalStatus = globalStatus;
     }
 
+    private static class ScreenshotData {
+        int ticks;
+        boolean success;
+
+        ScreenshotData(int ticks, boolean success) {
+            this.ticks = ticks;
+            this.success =success;
+        }
+
+        String getDirName() {
+            if (this.success) {
+                return "success";
+            }
+            return "fail";
+        }
+    }
+
 
     public boolean shouldDeleteWorldGlobal() {
         return (this.globalWorldOptions.deleteWorldOnSuccess() && this.globalStatus.succeeded())
@@ -55,39 +72,49 @@ public class TestActions {
     }
 
 
-    public Optional<Integer> shouldTakeScreenshotGlobal() {
-        if ((this.globalScreenshotOptions.takeScreenshotOnSuccess() && this.globalStatus.succeeded())
-            || (this.globalScreenshotOptions.takeScreenshotOnFailure() && this.globalStatus.failed())) {
-            return Optional.of(this.globalScreenshotOptions.delayTicks());
+    public Optional<ScreenshotData> shouldTakeScreenshotGlobal() {
+        boolean success = this.globalScreenshotOptions.takeScreenshotOnSuccess() && this.globalStatus.succeeded();
+        boolean fail =  this.globalScreenshotOptions.takeScreenshotOnFailure() && this.globalStatus.failed();
+        if (success || fail) {
+            return Optional.of(new ScreenshotData(this.globalScreenshotOptions.delayTicks(), success));
         }
         return Optional.empty();
     }
 
-    public Optional<Integer> shouldTakeScreenshotCustomOptions(FrameworkMethod method, TestStatus status) {
+    public Optional<ScreenshotData> shouldTakeScreenshotCustomOptions(FrameworkMethod method, TestStatus status) {
         ScreenshotOptions options = method.getAnnotation(ScreenshotOptions.class);
-        if (options != null && ((status.succeeded() && options.takeScreenshotOnSuccess()) || (status.failed() && options.takeScreenshotOnFailure()))) {
-            return Optional.of(options.delayTicks());
+        if (options == null) {
+            return Optional.empty();
+        }
+
+        boolean success = status.succeeded() && options.takeScreenshotOnSuccess();
+        boolean fail = status.failed() && options.takeScreenshotOnFailure();
+
+        if (success || fail) {
+            return Optional.of(new ScreenshotData(options.delayTicks(), success));
         }
         return Optional.empty();
     }
 
     public void tryTakeScreenShotGlobal(String name) {
-        this.shouldTakeScreenshotGlobal().ifPresent(ticks -> this.takeScreenshot(name, ticks));
+        this.shouldTakeScreenshotGlobal().ifPresent(data -> this.takeScreenshot(name, data));
     }
 
     public void tryTakeScreenShotCustom(FrameworkMethod method, TestStatus status) {
-        this.shouldTakeScreenshotCustomOptions(method, status).ifPresent(ticks -> this.takeScreenshot(method.getName() + "-", ticks));
+        this.shouldTakeScreenshotCustomOptions(method, status).ifPresent(data -> this.takeScreenshot(method.getName() + "-", data));
     }
 
 
-    private File takeScreenshot(String baseName, int ticks) {
-        this.testUtils.sleepTicks(ticks);
+    private File takeScreenshot(String baseName, ScreenshotData data) {
+        this.testUtils.sleepTicks(data.ticks);
 
         return Futures.getUnchecked(Minecraft.getMinecraft().addScheduledTask(new Callable<File>() {
 
             @Override
             public File call() {
                 File outputDir = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
+                outputDir = new File(outputDir, data.getDirName());
+                outputDir.mkdirs();
 
                 File outputFile = Utils.getTimestampedPNGFileForDirectory(baseName, outputDir);
                 BufferedImage screenshot = ScreenShotHelper

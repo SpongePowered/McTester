@@ -41,7 +41,7 @@ module.exports = function (req, res) {
 
             Promise.all(promises)
                 .then(upload.uploadAndComment)
-                .then(res.sendStatus(200));
+                .then(() => { res.sendStatus(200) } );
         });
 
         req.pipe(busboy);

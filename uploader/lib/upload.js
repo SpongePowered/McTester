@@ -14,7 +14,9 @@ module.exports.ImageWrapper = class ImageWrapper {
 function postComment(message) {
 	let gh = new GitHub({token: process.env.GITHUB_TOKEN});
 	return gh.getIssues('AaronBot1011', 'GHTest').createIssueComment(1, message).catch(function(error) {
-	    console.log("Err: " + error.response);
+	    console.error("Err: " + error.response);
+    }).then((p) => {
+        return p;
     });
 }
 
@@ -28,13 +30,15 @@ module.exports.uploadAndComment= function(images) {
     }
 
     return uploadImages(images).then(uploads => {
-        let message = "Some Minecraft integration tests for this PR failed. The following screenshots were taken:\n";
+        let message = "Some Minecraft integration tests for this PR failed. The following screenshots were taken:\n\n------\n";
 
         for (let upload of uploads) {
             message += upload.title + "\n";
-            message += "![](" + upload.link + ")";
+            message += "![" + upload.title + "](" + upload.link + ")";
         }
-        return postComment(message);
+        let res = postComment(message);
+        console.log("Posted comment for images: " + uploads.map(u => u.title));
+        return res;
     });
 }
 
