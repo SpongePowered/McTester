@@ -111,3 +111,6 @@ gradle-app.setting
 .gradle
 .mixin.out
 *.iml
+
+uploader/node_modules
+uploader/secrets.sh
