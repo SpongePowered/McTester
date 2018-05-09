@@ -26,7 +26,9 @@ package org.spongepowered.mctester.internal;
 
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 import org.spongepowered.mctester.junit.RunnerEvents;
+import sun.misc.Unsafe;
 
+import java.lang.reflect.Field;
 
 // We want JUnit to shut down the VM, not Minecraft, so
 // we need to bypass FMLSecurityManager

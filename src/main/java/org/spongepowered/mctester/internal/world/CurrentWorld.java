@@ -104,7 +104,7 @@ public class CurrentWorld {
                         // We could forcibly pause the game ourselves, but it's better
                         // to mimic Vanilla as closely as possible, to minimize any
                         // unforseen problems.
-                        if (!Minecraft.getMinecraft().isGamePaused()) {
+                        if (!Minecraft.getMinecraft().isGamePaused() && Minecraft.getMinecraft().isIntegratedServerRunning()) {
                             throw new IllegalStateException("The game didn't pause for some reason");
                         }
 

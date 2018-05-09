@@ -20,15 +20,16 @@ buildscript {
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
         classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
-        classpath 'org.spongepowered:mixingradle:0.5-SNAPSHOT'
+        //classpath 'org.spongepowered:mixingradle:0.5-SNAPSHOT'
     }
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.plugin"
-apply plugin: 'org.spongepowered.mixin'
+//apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'idea'
 apply plugin: "maven"
+apply plugin: 'groovy'
 
 
 version = modVersion
@@ -85,14 +86,16 @@ repositories {
 }
 
 dependencies {
+    compile gradleApi()
+    compile localGroovy()
     compile 'org.spongepowered:spongeapi:7.0.0'
     compile 'org.spongepowered:mixin:0.7.4-SNAPSHOT'
     compile 'junit:junit:4.12'
 }
 
-mixin {
+/*mixin {
     add sourceSets.main, "mctester.main.refmap.json"
-}
+}*/
 
 processResources {
     // this will ensure that this task is redone when the versions change.

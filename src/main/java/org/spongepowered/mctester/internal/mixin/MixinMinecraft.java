@@ -14,7 +14,9 @@ import org.spongepowered.mctester.junit.RunnerEvents;
 
 import javax.annotation.Nullable;
 
-@Mixin(Minecraft.class)
+// McTester always runs in a deobfuscated environment - it depends on GradleStart, after all!
+// Therefore, we disable all remapping, since we'll never need it.
+@Mixin(value = Minecraft.class, remap = false)
 public abstract class MixinMinecraft implements IMixinMinecraft {
 
     @Shadow public abstract void displayGuiScreen(@Nullable GuiScreen guiScreenIn);
@@ -48,7 +50,7 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         this.launchIntegratedServer(folderName, folderName, worldsettings);
     }*/
 
-    @Redirect(method = "shutdownMinecraftApplet", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/asm/transformers/TerminalTransformer$ExitVisitor;systemExitCalled(I)V"))
+    @Redirect(method = "shutdownMinecraftApplet", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/asm/transformers/TerminalTransformer$ExitVisitor;systemExitCalled(I)V", remap = false))
     public void onSystemExitCalled(int code) {
         // Notify any listenres that the game has closed, but don't actually
         // call System.exit here. We want to let JUnit exit cleanly.

@@ -73,6 +73,8 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     @Override
     public void run(RunNotifier notifier) {
         Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.globalTestStatus));
+        RemoveSecurityManager.clearSecurityManager();
+
         notifier.addListener(this.globalTestStatus);
         this.runNotifier = notifier;
         super.run(notifier);
