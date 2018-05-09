@@ -18,7 +18,7 @@ function postComment(message) {
 }
 
 function uploadImages(images) {
-    return Promise.all(images.map(image => imgurUploader(image.raw, {title: image.title})));
+    return Promise.all(images.map(image => imgurUploader(image.raw, {token: process.env.IMGUR_TOKEN, title: image.title})));
 }
 
 function uploadAndComment(images) {
