@@ -24,6 +24,7 @@
  */
 package org.spongepowered.mctester.junit;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.spongepowered.mctester.internal.RealJUnitRunner;
@@ -78,7 +79,15 @@ public class MinecraftServerStarter {
 			}
 		});
 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				Minecraft.getMinecraft().shutdown();
+			}
+		});
+
 		wrapperThread.start();
+
 	}
 
 	public ClassLoader getMinecraftServerClassLoader() {
