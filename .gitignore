@@ -115,3 +115,4 @@ gradle-app.setting
 uploader/node_modules
 uploader/secrets.sh
 bintray.sh
+uploader/dist

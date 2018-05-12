@@ -2,13 +2,13 @@
 var express = require('express')
 var getRawBody = require('raw-body')
 
-const handleUpload = require('./lib/handleUpload');
+const handleUploadExpress = require('../lib/handleUploadExpress');
 
 var app = express()
 //app.use(function (req, res, next) { getRawBody(req, { limit: '10mb'}) });
 
 // respond with "hello world" when a GET request is made to the homepage
-app.post('/upload', handleUpload);
+app.post('/upload', handleUploadExpress);
 /*app.get('/hi', function (res, req) {
     req.sendStatus(500);
 })*/

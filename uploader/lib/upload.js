@@ -36,9 +36,10 @@ module.exports.uploadAndComment= function(images) {
             message += upload.title + "\n";
             message += "![" + upload.title + "](" + upload.link + ")";
         }
-        let res = postComment(message);
-        console.log("Posted comment for images: " + uploads.map(u => u.title));
-        return res;
+        return postComment(message).then(() => {
+            console.log("Posted comment for images: " + uploads.map(u => u.title));
+            return uploads;
+        })
     });
 }
 
