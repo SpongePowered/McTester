@@ -26,9 +26,6 @@ interface Upload {
 }
 
 interface ClientFields {
-    user?: string,
-    repo?: string,
-    commitSha?: string
     [key: string]: string;
 }
 
