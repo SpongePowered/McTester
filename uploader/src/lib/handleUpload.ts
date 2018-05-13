@@ -1,13 +1,23 @@
-const Busboy = require('busboy');
+import ErrnoException = NodeJS.ErrnoException;
+import {Request} from 'express';
+
+import * as Busboy from 'busboy';
+
 const upload = require('./upload.js');
 const ImageWrapper = upload.ImageWrapper;
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function readFilePromise(filePath) {
+interface Upload {
+    fieldName: string,
+    path: string,
+    name: string
+}
+
+function readFilePromise(filePath: string) {
     return new Promise(function(resolve, reject) {
-        fs.readFile(filePath, function(err, data) {
+        fs.readFile(filePath, function(err: ErrnoException, data: Buffer) {
             if (err != null) {
                 reject(err);
             } else {
@@ -17,7 +27,7 @@ function readFilePromise(filePath) {
     });
 }
 
-function rejectMissing(required, actual, reject) {
+function rejectMissing(required: string[], actual, reject: (reason?: any) => void) {
     if (actual == null) {
         reject("Missing fields: " + required);
         return true;
@@ -37,13 +47,13 @@ function rejectMissing(required, actual, reject) {
     return false;
 }
 
-module.exports = function(req) {
+function handleUpload(req: Request) {
     return new Promise(function(resolve, reject) {
         if (req.method === 'POST') {
 
             const busboy = new Busboy({ headers: req.headers });
 
-            const uploads = [];
+            const uploads: Upload[] = [];
             const fields = {};
             const tmpdir = os.tmpdir();
 
@@ -89,3 +99,5 @@ module.exports = function(req) {
     })
 
 }
+
+export { handleUpload };

@@ -1,6 +1,18 @@
-const axios = require('axios');
+import axios, {AxiosInstance} from 'axios';
+import {ImageWrapper} from "./upload";
+
+interface Album {
+    id: string,
+    link: string
+}
+
+interface Image {
+    id: string
+}
 
 module.exports = class ImgurAPI {
+    private instance: AxiosInstance;
+
     constructor() {
         this.instance = axios.create(
             {
@@ -10,15 +22,15 @@ module.exports = class ImgurAPI {
         );
     }
 
-    get(url) {
-        return this.request("GET", url);
+    get<T>(url: string): Promise<T> {
+        return this.request("GET", url, {});
     }
 
-    post(url, data) {
+    post<T>(url: string, data: object): Promise<T> {
         return this.request("POST", url, data);
     }
 
-    request(method, url, data) {
+    request<T>(method: string, url: string, data: object): Promise<T> {
         return new Promise((resolve, reject) => {
             this.instance.request(
                 {
@@ -37,27 +49,29 @@ module.exports = class ImgurAPI {
 
     }
 
-    uploadImage(buf, opt) {
-        return this.post("image", Object.assign({image: buf.toString('base64')}, opt));
+    uploadImage(buf: Buffer, opt: Object): Promise<Image> {
+        return this.post<Image>("image", Object.assign({image: buf.toString('base64')}, opt));
     }
 
-    uploadImages(images) {
+    uploadImages(images: ImageWrapper[]): Promise<Image[]> {
         return Promise.all(images.map(image => this.uploadImage(image.raw, image.opt)));
     }
 
-    uploadIntoAlbum(images, albumOpt) {
+    uploadIntoAlbum(images: ImageWrapper[], albumOpt: Object): Promise<Album> {
         return this.uploadImages(images).then(uploads => {
             return this.createAlbum(Object.assign({deletehashes: uploads.map(upload => upload.deletehash)}, albumOpt));
         });
     }
 
-    createAlbum(opt) {
-        return this.post("album", opt).then(album => {
+    createAlbum(opt: Object): Promise<Album> {
+        return this.post<Album>("album", opt).then(album => {
             return this.getAlbum(album.id);
         })
     }
 
-    getAlbum(id) {
+    getAlbum(id: string): Promise<Album> {
         return this.get("album/" + id);
     }
 }
+
+export {Album, Image};

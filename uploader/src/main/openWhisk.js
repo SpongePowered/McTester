@@ -1,5 +1,5 @@
 var str = require('string-to-stream');
-const handleUpload = require('../lib/handleUpload.js');
+const handleUpload = require('../lib/handleUpload.ts');
 
 global.main = function (args) {
     let decoded = new Buffer(args.__ow_body,'base64');

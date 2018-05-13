@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-const handleUpload = require('./handleUpload.js');
+import { handleUpload } from './handleUpload';
 
 function handleUploadExpress(req: Request, res: Response) {
     handleUpload(req).then(code => {

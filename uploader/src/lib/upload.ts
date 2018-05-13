@@ -1,27 +1,29 @@
+import {Album} from "./imgurAPI";
+
 const imgurUploader = require('imgur-uploader');
 const GitHub = require('github-api');
 const fs = require('fs');
 const ImgurAPI = require('./imgurAPI');
 
 
-module.exports.ImageWrapper = class ImageWrapper {
-    constructor(raw, title) {
+class ImageWrapper {
+    public raw: Buffer;
+    public opt: { title: string };
+    constructor(raw: Buffer, title: string) {
         this.raw = raw;
         this.opt = {title: title};
     }
 
 };
 
-function postComment(message) {
+function postComment(message: string) {
 	let gh = new GitHub({token: process.env.GITHUB_TOKEN});
 	return gh.getIssues('AaronBot1011', 'GHTest').createIssueComment(1, message).catch(function(error) {
 	    console.error("Err: " + error.response);
-    }).then((p) => {
-        return p;
     });
 }
 
-function setStatus(user, repoName, sha, message, url) {
+function setStatus(user: string, repoName: string, sha: string, message: string, url: string) {
     let gh = new GitHub({token: process.env.GITHUB_TOKEN});
 
     return gh.getRepo(user, repoName).updateStatus(sha, {
@@ -32,26 +34,26 @@ function setStatus(user, repoName, sha, message, url) {
         });
 }
 
-function uploadImages(images) {
+function uploadImages(images: ImageWrapper[]) {
     let imgur = new ImgurAPI();
-    return Promise.all(images.map(image => imgur.uploadImage(image.raw, {title: image.title})));
+    return Promise.all(images.map(image => imgur.uploadImage(image.raw, image.opt)));
 }
 
 
-module.exports.createNewStatus = function(images, user, repoName, sha) {
+function createNewStatus(images: ImageWrapper[], user: string, repoName: string, sha: string) {
     if (images.length === 0) {
         return;
     }
     let imgur = new ImgurAPI();
 
-    return imgur.uploadIntoAlbum(images, {title: 'McTester images for ' + user + "/" + repoName + "#" + sha}).then(album => {
+    return imgur.uploadIntoAlbum(images, {title: 'McTester images for ' + user + "/" + repoName + "#" + sha}).then((album: Album) => {
         console.log("Made album: " + album.link);
         return setStatus(user, repoName, sha, "Some Minecraft integration tests failed", album.link)
     })
 };
 
 
-module.exports.uploadAndComment = function(images) {
+module.exports.uploadAndComment = function(images: ImageWrapper[]) {
     if (images.length === 0) {
         return;
     }
@@ -69,6 +71,8 @@ module.exports.uploadAndComment = function(images) {
         })
     });
 };
+
+export { ImageWrapper, createNewStatus };
 
 //uploadAndComment([new ImageWrapper(fs.readFileSync('test1.png'), "First title"), new ImageWrapper(fs.readFileSync('test2.png'), "Second title")]).then(() => console.log("All done!"));
 
