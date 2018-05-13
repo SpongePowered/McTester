@@ -1,6 +1,6 @@
 import {Album} from "./imgurAPI";
 
-const imgurUploader = require('imgur-uploader');
+//const imgurUploader = require('imgur-uploader');
 const GitHub = require('github-api');
 const fs = require('fs');
 const ImgurAPI = require('./imgurAPI');

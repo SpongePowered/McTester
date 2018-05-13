@@ -7,8 +7,8 @@
     "sourceMap": true,
     "allowJs": true,
     "lib": ["es5", "es6", "dom"],
-    "strict": true,
-    "strictNullChecks": true
+    "strict": false,
+    "strictNullChecks": false
   },
   "include": [
     "src/**/*"

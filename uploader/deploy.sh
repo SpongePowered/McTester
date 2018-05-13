@@ -1,6 +1,6 @@
 set -e
 
-npx webpack ./main/openWhisk.js
+npx webpack
 
 
 source ./secrets.sh

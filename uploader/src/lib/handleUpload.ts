@@ -3,11 +3,21 @@ import {Request} from 'express';
 
 import * as Busboy from 'busboy';
 
-const upload = require('./upload.js');
+const upload = require('./upload');
 const ImageWrapper = upload.ImageWrapper;
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+
+class ResponseData {
+    code: number;
+    message: string;
+
+    constructor(code: number, message: string) {
+        this.code = code;
+        this.message = message;
+    }
+}
 
 interface Upload {
     fieldName: string,
@@ -47,7 +57,7 @@ function rejectMissing(required: string[], actual, reject: (reason?: any) => voi
     return false;
 }
 
-function handleUpload(req: Request) {
+function handleUpload(req: Request): Promise<ResponseData> {
     return new Promise(function(resolve, reject) {
         if (req.method === 'POST') {
 
@@ -84,7 +94,7 @@ function handleUpload(req: Request) {
                 Promise.all(promises)
                     .then(uploads => upload.createNewStatus(uploads, fields.user, fields.repo, fields.commitSha))
                     .then(uploads => {
-                        resolve("Uploaded images: " + uploads)
+                        resolve(new ResponseData(200, "Uploaded images: " + uploads))
                     })
                     .catch(e => {
                         reject("Internal error: " + e);
@@ -100,4 +110,4 @@ function handleUpload(req: Request) {
 
 }
 
-export { handleUpload };
+export { ResponseData, handleUpload };

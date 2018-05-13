@@ -1,5 +1,6 @@
+import {ResponseData, handleUpload} from "../lib/handleUpload";
+
 var str = require('string-to-stream');
-const handleUpload = require('../lib/handleUpload.ts');
 
 global.main = function (args) {
     let decoded = new Buffer(args.__ow_body,'base64');
@@ -15,8 +16,8 @@ global.main = function (args) {
                                 newStream.pipe(target);
                             }
                         })
-        .then(message => {
-            return {custom_success: message};
+        .then((message: ResponseData) => {
+            return {custom_success: message.message};
         }).catch(err => {
             return {custom_error: err};
         });
