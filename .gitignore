@@ -114,5 +114,6 @@ gradle-app.setting
 
 uploader/node_modules
 uploader/secrets.sh
+uploader/prod_env.sh
 bintray.sh
 uploader/dist
