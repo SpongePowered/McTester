@@ -18,6 +18,13 @@ fs.readdir(screenshots, (err, files) => {
         formData[file] = fs.createReadStream(path.join(screenshots, file));
     });
 
+    slug = process.env.TRAVIS_REPO_SLUG.split("/");
+
+    formData.user = slug[0];
+    formData.repo = slug[1];
+    formData.commitSha = process.env.TRAVIS_COMMIT;
+
+
     request.post({url: process.env.MCTESTER_UPLOAD_URL, formData: formData}, function (error, response, body) {
         console.log('error:', error); // Print the error if one occurred
         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received

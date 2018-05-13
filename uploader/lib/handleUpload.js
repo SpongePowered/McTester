@@ -17,12 +17,34 @@ function readFilePromise(filePath) {
     });
 }
 
+function rejectMissing(required, actual, reject) {
+    if (actual == null) {
+        reject("Missing fields: " + required);
+        return true;
+    }
+
+    let missing = "";
+    for (let field of required) {
+        if (actual[field] == null) {
+            missing += field + ",";
+        }
+    }
+
+    if (missing !== "") {
+        reject("Missing fields: " + missing.slice(0, missing.length - 1));
+        return true;
+    }
+    return false;
+}
+
 module.exports = function(req) {
     return new Promise(function(resolve, reject) {
         if (req.method === 'POST') {
+
             const busboy = new Busboy({ headers: req.headers });
 
             const uploads = [];
+            const fields = {};
             const tmpdir = os.tmpdir();
 
             // This callback will be invoked for each file uploaded.
@@ -34,14 +56,23 @@ module.exports = function(req) {
                 file.pipe(fs.createWriteStream(filepath));
             });
 
+            busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
+                fields[fieldname] = val;
+            });
+
             // This callback will be invoked after all uploaded files are saved.
             busboy.on('finish', () => {
+
+                if (rejectMissing(["user", "repo", "commitSha"], fields, reject)) {
+                    return;
+                }
+
                 let promises = uploads.map(file => { return readFilePromise(file.path).then(data => {
                     return new ImageWrapper(data, file.fieldName);
                 })});
 
                 Promise.all(promises)
-                    .then(upload.uploadAndComment)
+                    .then(uploads => upload.createNewStatus(uploads, fields.user, fields.repo, fields.commitSha))
                     .then(uploads => {
                         resolve("Uploaded images: " + uploads.map(u => u.title + "/" + u.link))
                     })

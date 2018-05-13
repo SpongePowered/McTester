@@ -1,12 +1,13 @@
 const imgurUploader = require('imgur-uploader');
 const GitHub = require('github-api');
 const fs = require('fs');
+const ImgurAPI = require('./imgurAPI');
 
 
 module.exports.ImageWrapper = class ImageWrapper {
     constructor(raw, title) {
         this.raw = raw;
-        this.title = title;
+        this.opt = {title: title};
     }
 
 };
@@ -20,11 +21,37 @@ function postComment(message) {
     });
 }
 
-function uploadImages(images) {
-    return Promise.all(images.map(image => imgurUploader(image.raw, {token: process.env.IMGUR_TOKEN, title: image.title})));
+function setStatus(user, repoName, sha, message, url) {
+    let gh = new GitHub({token: process.env.GITHUB_TOKEN});
+
+    return gh.getRepo(user, repoName).updateStatus(sha, {
+            state: 'failure',
+            target_url: url,
+            description: message,
+            context: 'mctester'
+        });
 }
 
-module.exports.uploadAndComment= function(images) {
+function uploadImages(images) {
+    let imgur = new ImgurAPI();
+    return Promise.all(images.map(image => imgur.uploadImage(image.raw, {title: image.title})));
+}
+
+
+module.exports.createNewStatus = function(images, user, repoName, sha) {
+    if (images.length === 0) {
+        return;
+    }
+    let imgur = new ImgurAPI();
+
+    return imgur.uploadIntoAlbum(images, {title: 'McTester images for ' + user + "/" + repoName + "#" + sha}).then(album => {
+        console.log("Made album: " + album.link);
+        return setStatus(user, repoName, sha, "Some Minecraft integration tests failed", album.link)
+    })
+};
+
+
+module.exports.uploadAndComment = function(images) {
     if (images.length === 0) {
         return;
     }
@@ -41,7 +68,7 @@ module.exports.uploadAndComment= function(images) {
             return uploads;
         })
     });
-}
+};
 
 //uploadAndComment([new ImageWrapper(fs.readFileSync('test1.png'), "First title"), new ImageWrapper(fs.readFileSync('test2.png'), "Second title")]).then(() => console.log("All done!"));
 
