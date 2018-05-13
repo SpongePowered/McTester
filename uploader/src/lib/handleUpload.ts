@@ -25,6 +25,19 @@ interface Upload {
     name: string
 }
 
+interface ClientFields {
+    user?: string,
+    repo?: string,
+    commitSha?: string
+    [key: string]: string;
+}
+
+interface RequestLike {
+    method: string;
+    headers: Object;
+    pipe: <T extends NodeJS.WritableStream>(dest: T) => T;
+}
+
 function readFilePromise(filePath: string) {
     return new Promise(function(resolve, reject) {
         fs.readFile(filePath, function(err: ErrnoException, data: Buffer) {
@@ -37,7 +50,7 @@ function readFilePromise(filePath: string) {
     });
 }
 
-function rejectMissing(required: string[], actual, reject: (reason?: any) => void) {
+function rejectMissing(required: string[], actual: ClientFields, reject: (reason?: any) => void) {
     if (actual == null) {
         reject("Missing fields: " + required);
         return true;
@@ -57,14 +70,14 @@ function rejectMissing(required: string[], actual, reject: (reason?: any) => voi
     return false;
 }
 
-function handleUpload(req: Request): Promise<ResponseData> {
+function handleUpload(req: RequestLike): Promise<ResponseData> {
     return new Promise(function(resolve, reject) {
         if (req.method === 'POST') {
 
             const busboy = new Busboy({ headers: req.headers });
 
             const uploads: Upload[] = [];
-            const fields = {};
+            const fields : ClientFields = {};
             const tmpdir = os.tmpdir();
 
             // This callback will be invoked for each file uploaded.
@@ -92,10 +105,9 @@ function handleUpload(req: Request): Promise<ResponseData> {
                 })});
 
                 Promise.all(promises)
-                    .then(uploads => upload.createNewStatus(uploads, fields.user, fields.repo, fields.commitSha))
-                    .then(uploads => {
+                    .then(uploads => upload.createNewStatus(uploads, fields.user, fields.repo, fields.commitSha).then((githubData: Object) => {
                         resolve(new ResponseData(200, "Uploaded images: " + uploads))
-                    })
+                    }))
                     .catch(e => {
                         reject("Internal error: " + e);
                     })

@@ -5,6 +5,9 @@ const GitHub = require('github-api');
 const fs = require('fs');
 const ImgurAPI = require('./imgurAPI');
 
+interface GithubResponse {
+    response: Object
+}
 
 class ImageWrapper {
     public raw: Buffer;
@@ -14,11 +17,15 @@ class ImageWrapper {
         this.opt = {title: title};
     }
 
+    public toString(): string {
+        return `ImageWrapper(${JSON.stringify(this.opt)})`
+    }
+
 };
 
 function postComment(message: string) {
 	let gh = new GitHub({token: process.env.GITHUB_TOKEN});
-	return gh.getIssues('AaronBot1011', 'GHTest').createIssueComment(1, message).catch(function(error) {
+	return gh.getIssues('AaronBot1011', 'GHTest').createIssueComment(1, message).catch(function(error: GithubResponse) {
 	    console.error("Err: " + error.response);
     });
 }

@@ -7,7 +7,8 @@ interface Album {
 }
 
 interface Image {
-    id: string
+    id: string,
+    deletehash: string
 }
 
 module.exports = class ImgurAPI {
