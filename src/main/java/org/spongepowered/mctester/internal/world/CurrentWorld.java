@@ -9,10 +9,13 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.ISaveFormat;
+import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class CurrentWorld {
 
@@ -86,18 +89,39 @@ public class CurrentWorld {
         CompletableFuture<Void> atMainMenu = new CompletableFuture<>();
         Minecraft.getMinecraft().addScheduledTask(new Runnable() {
 
+            private Future<Void> mainThreadTask;
+            private int gameLoopRuns = 0;
+
             @Override
             public void run() {
                 Minecraft.getMinecraft().displayGuiScreen(new GuiScreen() {
 
-                    private int ticks;
-
                     @Override
                     public void updateScreen() {
-                        // Let a few ticks go by, to ensure that the game is actually paused
-                        // when we shut down the server. If the game isn't actually
-                        // paused, we'll run into a nasty race condition
-                        if (ticks++ != 5) {
+                        // Minecraft only pauses the game in Minecraft#runGameLoop.
+                        // However, the game (and therefore any open GuiScreen) ticks multiple
+                        // times per call to runGameLoop.
+
+                        // To ensure that the game is actually paused, we schedule a new task
+                        // from our GuiScreen, and don't do anything until it runs.
+                        // Since all client scheduled tasks run at the start of
+                        // runGameLoop, we know that we've gone through a full
+                        // execution of runGameLoop when our second scheduled task runs
+                        // (the gui first opens in the previous set of runGameLoop
+                        // scheduled tasks).
+
+                        // All of this ensures that we only try to exit the game when
+                        // it's actually paused, and lets us avoid taking over
+                        // Vanilla's handling of pausing the game. Just in case,
+                        // we throw an exception if the game isn't actually paused - however,
+                        // this should never happen.
+                        if (gameLoopRuns < 1) {
+                            if (mainThreadTask == null) {
+                                mainThreadTask = ((IMixinMinecraft) Minecraft.getMinecraft()).addScheduledTaskAlwaysDelay(() -> {
+                                    gameLoopRuns++;
+                                    return null;
+                                });
+                            }
                             return;
                         }
 
@@ -108,13 +132,12 @@ public class CurrentWorld {
                             throw new IllegalStateException("The game didn't pause for some reason");
                         }
 
-                        if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
-                            // This seems completely uncessary, and is just asking for race conditions
+                        if (Minecraft.getMinecraft().world != null) {
                             Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
-                            Minecraft.getMinecraft().loadWorld(null);
 
                         }
 
+                        Minecraft.getMinecraft().loadWorld(null);
                         Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
                         atMainMenu.complete(null);
                     }

@@ -1,5 +1,9 @@
 package org.spongepowered.mctester.internal.mixin;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
+import org.apache.commons.lang3.Validate;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -11,6 +15,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.mctester.junit.RunnerEvents;
+
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nullable;
 
@@ -28,6 +36,8 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
     @Shadow protected abstract void clickMouse();
 
     @Shadow protected abstract void rightClickMouse();
+
+    @Shadow @Final private Queue<FutureTask<?>> scheduledTasks;
 
     @Inject(method = "init", at = @At(value = "RETURN"))
     public void onInitDone(CallbackInfo ci) {
@@ -64,6 +74,19 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
             ci.cancel();
         }
     }
+
+    @Override
+    public <T> ListenableFuture<T> addScheduledTaskAlwaysDelay(Callable<T> callable) {
+        Validate.notNull(callable);
+        ListenableFutureTask<T> listenablefuturetask = ListenableFutureTask.<T>create(callable);
+
+        synchronized (this.scheduledTasks)
+        {
+            this.scheduledTasks.add(listenablefuturetask);
+            return listenablefuturetask;
+        }
+    }
+
 
     @Override
     public boolean isRunning() {
