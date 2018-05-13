@@ -74,7 +74,7 @@ module.exports = function(req) {
                 Promise.all(promises)
                     .then(uploads => upload.createNewStatus(uploads, fields.user, fields.repo, fields.commitSha))
                     .then(uploads => {
-                        resolve("Uploaded images: " + uploads.map(u => u.title + "/" + u.link))
+                        resolve("Uploaded images: " + uploads)
                     })
                     .catch(e => {
                         reject("Internal error: " + e);

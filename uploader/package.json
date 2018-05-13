@@ -6,7 +6,7 @@
     "mctesterupload": "./client.js"
   },
   "scripts": {
-    "start": "node $NODE_DEBUG_OPTION main/expressServer.js",
+    "start": "node $NODE_DEBUG_OPTION dist/src/main/expressServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -22,6 +22,8 @@
     "string-to-stream": "^1.1.1"
   },
   "devDependencies": {
+    "ts-loader": "^4.3.0",
+    "typescript": "^2.8.3",
     "webpack": "^4.8.3",
     "webpack-cli": "^2.1.3"
   }
