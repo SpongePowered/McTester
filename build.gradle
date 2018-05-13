@@ -36,6 +36,11 @@ apply plugin: "maven"
 apply plugin: 'groovy'
 
 
+version = modVersion
+group = modGroup
+archivesBaseName = modBaseName
+
+
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
@@ -46,14 +51,10 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/Aaron1011/McTester'
         version {
-            name = '0.2.0'
+            name = version
         }
     }
 }
-
-version = modVersion
-group = modGroup
-archivesBaseName = modBaseName
 
 minecraft {
     version = project.forgeVersion
