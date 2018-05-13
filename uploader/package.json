@@ -6,12 +6,13 @@
     "mctesterupload": "./client.js"
   },
   "scripts": {
-    "start": "node $NODE_DEBUG_OPTION dist/src/main/expressServer.js",
+    "start": "node $NODE_DEBUG_OPTION dist/main/expressServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^10.0.8",
     "axios": "^0.18.0",
     "express": "^4.16.3",
     "github-api": "^3.0.0",
@@ -22,6 +23,7 @@
     "string-to-stream": "^1.1.1"
   },
   "devDependencies": {
+    "@types/express": "^4.11.1",
     "ts-loader": "^4.3.0",
     "typescript": "^2.8.3",
     "webpack": "^4.8.3",

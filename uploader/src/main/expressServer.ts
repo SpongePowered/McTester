@@ -1,10 +1,9 @@
 'use strict';
-var express = require('express')
-var getRawBody = require('raw-body')
+import * as express from 'express';
 
-const handleUploadExpress = require('../lib/handleUploadExpress');
+import { handleUploadExpress } from '../lib/handleUploadExpress';
 
-var app = express()
+var app = express();
 //app.use(function (req, res, next) { getRawBody(req, { limit: '10mb'}) });
 
 // respond with "hello world" when a GET request is made to the homepage
