@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.internal.framework;
 
+import org.junit.Assert;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.mctester.internal.McTesterDummy;
@@ -8,6 +9,7 @@ import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.event.ErrorPropagatingEventListener;
 import org.spongepowered.mctester.internal.event.OneShotEventListener;
 import org.spongepowered.mctester.internal.TestUtils;
+import org.spongepowered.mctester.internal.event.StandaloneEventListener;
 import org.spongepowered.mctester.internal.framework.proxy.MainThreadProxy;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteClientProxy;
 import org.spongepowered.api.Game;
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     private List<OneShotEventListener> listeners = new ArrayList<>();
-    public Game fakeGame;
+    //public Game fakeGame;
     public Client client;
     public ErrorSlot errorSlot = new ErrorSlot();
 
@@ -41,8 +43,8 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }*/
 
     public TesterManager() {
-        Game realGame = Sponge.getGame();
-        this.fakeGame = MainThreadProxy.newProxy(realGame, Game.class, null);
+        //Game realGame = Sponge.getGame();
+        //this.fakeGame = MainThreadProxy.newProxy(realGame, Game.class, null);
         this.client = new ServerSideClientHandler(RemoteClientProxy.newProxy(this));
     }
 
@@ -56,7 +58,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     @Override
     public Game getGame() {
-        return this.fakeGame;
+        return Sponge.getGame();
     }
 
     @Override
@@ -66,7 +68,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     @Override
     public Player getThePlayer() {
-        Collection<Player> players = fakeGame.getServer().getOnlinePlayers();
+        Collection<Player> players = Sponge.getServer().getOnlinePlayers();
         if (players.size() != 1) {
             throw new RuntimeException("Unexpected players: " + players);
         }
@@ -74,15 +76,47 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
-    public <T extends Event> EventListener<T> listenOneShot(Class<T> eventClass, EventListener<? super T> listener) {
-        AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
-        error.fillInStackTrace();
+    public void listenOneShot(Runnable runnable, StandaloneEventListener<?>... listeners) throws Throwable {
+        /*AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
+        error.fillInStackTrace();*/
 
-        OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
+        List<OneShotEventListener<?>> newListeners = this.setupOneShotListeners(listeners);
+        runnable.run();
+        this.finishOneShotListeners(newListeners);
+
+
+
+        /*OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
         Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, oneShot);
-        this.listeners.add(oneShot);
+        this.listeners.add(oneShot);*/
 
-        return oneShot;
+        //return oneShot;
+    }
+
+    private List<OneShotEventListener<?>> setupOneShotListeners(StandaloneEventListener<?>... listeners) {
+        List<OneShotEventListener<?>> newListeners = new ArrayList<>(listeners.length);
+        for (StandaloneEventListener<?> listener: listeners) {
+            OneShotEventListener<?> newListener = new OneShotEventListener((Class) listener.getEventClass(), listener, new ErrorSlot());
+            Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, (Class) listener.getEventClass(), (EventListener) newListener);
+            newListeners.add(newListener);
+        }
+
+        return newListeners;
+    }
+
+    private void finishOneShotListeners(List<OneShotEventListener<?>> listeners) throws Throwable {
+        // Throw any caught exceptions before checking if listeners ran.
+        for (OneShotEventListener<?> listener: listeners) {
+            listener.throwCaughtException();
+        }
+
+        for (OneShotEventListener listener: listeners) {
+            if (!listener.handleFinished.isDone()) {
+                throw new AssertionError("A one-shot listener failed to run in time!\n" +
+                        "By the time this method call finished, a one-shot event listener should have been run - but it wasn't.\n");
+            }
+            Sponge.getEventManager().unregisterListeners(listener);
+        }
     }
 
     @Override
@@ -93,23 +127,25 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
-    public <T extends Event> int listenTimeout(Class<T> eventClass, EventListener<? super T> listener, int ticks) throws Throwable {
-        AssertionError error = new AssertionError(String.format("The one shot event listener registered here failed to run in %s ticks!\n", ticks));
-        error.fillInStackTrace();
+    public <T extends Event> int listenTimeout(Runnable runnable, StandaloneEventListener<T> listener, int ticks) throws Throwable {
+        /*AssertionError error = this.makeFakeException(String.format("The one shot event listener registered here failed to run in %s ticks!\n", ticks));*/
 
-        OneShotEventListener<T> oneShot = new OneShotEventListener<>(eventClass, listener, this.errorSlot, error);
-        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, oneShot);
+        OneShotEventListener<T> oneShot = new OneShotEventListener<>(listener.getEventClass(), listener, new ErrorSlot());
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, listener.getEventClass(), oneShot);
 
         // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
         // At the end of this method, we wait for handleFinished to ensure
         // that we re-throw any exception that may have occured.
         CompletableFuture<Long> handledFuture = oneShot.handleStarted;
         CompletableFuture<Void> timeoutFuture = new CompletableFuture<>();
+
         long startTime = System.currentTimeMillis();
         Task task = Sponge.getScheduler().createTaskBuilder().delayTicks(ticks).execute(() -> timeoutFuture.complete(null)).submit(McTesterDummy.INSTANCE);
 
+        runnable.run();
+
         // Blocking
-        Object result = null;
+        Object result;
         try {
             result = CompletableFuture.anyOf(handledFuture, timeoutFuture).get();
         } catch (Exception e) {
@@ -133,6 +169,22 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         this.errorSlot.throwIfSet();
 
         return Math.max(ticks - elapsedTicks, 0);
+    }
+
+    private AssertionError makeFakeException(String message) {
+        AssertionError assertionError = new AssertionError(message);
+        assertionError.fillInStackTrace();
+
+        // We remove the first two StackTraceElements, which correspond to the invocation
+        // of this method and its caller. This causes the first element to point
+        // to the user's code (e.g. an invocation of listenTimeout)
+        int shortLength = assertionError.getStackTrace().length - 2;
+        StackTraceElement[] modified = new StackTraceElement[shortLength];
+        System.arraycopy(assertionError.getStackTrace(), 2, modified, 0, shortLength);
+
+        assertionError.setStackTrace(modified);
+
+        return assertionError;
     }
 
     @Override

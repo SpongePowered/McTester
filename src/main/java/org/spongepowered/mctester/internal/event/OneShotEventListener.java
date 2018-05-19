@@ -36,9 +36,8 @@ public class OneShotEventListener<T extends Event> extends ErrorPropagatingEvent
     public CompletableFuture<Void> handleFinished = new CompletableFuture<>();
     public AssertionError fakeError;
 
-    public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot, AssertionError fakeError) {
+    public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot) {
         super(eventClass, listener, errorSlot);
-        this.fakeError = fakeError;
     }
 
     @Override
@@ -52,5 +51,9 @@ public class OneShotEventListener<T extends Event> extends ErrorPropagatingEvent
         } finally {
             this.handleFinished.complete(null);
         }
+    }
+
+    public void throwCaughtException() throws Throwable {
+        this.errorSlot.throwIfSet();
     }
 }

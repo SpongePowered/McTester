@@ -11,8 +11,8 @@ class McTesterGradlePlugin implements Plugin<Project> {
 
     void apply(Project project) {
         this.addGradleStart(project)
-        this.addDependency(project)
-        this.setupTestEnvironment(project)
+        //this.addDependency(project)
+        //this.setupTestEnvironment(project)
     }
 
     private void addGradleStart(Project project) {

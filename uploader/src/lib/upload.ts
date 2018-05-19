@@ -11,7 +11,7 @@ interface GithubResponse {
 
 class ImageWrapper {
     public raw: Buffer;
-    public opt: { title: string };
+    public opt: { title: string
     constructor(raw: Buffer, title: string) {
         this.raw = raw;
         this.opt = {title: title};

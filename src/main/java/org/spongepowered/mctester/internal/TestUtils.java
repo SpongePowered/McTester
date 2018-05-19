@@ -31,6 +31,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.EventManager;
+import org.spongepowered.mctester.internal.event.StandaloneEventListener;
 import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.mctester.junit.MinecraftRunner;
 
@@ -79,15 +80,17 @@ public interface TestUtils {
     Player getThePlayer();
 
     /**
-     * Registers a 'one-shot' listener. This behaves like a regular Sponge event listener,
+     * Executes the provided {@link Runnable} after registering the specified
+     * event listener.
+     * This 'one-shot' listener behaves like a regular Sponge event listener,
      * with the following differences:
      *
      * - Any exceptions thrown by the handler are treated as a test failure. This
      *   allows you to use {@link Assert} and friends as usual.
-     * - If the handler has not executed after the next call to a {@link Client}
-     * method, the test fails
-     * - The event handler is automatically unregistered after the next {@link Client}
-     * method call
+     * - If the handler is not invoked at some point during the {@link Runnable}'s
+     * execution, the test fails.
+     * - The event handler is automatically unregistered after the {@link Runnable}
+     * completes.
      *
      * This method is useful for verifying that certain client interaction (e.g. clicking
      * a block) causes a Sponge event to be fired.
@@ -99,7 +102,7 @@ public interface TestUtils {
      * as {@param listener}. If you want to unregister your listener early, use the return
      * value of this method with {@link EventManager#unregisterListeners(Object)}.
      */
-    <T extends Event> EventListener<T> listenOneShot(Class<T> eventClass, EventListener<? super T> listener);
+    void listenOneShot(Runnable runnable, StandaloneEventListener<?>... listeners) throws Throwable;
 
     /**
      * Registers an event listener. This behaves like a regular Sponge event listener,
@@ -108,7 +111,7 @@ public interface TestUtils {
      * - Any exceptions thrown by the handler are treated as a test failure. This
      *   allows you to use {@link Assert} and friends as usual.
      *
-     * It us usually preferrable to use either this method or {@link #listenOneShot(Class, EventListener)}
+     * It us usually preferrable to use either this method or {@link #listenOneShot(Class, EventListener, Runnable)}
      * instead of using {@link EventManager} directly. These methods ensure that any exceptions
      * thrown by listeners result in a test failure. Any exceptions thrown
      * by normal listeners are logged, but otherwise ignored.
@@ -147,7 +150,7 @@ public interface TestUtils {
      * @return The number of ticks remaining when the listener returned. This will be at most,
      * {@param ticks}, and at least 0. Note that this is an estimate.
      */
-    <T extends Event> int listenTimeout(Class<T> eventClass, EventListener<? super T> listener, int ticks) throws Throwable;
+    <T extends Event> int listenTimeout(Runnable runnable, StandaloneEventListener<T> listener, int ticks) throws Throwable;
 
     /**
      * Runs a {@link Callable} on the main thread, returning this result.

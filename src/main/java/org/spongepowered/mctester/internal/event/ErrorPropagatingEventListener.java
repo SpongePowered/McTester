@@ -4,7 +4,7 @@ import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 
-public class ErrorPropagatingEventListener<T extends Event> implements EventListener<T> {
+public class ErrorPropagatingEventListener<T extends Event> implements StandaloneEventListener<T> {
 
     private Class<T> eventClass;
     EventListener<? super T> listener;
@@ -24,6 +24,11 @@ public class ErrorPropagatingEventListener<T extends Event> implements EventList
             this.errorSlot.setErrorIfUnset(e);
             throw e;
         }
+    }
+
+    @Override
+    public Class<T> getEventClass() {
+        return this.eventClass;
     }
 
 }
