@@ -155,9 +155,8 @@ public interface TestUtils {
     /**
      * Runs a {@link Callable} on the main thread, returning this result.
      *
-     * <p>This method is provided as a performance optimization. It is completely optional:
-     * if you don't use it, your code will run on the main thread one method
-     * call at a time, instead of all at once.</p>
+     * <p>All SpongeAPI methods **must** be called from a runOnMainThread block,
+     * or from an event listener.</p>
      *
      * <p>Calls to {@link Client} methods, as well as {@link #sleepTicks(int)}, must
      * not be called on the main thread. Attempting to call them within the {@link Callable}
@@ -167,7 +166,7 @@ public interface TestUtils {
      * @return The result of the callable
      * @throws Throwable any exception thrown by the Callable
      */
-    <T> T batchActions(Callable<T> callable) throws Throwable;
+    <T> T runOnMainThread(Callable<T> callable) throws Throwable;
 
     /**
      * Runs a {@link Runnable} on the main threa
@@ -183,7 +182,7 @@ public interface TestUtils {
      * @param callable The {@link Runnable} to run on the main thread
      * @throws Throwable any exception thrown by the Callable
      */
-    void batchActions(Runnable callable) throws Throwable;
+    void runOnMainThread(Runnable callable) throws Throwable;
 
     /**
      * Delays the test thread for the specified number of ticks.

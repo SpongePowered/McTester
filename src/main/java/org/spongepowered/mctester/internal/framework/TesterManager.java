@@ -1,16 +1,13 @@
 package org.spongepowered.mctester.internal.framework;
 
-import org.junit.Assert;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.mctester.internal.McTesterDummy;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
-import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.event.ErrorPropagatingEventListener;
 import org.spongepowered.mctester.internal.event.OneShotEventListener;
 import org.spongepowered.mctester.internal.TestUtils;
 import org.spongepowered.mctester.internal.event.StandaloneEventListener;
-import org.spongepowered.mctester.internal.framework.proxy.MainThreadProxy;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteClientProxy;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -24,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -79,6 +75,10 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     public void listenOneShot(Runnable runnable, StandaloneEventListener<?>... listeners) throws Throwable {
         /*AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
         error.fillInStackTrace();*/
+
+        if (listeners == null || listeners.length == 0) {
+            throw new IllegalArgumentException("Must provide at least one listener!");
+        }
 
         List<OneShotEventListener<?>> newListeners = this.setupOneShotListeners(listeners);
         runnable.run();
@@ -188,9 +188,9 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
-    public <T> T batchActions(Callable<T> callable) throws Throwable {
+    public <T> T runOnMainThread(Callable<T> callable) throws Throwable {
         if (Sponge.getServer().isMainThread()) {
-            throw new IllegalStateException("Calling batchActions from the main thread is pointless!");
+            throw new IllegalStateException("Calling runOnMainThread from the main thread is pointless!");
         }
 
         try {
@@ -201,12 +201,12 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
-    public void batchActions(Runnable runnable) throws Throwable {
+    public void runOnMainThread(Runnable runnable) throws Throwable {
         if (Sponge.getServer().isMainThread()) {
-            throw new IllegalStateException("Calling batchActions from the main thread is pointless!");
+            throw new IllegalStateException("Calling runOnMainThread from the main thread is pointless!");
         }
 
-        this.batchActions(() -> {
+        this.runOnMainThread(() -> {
             runnable.run();
             return null;
         });

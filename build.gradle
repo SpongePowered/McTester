@@ -65,7 +65,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = project.mcpVersion
+    mappings = project.mcpVersion // Must be the same as SpongeForge
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
@@ -108,9 +108,10 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.spongepowered:spongeapi:7.0.0'
+    compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile 'org.spongepowered:mixin:0.7.4-SNAPSHOT'
     compile 'junit:junit:4.12'
+    compile 'com.google.guava:guava:21.0'
 }
 
 /*mixin {

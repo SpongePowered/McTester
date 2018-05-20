@@ -31,6 +31,7 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
+import org.spongepowered.mctester.internal.asm.MainThreadChecker;
 
 import java.util.List;
 

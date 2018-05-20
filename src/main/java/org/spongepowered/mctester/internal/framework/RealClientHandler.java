@@ -115,22 +115,15 @@ public class RealClientHandler implements RawClient {
     public void selectHotbarSlot(int slot) {
         EntityPlayerSP player = Minecraft.getMinecraft().player;
 
-        // Copied from Minecraft#processKeyBinds
+        // Copied from Minecraft#processKeyBinds, with some modifications
 
-        boolean flag = Minecraft.getMinecraft().gameSettings.field_193629_ap.isKeyDown();
-        boolean flag1 = Minecraft.getMinecraft().gameSettings.field_193630_aq.isKeyDown();
-
-        if (player.isSpectator())
+        if (Minecraft.getMinecraft().player.isSpectator())
         {
             Minecraft.getMinecraft().ingameGUI.getSpectatorGui().onHotbarSelected(slot);
         }
-        else if (player.isCreative() || Minecraft.getMinecraft().currentScreen != null || !flag1 && !flag)
-        {
-            player.inventory.currentItem = slot;
-        }
         else
         {
-            GuiContainerCreative.func_192044_a(Minecraft.getMinecraft(), slot, flag1, flag);
+            Minecraft.getMinecraft().player.inventory.currentItem = slot;
         }
     }
 

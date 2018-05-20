@@ -2,12 +2,15 @@ package org.spongepowered.mctester.internal;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
+import net.minecraft.launchwrapper.Launch;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
+import org.spongepowered.asm.lib.ClassReader;
+import org.spongepowered.mctester.internal.asm.MainThreadChecker;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.internal.world.CurrentWorld;
 import org.spongepowered.mctester.junit.DefaultScreenshotOptions;
@@ -20,6 +23,8 @@ import org.spongepowered.mctester.junit.UseSeparateWorld;
 import org.spongepowered.mctester.junit.WorldOptions;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +60,8 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
      */
     public RealJUnitRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
+
+        MainThreadChecker.checkClass(testClass);
 
         this.worldOptions = testClass.getAnnotation(WorldOptions.class);
         if (this.worldOptions == null) {
@@ -151,6 +158,15 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         }
     }
 
+    private void checkTestBytecode(Class<?> testClass) {
+        try {
+            byte[] bytecode = Launch.classLoader.getClassBytes(testClass.getName());
+            ClassReader reader = new ClassReader(bytecode);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public Object createTest() throws Exception {
         this.performInit();
@@ -181,7 +197,6 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public void afterInvoke(FrameworkMethod method, Throwable throwable) {
-
 
         if (this.tempWorld != null) {
             this.testActions.tryDeleteTempWorld(method, this.currentTestStatus, this.tempWorld);

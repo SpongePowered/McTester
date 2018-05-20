@@ -25,7 +25,7 @@ public class RemoteClientProxy extends BaseProxy {
     @Override
     Object dispatch(InvocationData data) {
         if (Sponge.getServer().isMainThread()) {
-            throw new IllegalStateException(String.format("You attempted to call '%s' from the main thread, probably by using the Scheduler API or TestUtils.batchActions.\n" +
+            throw new IllegalStateException(String.format("You attempted to call '%s' from the main thread, probably by using the Scheduler API or TestUtils.runOnMainThread.\n" +
                                             "All Client methods must be called directly or indirectly from your @Test method.", data.format()));
         }
 

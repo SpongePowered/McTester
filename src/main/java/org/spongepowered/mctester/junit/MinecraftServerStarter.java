@@ -27,7 +27,10 @@ package org.spongepowered.mctester.junit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.spongepowered.mctester.installer.SpongeInstaller;
 import org.spongepowered.mctester.internal.RealJUnitRunner;
+
+import java.io.File;
 
 /**
  * Helper to programmatically manage a Minecraft server.
@@ -59,15 +62,19 @@ public class MinecraftServerStarter {
 	        return;
         }
 
-	    this.started = true;
-        String existing = System.getProperty("fml.coreMods.load");
-        if (existing == null) {
-            existing = "";
+        this.started = true;
+
+        boolean spongeInstalled = this.isSpongeInstalled();
+        if (!spongeInstalled) {
+	    	this.installSponge();
+		}  else {
+            String existing = System.getProperty("fml.coreMods.load", "");
+            System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
         }
 
-        System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
 		System.setProperty("mixin.env.disableRefMap", "true");
 		System.setProperty("fml.readTimeout", "0");
+		System.setProperty("mixin.debug.verbose", "true");
 
 		String[] args = new String[] { "--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir", RealJUnitRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
 		// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
@@ -102,6 +109,20 @@ public class MinecraftServerStarter {
 			minecraftServerClassLoader = Launch.classLoader;
 		}
 		return minecraftServerClassLoader;
+	}
+
+	private boolean isSpongeInstalled() {
+		return this.getClass().getClassLoader().getResource("org/spongepowered/common/launch/SpongeLaunch.class") != null;
+	}
+
+	private void installSponge() {
+		System.err.println("Downloading latest SpongeForge!");
+		File outputDir = new File(RealJUnitRunner.GLOBAL_SETTINGS.getGameDir(), "mods");
+		outputDir.mkdirs();
+
+		new SpongeInstaller().downloadLatestSponge(outputDir);
+        System.err.println("Downloaded latest SpongeForge!");
+
 	}
 
 }
