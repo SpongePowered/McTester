@@ -176,7 +176,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public Statement methodInvoker(FrameworkMethod method, Object test) {
-        return new InvokeMethodWrapper(method, test, this.testerManager.errorSlot, this);
+        return new InvokeMethodWrapper(method, test, this);
     }
 
     private String getWorldName() {
@@ -196,7 +196,8 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     }
 
     @Override
-    public void afterInvoke(FrameworkMethod method, Throwable throwable) {
+    public void afterInvoke(FrameworkMethod method) throws Throwable {
+        this.testerManager.checkAndClearErrorSlots();
 
         if (this.tempWorld != null) {
             this.testActions.tryDeleteTempWorld(method, this.currentTestStatus, this.tempWorld);

@@ -110,8 +110,12 @@ dependencies {
     compile localGroovy()
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile 'org.spongepowered:mixin:0.7.4-SNAPSHOT'
+
+    testCompile 'junit:junit:4.12'
     compile 'junit:junit:4.12'
+
     compile 'com.google.guava:guava:21.0'
+
 }
 
 /*mixin {

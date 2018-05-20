@@ -6,6 +6,6 @@ public interface InvokerCallback {
 
     void beforeInvoke(FrameworkMethod method);
 
-    void afterInvoke(FrameworkMethod method, Throwable throwable);
+    void afterInvoke(FrameworkMethod method) throws Throwable ;
 
 }

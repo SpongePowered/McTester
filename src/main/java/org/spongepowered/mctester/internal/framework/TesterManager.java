@@ -17,7 +17,9 @@ import org.spongepowered.mctester.internal.framework.proxy.ProxyCallback;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -29,7 +31,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     private List<OneShotEventListener> listeners = new ArrayList<>();
     //public Game fakeGame;
     public Client client;
-    public ErrorSlot errorSlot = new ErrorSlot();
+    private Set<ErrorSlot> errorSlots = new HashSet<>();
 
     /*public static void runTestThread() {
         TesterManager manager = new TesterManager();
@@ -96,7 +98,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     private List<OneShotEventListener<?>> setupOneShotListeners(StandaloneEventListener<?>... listeners) {
         List<OneShotEventListener<?>> newListeners = new ArrayList<>(listeners.length);
         for (StandaloneEventListener<?> listener: listeners) {
-            OneShotEventListener<?> newListener = new OneShotEventListener((Class) listener.getEventClass(), listener, new ErrorSlot());
+            OneShotEventListener<?> newListener = new OneShotEventListener((Class) listener.getEventClass(), listener, this.makeErrorSlot());
             Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, (Class) listener.getEventClass(), (EventListener) newListener);
             newListeners.add(newListener);
         }
@@ -121,16 +123,35 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     @Override
     public <T extends Event> EventListener<T> listen(Class<T> eventClass, EventListener<? super T> listener) {
-        ErrorPropagatingEventListener<T> newListener = new ErrorPropagatingEventListener<>(eventClass, listener, this.errorSlot);
+        ErrorPropagatingEventListener<T> newListener = new ErrorPropagatingEventListener<>(eventClass, listener, this.makeErrorSlot());
         Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, newListener);
         return newListener;
+    }
+
+    public ErrorSlot makeErrorSlot() {
+        ErrorSlot slot = new ErrorSlot();
+        this.errorSlots.add(slot);
+        return slot;
+    }
+
+
+    private void checkErrorSlots() throws Throwable {
+        for (ErrorSlot slot: this.errorSlots) {
+            slot.throwIfSet();
+        }
+    }
+
+
+    public void checkAndClearErrorSlots() throws Throwable {
+        this.checkErrorSlots();
+        this.errorSlots.clear();
     }
 
     @Override
     public <T extends Event> int listenTimeout(Runnable runnable, StandaloneEventListener<T> listener, int ticks) throws Throwable {
         /*AssertionError error = this.makeFakeException(String.format("The one shot event listener registered here failed to run in %s ticks!\n", ticks));*/
 
-        OneShotEventListener<T> oneShot = new OneShotEventListener<>(listener.getEventClass(), listener, new ErrorSlot());
+        OneShotEventListener<T> oneShot = new OneShotEventListener<>(listener.getEventClass(), listener, this.makeErrorSlot());
         Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, listener.getEventClass(), oneShot);
 
         // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
@@ -166,7 +187,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         }
 
         oneShot.handleFinished.get();
-        this.errorSlot.throwIfSet();
+        this.checkErrorSlots();
 
         return Math.max(ticks - elapsedTicks, 0);
     }
@@ -230,7 +251,8 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     public void afterInvoke() throws Throwable {
 
         // Run this first, since it was
-        this.errorSlot.throwIfSet();
+        /*this.checkErrorSlots();
+
 
         // This runs after a Client method has returned
         for (OneShotEventListener listener: this.listeners) {
@@ -241,7 +263,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
             }
             Sponge.getEventManager().unregisterListeners(listener);
         }
-        listeners.clear();
+        listeners.clear();*/
     }
 
     @Override

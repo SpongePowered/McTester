@@ -19,6 +19,8 @@ public class ErrorSlot {
     public void setErrorIfUnset(Throwable throwable) {
         if (this.error == null) {
             this.error = throwable;
+        }else {
+            throw new IllegalStateException("Attempted to overwrite exception! Old: " + this.error + " new: " + throwable);
         }
     }
 

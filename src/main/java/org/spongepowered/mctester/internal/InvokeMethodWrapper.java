@@ -8,38 +8,24 @@ import org.spongepowered.mctester.junit.UseSeparateWorld;
 
 public class InvokeMethodWrapper extends InvokeMethod {
 
-    private ErrorSlot errorSlot;
     private FrameworkMethod method;
     private InvokerCallback callback;
 
-    public InvokeMethodWrapper(FrameworkMethod testMethod, Object target, ErrorSlot errorSlot, InvokerCallback callback) {
+    public InvokeMethodWrapper(FrameworkMethod testMethod, Object target, InvokerCallback callback) {
         super(testMethod, target);
-        this.errorSlot = errorSlot;
         this.method = testMethod;
         this.callback = callback;
     }
 
     @Override
     public void evaluate() throws Throwable {
-        this.errorSlot.clear();
         this.callback.beforeInvoke(this.method);
-
-        Throwable throwable = null;
 
         try {
             super.evaluate();
-        } catch (Throwable t) {
-            throwable = t;
-            throw throwable;
         } finally {
             Sponge.getEventManager().unregisterPluginListeners(McTesterDummy.INSTANCE);
-
-            Throwable captured = throwable;
-            if (captured == null) {
-                captured = errorSlot.getStored();
-            }
-            this.callback.afterInvoke(this.method, captured);
+            this.callback.afterInvoke(this.method);
         }
-        errorSlot.throwIfSet();
     }
 }
