@@ -9,6 +9,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.asm.lib.ClassReader;
 import org.spongepowered.mctester.internal.asm.MainThreadChecker;
 import org.spongepowered.mctester.internal.framework.TesterManager;
@@ -193,6 +194,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         }
 
         this.currentTestStatus = new TestStatus(null);
+        this.testerManager.beforeTest();
     }
 
     @Override

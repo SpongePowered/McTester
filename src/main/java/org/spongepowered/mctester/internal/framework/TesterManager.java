@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
-    private List<OneShotEventListener> listeners = new ArrayList<>();
     //public Game fakeGame;
     public Client client;
     private Set<ErrorSlot> errorSlots = new HashSet<>();
@@ -106,6 +105,10 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         return newListeners;
     }
 
+    public void beforeTest() {
+        this.errorSlots.clear();
+    }
+
     private void finishOneShotListeners(List<OneShotEventListener<?>> listeners) throws Throwable {
         // Throw any caught exceptions before checking if listeners ran.
         for (OneShotEventListener<?> listener: listeners) {
@@ -144,7 +147,6 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     public void checkAndClearErrorSlots() throws Throwable {
         this.checkErrorSlots();
-        this.errorSlots.clear();
     }
 
     @Override

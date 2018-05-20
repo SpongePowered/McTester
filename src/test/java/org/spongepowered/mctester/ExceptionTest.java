@@ -29,10 +29,10 @@ public class ExceptionTest extends BaseTest {
     @Test
     public void testOneShotEventListenerException() throws Throwable {
         expectedEx.expect(AssertionError.class);
-        expectedEx.expectMessage(CoreMatchers.containsString("Got message: Some message"));
+        expectedEx.expectMessage(CoreMatchers.containsString("Got message: One shot"));
 
         this.testUtils.listenOneShot(() -> {
-            this.testUtils.getClient().sendMessage("Some message");
+            this.testUtils.getClient().sendMessage("One shot");
         }, new StandaloneEventListener<MessageChannelEvent.Chat>() {
 
             @Override
@@ -50,7 +50,7 @@ public class ExceptionTest extends BaseTest {
     @Test
     public void testPermanentEventListenerException() throws Throwable {
         expectedEx.expect(AssertionError.class);
-        expectedEx.expectMessage(CoreMatchers.containsString("Got message: Other message"));
+        expectedEx.expectMessage(CoreMatchers.containsString("Got message: Permanent message"));
 
         this.testUtils.listen(MessageChannelEvent.Chat.class,
                 new StandaloneEventListener<MessageChannelEvent.Chat>() {
@@ -67,16 +67,16 @@ public class ExceptionTest extends BaseTest {
 
                 });
 
-        this.testUtils.getClient().sendMessage("Other message");
+        this.testUtils.getClient().sendMessage("Permanent message");
     }
 
     @Test
     public void testTimeoutEventListenerException() throws Throwable {
         expectedEx.expect(AssertionError.class);
-        expectedEx.expectMessage(CoreMatchers.containsString("Got message: From timeout"));
+        expectedEx.expectMessage(CoreMatchers.containsString("Got message: Timeout message"));
 
         this.testUtils.listenTimeout(() -> {
-            this.testUtils.getClient().sendMessage("From timeout");
+            this.testUtils.getClient().sendMessage("Timeout message");
         }, new StandaloneEventListener<MessageChannelEvent.Chat>() {
 
             @Override
