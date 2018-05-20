@@ -16,11 +16,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class SpongeInstaller {
 
+    private static final String SPONGE_JAR_GLOB = "glob:spongeforge-*-dev.jar";
     private static final String DOWNLOAD_LIST = "https://dl-api.spongepowered.org/v1/org.spongepowered/spongeforge/downloads?type=stable&minecraft=1.12.2";
 
     public void downloadLatestSponge(File downloadDirectory) {
@@ -39,6 +44,8 @@ public class SpongeInstaller {
             return;
         }
 
+        this.removeOtherSpongeBuilds(downloadDirectory);
+
         try {
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(outputFile);
@@ -46,6 +53,20 @@ public class SpongeInstaller {
         } catch (IOException e) {
             throw new RuntimeException("Failed to save Sponge jar!", e);
         }
+    }
+
+    private void removeOtherSpongeBuilds(File downloadDirectory) {
+        System.err.println("Removing old Sponge build...");
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher(SPONGE_JAR_GLOB);
+        try {
+            for (Path path : Files.newDirectoryStream(downloadDirectory.toPath(), (p) -> matcher.matches(p.getFileName()))) {
+                System.err.println("Deleting old Sponge version: " + path);
+                Files.delete(path);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to remove old Sponge versions!", e);
+        }
+
     }
 
     private JsonArray getDownloadList() {

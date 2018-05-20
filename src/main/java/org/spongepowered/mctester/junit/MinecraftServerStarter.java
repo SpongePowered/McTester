@@ -74,7 +74,7 @@ public class MinecraftServerStarter {
 
 		System.setProperty("mixin.env.disableRefMap", "true");
 		System.setProperty("fml.readTimeout", "0");
-		System.setProperty("mixin.debug.verbose", "true");
+		//System.setProperty("mixin.debug.verbose", "true");
 
 		String[] args = new String[] { "--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir", RealJUnitRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
 		// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
