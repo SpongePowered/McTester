@@ -4,17 +4,30 @@ import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 
-public class ErrorPropagatingEventListener<T extends Event> implements StandaloneEventListener<T> {
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    private Class<T> eventClass;
-    EventListener<? super T> listener;
+public class ErrorPropagatingEventListener<T extends Event> extends StandaloneEventListener<T> {
+
     ErrorSlot errorSlot;
 
-    public ErrorPropagatingEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot) {
-        this.eventClass = eventClass;
-        this.listener = listener;
+    public ErrorPropagatingEventListener(StandaloneEventListener<T> listener, ErrorSlot errorSlot) {
+        super(listener.getEventClass(), listener);
         this.errorSlot = errorSlot;
     }
+
+    /*
+    private static <V extends Event> Class<V> getClassFromListener(EventListener<V> listener) {
+        List<Method> handleMethods = Arrays.stream(listener.getClass().getMethods()).filter(m -> m.getName().equals("handle") && m.getParameterTypes().length > 0 && m.getParameterTypes()[0] != Event.class).collect(Collectors.toList());
+        if (handleMethods.size() != 1) {
+            // This should be impossible
+            throw new IllegalStateException(String.format("Event listener %s had unexpected'handle' methods: %s", listener, handleMethods));
+        }
+        Class<V> eventClass = (Class) handleMethods.get(0).getParameterTypes()[0];
+        return eventClass;
+    }*/
 
     @Override
     public void handle(T event) throws Exception {
@@ -25,10 +38,4 @@ public class ErrorPropagatingEventListener<T extends Event> implements Standalon
             throw e;
         }
     }
-
-    @Override
-    public Class<T> getEventClass() {
-        return this.eventClass;
-    }
-
 }

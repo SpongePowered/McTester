@@ -76,8 +76,23 @@ public interface Client {
      * <p>The result of this action is dependent on what the client
      * is currently looking at, as well as what it is currently holding
      * - just like a human pressing the left mouse button.</p>
+     *
+     * <p>This method performs an instantaneously click - it only lasts
+     * for one client tick. To perform a longer click, use
+     * {@link #holdLeftClick(boolean)}.</p>
      */
     void leftClick();
+
+    /**
+     * Causes the client to start or stop holding a left click.
+     *
+     * <p>If {@param clicking} is <code>true</code>, the client
+     * will hold down left click until {@link #holdLeftClick(boolean)}
+     * is called with <code>false</code>.</p>
+     *
+     * @param clicking The clicking state
+     */
+    void holdLeftClick(boolean clicking);
 
     /**
      * Causes the client to perform a right mouse click.
@@ -85,8 +100,24 @@ public interface Client {
      * <p>The result of this action is dependent on what the client
      * is currently looking at, as well as what it is currently holding
      * - just like a human pressing the right mouse button.</p>
+     *
+     * <p>This method performs an instantaneously click - it only lasts
+     * for one client tick. To perform a longer click, use
+     * {@link #holdRightClick(boolean)}.</p>
+     *
      */
     void rightClick();
+
+    /**
+     * Causes the client to start or stop holding a right click.
+     *
+     * <p>If {@param clicking} is <code>true</code>, the client
+     * will hold down right click until {@link #holdRightClick(boolean)}
+     * is called with <code>false</code>.</p>
+     *
+     * @param clicking The clicking state
+     */
+    void holdRightClick(boolean clicking);
 
     /**
      * Gets the item in the client's specified hand.

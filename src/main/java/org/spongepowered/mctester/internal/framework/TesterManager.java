@@ -1,6 +1,9 @@
 package org.spongepowered.mctester.internal.framework;
 
+import org.junit.Assert;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackComparators;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.mctester.internal.McTesterDummy;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
@@ -73,7 +76,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
-    public void listenOneShot(Runnable runnable, StandaloneEventListener<?>... listeners) throws Throwable {
+    public void listenOneShot(Runnable runnable, StandaloneEventListener<? extends Event>... listeners) throws Throwable {
         /*AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
         error.fillInStackTrace();*/
 
@@ -94,11 +97,11 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         //return oneShot;
     }
 
-    private List<OneShotEventListener<?>> setupOneShotListeners(StandaloneEventListener<?>... listeners) {
+    private List<OneShotEventListener<?>> setupOneShotListeners(StandaloneEventListener<? extends Event>... listeners) {
         List<OneShotEventListener<?>> newListeners = new ArrayList<>(listeners.length);
-        for (StandaloneEventListener<?> listener: listeners) {
-            OneShotEventListener<?> newListener = new OneShotEventListener((Class) listener.getEventClass(), listener, this.makeErrorSlot());
-            Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, (Class) listener.getEventClass(), (EventListener) newListener);
+        for (EventListener<?> listener: listeners) {
+            OneShotEventListener<?> newListener = new OneShotEventListener((StandaloneEventListener) listener, this.makeErrorSlot());
+            Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, newListener.getEventClass(), (EventListener) newListener);
             newListeners.add(newListener);
         }
 
@@ -125,9 +128,9 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Override
-    public <T extends Event> EventListener<T> listen(Class<T> eventClass, EventListener<? super T> listener) {
-        ErrorPropagatingEventListener<T> newListener = new ErrorPropagatingEventListener<>(eventClass, listener, this.makeErrorSlot());
-        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, eventClass, newListener);
+    public <T extends Event> StandaloneEventListener<T> listen(StandaloneEventListener<T> listener) {
+        ErrorPropagatingEventListener<T> newListener = new ErrorPropagatingEventListener<>(listener, this.makeErrorSlot());
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, newListener.getEventClass(), newListener);
         return newListener;
     }
 
@@ -153,8 +156,8 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     public <T extends Event> int listenTimeout(Runnable runnable, StandaloneEventListener<T> listener, int ticks) throws Throwable {
         /*AssertionError error = this.makeFakeException(String.format("The one shot event listener registered here failed to run in %s ticks!\n", ticks));*/
 
-        OneShotEventListener<T> oneShot = new OneShotEventListener<>(listener.getEventClass(), listener, this.makeErrorSlot());
-        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, listener.getEventClass(), oneShot);
+        OneShotEventListener<T> oneShot = new OneShotEventListener<>(listener, this.makeErrorSlot());
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, oneShot.getEventClass(), oneShot);
 
         // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
         // At the end of this method, we wait for handleFinished to ensure
@@ -281,5 +284,10 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
     @Override
     public void waitForAll() {
         this.sleepTicks(2);
+    }
+
+    @Override
+    public void assertStacksEqual(ItemStack serverStack, ItemStack clientStack) {
+        Assert.assertEquals("Itemstacks are not equal! Server: " + serverStack + " client " + clientStack, 0, ItemStackComparators.ALL.compare(serverStack, clientStack));
     }
 }

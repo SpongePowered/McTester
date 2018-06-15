@@ -133,9 +133,21 @@ public class RealClientHandler implements RawClient {
     }
 
     @Override
+    public void holdLeftClick(boolean clicking) {
+        ((IMixinMinecraft) Minecraft.getMinecraft()).holdLeftClick(clicking);
+    }
+
+
+    @Override
     public void rightClick() {
         ((IMixinMinecraft) Minecraft.getMinecraft()).rightClick();
     }
+
+    @Override
+    public void holdRightClick(boolean clicking) {
+        ((IMixinMinecraft) Minecraft.getMinecraft()).holdRightClick(clicking);
+    }
+
 
     @Override
     public ItemStack getItemInHand(HandType type) {

@@ -62,8 +62,18 @@ public class ServerSideClientHandler implements Client {
     }
 
     @Override
+    public void holdLeftClick(boolean clicking) {
+        this.proxyClient.holdLeftClick(clicking);
+    }
+
+    @Override
     public void rightClick() {
         this.proxyClient.rightClick();
+    }
+
+    @Override
+    public void holdRightClick(boolean clicking) {
+        this.proxyClient.holdRightClick(clicking);
     }
 
     @Override

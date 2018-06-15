@@ -25,7 +25,7 @@ public class MessageRPCRequest extends BaseClientMessage {
                 try {
                     McTester.INSTANCE.channel.sendToServer(MessageRPCRequest.this.data.makeResponse());
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException("Expcetion processing RPC request: " + MessageRPCRequest.this.data, e);
                 }
             }
         });

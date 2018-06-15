@@ -33,18 +33,7 @@ public class ExceptionTest extends BaseTest {
 
         this.testUtils.listenOneShot(() -> {
             this.testUtils.getClient().sendMessage("One shot");
-        }, new StandaloneEventListener<MessageChannelEvent.Chat>() {
-
-            @Override
-            public Class<MessageChannelEvent.Chat> getEventClass() {
-                return MessageChannelEvent.Chat.class;
-            }
-
-            @Override
-            public void handle(MessageChannelEvent.Chat event) throws Exception {
-                Assert.fail("Got message: " + event.getRawMessage().toPlain());
-            }
-        });
+        }, new StandaloneEventListener<>(MessageChannelEvent.Chat.class, (MessageChannelEvent.Chat event) -> Assert.fail("Got message: " + event.getRawMessage().toPlain())));
     }
 
     @Test
@@ -52,21 +41,7 @@ public class ExceptionTest extends BaseTest {
         expectedEx.expect(AssertionError.class);
         expectedEx.expectMessage(CoreMatchers.containsString("Got message: Permanent message"));
 
-        this.testUtils.listen(MessageChannelEvent.Chat.class,
-                new StandaloneEventListener<MessageChannelEvent.Chat>() {
-
-                    @Override
-                    public Class<MessageChannelEvent.Chat> getEventClass() {
-                        return MessageChannelEvent.Chat.class;
-                    }
-
-                    @Override
-                    public void handle(MessageChannelEvent.Chat event) throws Exception {
-                        Assert.fail("Got message: " + event.getRawMessage().toPlain());
-                    }
-
-                });
-
+        this.testUtils.listen(new StandaloneEventListener<>(MessageChannelEvent.Chat.class, (MessageChannelEvent.Chat event) -> Assert.fail("Got message: " + event.getRawMessage().toPlain())));
         this.testUtils.getClient().sendMessage("Permanent message");
     }
 
@@ -77,18 +52,8 @@ public class ExceptionTest extends BaseTest {
 
         this.testUtils.listenTimeout(() -> {
             this.testUtils.getClient().sendMessage("Timeout message");
-        }, new StandaloneEventListener<MessageChannelEvent.Chat>() {
-
-            @Override
-            public Class<MessageChannelEvent.Chat> getEventClass() {
-                return MessageChannelEvent.Chat.class;
-            }
-
-            @Override
-            public void handle(MessageChannelEvent.Chat event) throws Exception {
-                Assert.fail("Got message: " + event.getRawMessage().toPlain());
-            }
-        }, 20);
+        }, new StandaloneEventListener<MessageChannelEvent.Chat>(MessageChannelEvent.Chat.class, (MessageChannelEvent.Chat event) -> Assert.fail("Got message: " + event.getRawMessage().toPlain())),
+                20);
     }
 
 }

@@ -10,7 +10,11 @@ public interface IMixinMinecraft {
 
     void leftClick();
 
+    void holdLeftClick(boolean clicking);
+
     void rightClick();
+
+    void holdRightClick(boolean clicking);
 
     <T> ListenableFuture<T> addScheduledTaskAlwaysDelay(Callable<T> callable);
 

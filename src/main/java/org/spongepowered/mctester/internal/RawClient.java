@@ -22,7 +22,12 @@ public interface RawClient {
 
     void leftClick();
 
+    void holdLeftClick(boolean clicking);
+
     void rightClick();
+
+    void holdRightClick(boolean clicking);
+
 
     ItemStack getItemInHand(HandType type);
 

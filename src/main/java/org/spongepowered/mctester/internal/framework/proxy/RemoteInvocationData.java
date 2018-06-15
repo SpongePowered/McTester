@@ -32,4 +32,14 @@ public class RemoteInvocationData extends InvocationData implements DataSerializ
                 .set(RPCKeys.PARAM_TYPES, Arrays.stream(this.method.getParameterTypes()).map(Class::getCanonicalName).collect(Collectors.toList()))
                 .set(RPCKeys.PARAMS.getQuery(), this.args);
     }
+
+    @Override
+    public String toString() {
+        return "RemoteInvocationData{" +
+                "realObject=" + realObject +
+                ", method=" + method +
+                ", args=" + args +
+                ", response=" + response +
+                '}';
+    }
 }

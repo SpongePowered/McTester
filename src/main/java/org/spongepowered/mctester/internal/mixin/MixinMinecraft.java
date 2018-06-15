@@ -2,6 +2,8 @@ package org.spongepowered.mctester.internal.mixin;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
@@ -39,6 +41,10 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
 
     @Shadow @Final private Queue<FutureTask<?>> scheduledTasks;
 
+    @Shadow public GameSettings gameSettings;
+    private boolean leftClicking;
+    private boolean rightClicking;
+
     @Inject(method = "init", at = @At(value = "RETURN"))
     public void onInitDone(CallbackInfo ci) {
         RunnerEvents.setClientInit();
@@ -75,6 +81,17 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         }
     }
 
+    @Inject(method = "processKeyBinds", at = @At("HEAD"))
+    public void onProcessKeyBinds(CallbackInfo ci) {
+        if (this.leftClicking) {
+
+        }
+
+        if (this.rightClicking) {
+
+        }
+    }
+
     @Override
     public <T> ListenableFuture<T> addScheduledTaskAlwaysDelay(Callable<T> callable) {
         Validate.notNull(callable);
@@ -96,6 +113,30 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
     @Override
     public void leftClick() {
         this.clickMouse();
+    }
+
+    @Override
+    public void holdLeftClick(boolean clicking) {
+        this.leftClicking = clicking;
+
+        KeyBinding attack = this.gameSettings.keyBindAttack;
+
+        KeyBinding.setKeyBindState(attack.getKeyCode(), clicking);
+        if (clicking) {
+            KeyBinding.onTick(attack.getKeyCode());
+        }
+    }
+
+    @Override
+    public void holdRightClick(boolean clicking) {
+        this.rightClicking = clicking;
+
+        KeyBinding useItem = this.gameSettings.keyBindUseItem;
+
+        KeyBinding.setKeyBindState(useItem.getKeyCode(), clicking);
+        if (clicking) {
+            KeyBinding.onTick(useItem.getKeyCode());
+        }
     }
 
     @Override

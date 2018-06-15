@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.internal.framework.proxy;
 
+import org.spongepowered.api.util.Coerce;
 import org.spongepowered.mctester.internal.message.RPCKeys;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
@@ -50,13 +51,20 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
             } else if (CatalogType.class.isAssignableFrom(paramType)) {
                 finalParams.add(Sponge.getRegistry().getType((Class) paramType, (String) rawParam).get());
             } else {
-                finalParams.add(rawParam);
+                finalParams.add(this.tryCoerce(rawParam, paramType));
             }
 
             /*Utils.dataToArbitrary(rawParam).
             finalParams.add(Utils.dataToArbitrary(rawParam, paramType));*/
         }
         return Optional.of(new RemoteInvocationData(this.realObject, method, finalParams));
+    }
+
+    private Object tryCoerce(Object object, Class<?> clazz) {
+        if (clazz.equals(boolean.class)) {
+            return ((Optional) Coerce.asBoolean(object)).orElse(object);
+        }
+        return object;
     }
 
 }

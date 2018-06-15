@@ -36,8 +36,8 @@ public class OneShotEventListener<T extends Event> extends ErrorPropagatingEvent
     public CompletableFuture<Void> handleFinished = new CompletableFuture<>();
     public AssertionError fakeError;
 
-    public OneShotEventListener(Class<T> eventClass, EventListener<? super T> listener, ErrorSlot errorSlot) {
-        super(eventClass, listener, errorSlot);
+    public OneShotEventListener(StandaloneEventListener<T> listener, ErrorSlot errorSlot) {
+        super(listener, errorSlot);
     }
 
     @Override

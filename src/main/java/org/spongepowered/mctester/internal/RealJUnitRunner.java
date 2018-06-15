@@ -62,7 +62,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     public RealJUnitRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
 
-        MainThreadChecker.checkClass(testClass);
+        //MainThreadChecker.checkClass(testClass);
 
         this.worldOptions = testClass.getAnnotation(WorldOptions.class);
         if (this.worldOptions == null) {

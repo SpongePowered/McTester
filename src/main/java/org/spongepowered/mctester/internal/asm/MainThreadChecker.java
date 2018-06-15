@@ -65,3 +65,4 @@ class MethodChecker extends MethodVisitor {
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 }
+
