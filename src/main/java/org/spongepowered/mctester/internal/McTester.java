@@ -25,6 +25,10 @@
 package org.spongepowered.mctester.internal;
 
 import com.google.inject.Inject;
+import net.minecraft.client.Minecraft;
+import org.slf4j.Logger;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -33,7 +37,15 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.monster.Creeper;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.network.ChannelBinding;
+import org.spongepowered.api.network.MessageHandler;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationData;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationDataBuilder;
@@ -41,21 +53,8 @@ import org.spongepowered.mctester.internal.message.ClientDelegateHandler;
 import org.spongepowered.mctester.internal.message.ServerDelegateHandler;
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest;
 import org.spongepowered.mctester.internal.message.toserver.MessageRPCResponse;
-import net.minecraft.client.Minecraft;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.mctester.junit.RunnerEvents;
-import org.slf4j.Logger;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.network.ChannelBinding;
-import org.spongepowered.api.network.MessageHandler;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 @Plugin(
@@ -142,7 +141,7 @@ public class McTester {
     }
 
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event) {
+    public void onClientJoin(ClientConnectionEvent.Join event) {
         RunnerEvents.setPlayerJoined();
     }
 }
