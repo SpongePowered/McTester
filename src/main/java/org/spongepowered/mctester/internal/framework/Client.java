@@ -11,6 +11,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.text.Text;
 
+import java.util.Optional;
+
 /**
  * The Client controller.
  *
@@ -147,5 +149,7 @@ public interface Client {
      * @return
      */
     PlayerInventory getClientInventory();
+
+    Optional<String> getOpenGuiClass();
 
 }

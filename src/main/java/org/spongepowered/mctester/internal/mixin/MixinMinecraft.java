@@ -45,6 +45,8 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
     private boolean leftClicking;
     private boolean rightClicking;
 
+    private boolean allowPause = false;
+
     @Inject(method = "init", at = @At(value = "RETURN"))
     public void onInitDone(CallbackInfo ci) {
         RunnerEvents.setClientInit();
@@ -144,4 +146,13 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         this.rightClickMouse();
     }
 
+    @Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;doesGuiPauseGame()Z"))
+    public boolean onDoesGuiPauseGame(GuiScreen screen) {
+        return this.allowPause && screen.doesGuiPauseGame();
+    }
+
+    @Override
+    public void setAllowPause(boolean allowPause) {
+        this.allowPause = allowPause;
+    }
 }

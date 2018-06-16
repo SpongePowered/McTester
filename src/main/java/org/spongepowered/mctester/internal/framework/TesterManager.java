@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.internal.framework;
 
+import net.minecraft.client.Minecraft;
 import org.junit.Assert;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -19,6 +20,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.mctester.internal.framework.proxy.ProxyCallback;
+import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.ArrayList;
@@ -118,6 +120,7 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
         // like chunk data. This can help avoid race conditions later, by ensuring that client
         // ticks will be fast when a test starts executing.
         this.client.onFullyLoggedIn();
+        ((IMixinMinecraft) Minecraft.getMinecraft()).setAllowPause(false);
     }
 
     private void finishOneShotListeners(List<OneShotEventListener<?>> listeners) throws Throwable {

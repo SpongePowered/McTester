@@ -168,6 +168,14 @@ public class RealClientHandler implements RawClient {
     }
 
     @Override
+    public String getOpenGuiClass() {
+        if (Minecraft.getMinecraft().currentScreen == null) {
+            return "";
+        }
+        return Minecraft.getMinecraft().currentScreen.getClass().getName();
+    }
+
+    @Override
     public void onFullyLoggedIn() {
         System.err.println("Fully logged in on client!");
         //RunnerEvents.setPlayerJoined();

@@ -10,8 +10,10 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.RawClient;
+import scala.tools.cmd.Opt;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ServerSideClientHandler implements Client {
 
@@ -33,6 +35,14 @@ public class ServerSideClientHandler implements Client {
         return (PlayerInventory) inventory;
     }
 
+    @Override
+    public Optional<String> getOpenGuiClass() {
+        String className = this.proxyClient.getOpenGuiClass();
+        if (className.equals("")) {
+            return Optional.empty();
+        }
+        return Optional.of(className);
+    }
 
     // Boilerplate
 

@@ -36,6 +36,7 @@ public class CurrentWorld {
             public void run() {
 
                 WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
+                worldsettings.enableCommands();
                 Minecraft.getMinecraft().launchIntegratedServer(CurrentWorld.this.name, CurrentWorld.this.name, worldsettings);
             }
         }));
@@ -57,6 +58,8 @@ public class CurrentWorld {
 
 
     public void exitToMainMenu() {
+        ((IMixinMinecraft) Minecraft.getMinecraft()).setAllowPause(true);
+
         if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
             RunnerEvents.resetPlayerJoined();
             return;

@@ -8,6 +8,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RawClient {
@@ -33,4 +34,6 @@ public interface RawClient {
     ItemStack getItemInHand(HandType type);
 
     List<DataView> getRawInventory();
+
+    String getOpenGuiClass();
 }
