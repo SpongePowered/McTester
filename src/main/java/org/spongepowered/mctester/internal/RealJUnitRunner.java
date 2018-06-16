@@ -102,13 +102,15 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     private void performInit() {
         if (!this.initialized) {
-            RunnerEvents.waitForClientInit();
+            this.initialized = true;
 
-            this.joinNewWorld();
+            RunnerEvents.waitForClientInit();
 
             this.testerManager = new TesterManager();
             this.testActions = new TestActions(this.testerManager, this.worldOptions, this.screenshotOptions, this.globalTestStatus);
-            this.initialized = true;
+
+            this.joinNewWorld();
+
         }
     }
 

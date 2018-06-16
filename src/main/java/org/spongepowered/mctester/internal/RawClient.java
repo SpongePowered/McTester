@@ -28,6 +28,7 @@ public interface RawClient {
 
     void holdRightClick(boolean clicking);
 
+    void onFullyLoggedIn();
 
     ItemStack getItemInHand(HandType type);
 

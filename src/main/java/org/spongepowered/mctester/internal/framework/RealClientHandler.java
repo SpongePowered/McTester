@@ -20,6 +20,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.mctester.internal.RawClient;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
+import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,5 +165,11 @@ public class RealClientHandler implements RawClient {
             stacks.add(((ItemStack) (Object) inventory.getStackInSlot(i)).toContainer());
         }
         return stacks;
+    }
+
+    @Override
+    public void onFullyLoggedIn() {
+        System.err.println("Fully logged in on client!");
+        //RunnerEvents.setPlayerJoined();
     }
 }

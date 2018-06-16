@@ -2,9 +2,11 @@ package org.spongepowered.mctester.internal.framework;
 
 import org.junit.Assert;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackComparators;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.McTesterDummy;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 import org.spongepowered.mctester.internal.event.ErrorPropagatingEventListener;
@@ -17,6 +19,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.mctester.internal.framework.proxy.ProxyCallback;
+import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     //public Game fakeGame;
-    public Client client;
+    public ServerSideClientHandler client;
     private Set<ErrorSlot> errorSlots = new HashSet<>();
 
     /*public static void runTestThread() {
@@ -110,6 +113,11 @@ public class TesterManager implements /*Runnable,*/ TestUtils, ProxyCallback {
 
     public void beforeTest() {
         this.errorSlots.clear();
+
+        // Wait for a packet round-trip to ensure that the client has processed previous packets,
+        // like chunk data. This can help avoid race conditions later, by ensuring that client
+        // ticks will be fast when a test starts executing.
+        this.client.onFullyLoggedIn();
     }
 
     private void finishOneShotListeners(List<OneShotEventListener<?>> listeners) throws Throwable {

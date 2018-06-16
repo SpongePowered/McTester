@@ -80,4 +80,8 @@ public class ServerSideClientHandler implements Client {
     public ItemStack getItemInHand(HandType type) {
         return this.proxyClient.getItemInHand(type);
     }
+
+    public void onFullyLoggedIn() {
+        this.proxyClient.onFullyLoggedIn();
+    }
 }
