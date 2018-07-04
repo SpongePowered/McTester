@@ -4,6 +4,7 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 
+// Inspired by http://weblog.ikvm.net/2011/08/01/HowToDisableTheJavaSecurityManager.aspx
 public class RemoveSecurityManager {
 
 
