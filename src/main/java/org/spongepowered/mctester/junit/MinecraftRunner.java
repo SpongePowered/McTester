@@ -33,6 +33,7 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.internal.asm.MainThreadChecker;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
@@ -90,6 +91,12 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	@Override
 	protected void validateConstructor(List<Throwable> errors) {
 		realJUnitRunner.validateConstructor(errors);
+	}
+
+	@Override
+	protected void validatePublicVoidNoArgMethods(Class<? extends Annotation> annotation,
+			boolean isStatic, List<Throwable> errors) {
+		realJUnitRunner.validatePublicVoidNoArgMethods(annotation, isStatic, errors);
 	}
 
 	@Override

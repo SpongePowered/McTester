@@ -1,6 +1,7 @@
-package org.spongepowered.mctester.internal.framework;
+package org.spongepowered.mctester.junit;
 
 import com.flowpowered.math.vector.Vector3d;
+import kotlin.coroutines.experimental.Continuation;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -24,7 +25,7 @@ import java.util.Optional;
  * on the actual client, the specified message to be inputted,
  * and finally sent to the server.
  */
-public interface Client {
+interface Client {
 
     /**
      * Causes the client to send a chat message
@@ -40,7 +41,7 @@ public interface Client {
      * causes a chat packet to be sent to the server.
      * @param text The message to send
      */
-    void sendMessage(String text);
+    fun sendMessage(text: String);
 
     /**
      * Causes the client to look at the specified block.
@@ -50,7 +51,9 @@ public interface Client {
      * {@link MoveEntityEvent}s to be fired.</p>
      * @param targetPos The position to look at
      */
-    void lookAt(Vector3d targetPos);
+    fun lookAt(targetPos: Vector3d);
+
+    suspend fun lookAtSuspend(targetPos: Vector3d);
 
     /**
      * Causes the client to look at the specified entity.
@@ -60,7 +63,7 @@ public interface Client {
      * {@link MoveEntityEvent}s to be fired.</p>
      * @param entity The entity to look at
      */
-    void lookAt(Entity entity);
+    fun lookAt(entity: Entity);
 
     /**
      * Causes the client to select the given hotbar slot.
@@ -70,7 +73,7 @@ public interface Client {
      * the given hotbar slot.</p>
      * @param slot The slot to select
      */
-    void selectHotbarSlot(int slot);
+    fun selectHotbarSlot(slot: Int);
 
     /**
      * Causes the client to perform a left mouse click.
@@ -83,7 +86,7 @@ public interface Client {
      * for one client tick. To perform a longer click, use
      * {@link #holdLeftClick(boolean)}.</p>
      */
-    void leftClick();
+    fun leftClick();
 
     /**
      * Causes the client to start or stop holding a left click.
@@ -94,7 +97,7 @@ public interface Client {
      *
      * @param clicking The clicking state
      */
-    void holdLeftClick(boolean clicking);
+    fun holdLeftClick(clicking: Boolean);
 
     /**
      * Causes the client to perform a right mouse click.
@@ -108,7 +111,9 @@ public interface Client {
      * {@link #holdRightClick(boolean)}.</p>
      *
      */
-    void rightClick();
+    fun rightClick();
+
+    suspend fun rightClickSuspend();
 
     /**
      * Causes the client to start or stop holding a right click.
@@ -119,7 +124,7 @@ public interface Client {
      *
      * @param clicking The clicking state
      */
-    void holdRightClick(boolean clicking);
+    fun holdRightClick(clicking: Boolean);
 
     /**
      * Gets the item in the client's specified hand.
@@ -134,7 +139,7 @@ public interface Client {
      * @param type The {@link HandType} to get the {@link ItemStack} for
      * @return the {@link ItemStack} in the specified {@link HandType}
      */
-    ItemStack getItemInHand(HandType type);
+    fun getItemInHand(type: HandType): ItemStack ;
 
     /**
      * Returns a copy of the player's client-side inventory.
@@ -148,8 +153,8 @@ public interface Client {
      * of the player's client-side inventory at the time it was called.</p>
      * @return
      */
-    PlayerInventory getClientInventory();
+    fun getClientInventory(): PlayerInventory ;
 
-    Optional<String> getOpenGuiClass();
+    fun getOpenGuiClass(): Optional<String>;
 
 }

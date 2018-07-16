@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.internal;
+package org.spongepowered.mctester.junit;
 
 import org.junit.Assert;
 import org.spongepowered.api.Game;
@@ -32,8 +32,6 @@ import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.mctester.internal.event.StandaloneEventListener;
-import org.spongepowered.mctester.internal.framework.Client;
-import org.spongepowered.mctester.junit.MinecraftRunner;
 
 import java.util.concurrent.Callable;
 
@@ -170,10 +168,6 @@ public interface TestUtils {
     /**
      * Runs a {@link Runnable} on the main threa
      *
-     * <p>This method is provided as a performance optimization. It is completely optional:
-     * if you don't use it, your code will run on the main thread one method
-     * call at a time, instead of all at once.</p>
-     *
      * <p>Calls to {@link Client} methods, as well as {@link #sleepTicks(int)}, must
      * not be called on the main thread. Attempting to call them within the {@link Runnable}
      * passed to this method will throw an exception</p>
@@ -182,6 +176,7 @@ public interface TestUtils {
      * @throws Throwable any exception thrown by the Callable
      */
     void runOnMainThread(Runnable callable) throws Throwable;
+
 
     /**
      * Delays the test thread for the specified number of ticks.

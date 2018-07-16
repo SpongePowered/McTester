@@ -1,6 +1,7 @@
 package org.spongepowered.mctester.internal;
 
 import com.google.common.collect.Lists;
+import kotlin.coroutines.experimental.Continuation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
 import org.junit.runner.notification.RunNotifier;
@@ -9,23 +10,24 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.asm.lib.ClassReader;
-import org.spongepowered.mctester.internal.asm.MainThreadChecker;
+import org.spongepowered.mctester.internal.coroutine.CoroutineInvoker;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.internal.world.CurrentWorld;
+import org.spongepowered.mctester.junit.CoroutineTest;
 import org.spongepowered.mctester.junit.DefaultScreenshotOptions;
 import org.spongepowered.mctester.junit.DefaultWorldOptions;
 import org.spongepowered.mctester.junit.IJunitRunner;
 import org.spongepowered.mctester.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.junit.RunnerEvents;
 import org.spongepowered.mctester.junit.ScreenshotOptions;
+import org.spongepowered.mctester.junit.TestUtils;
 import org.spongepowered.mctester.junit.UseSeparateWorld;
 import org.spongepowered.mctester.junit.WorldOptions;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLClassLoader;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -131,6 +133,30 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     }
 
     @Override
+    public void validatePublicVoidNoArgMethods(Class<? extends Annotation> annotation,
+            boolean isStatic, List<Throwable> errors) {
+        List<FrameworkMethod> methods = getTestClass().getAnnotatedMethods(annotation);
+
+        for (FrameworkMethod eachTestMethod : methods) {
+            if (eachTestMethod.getAnnotation(CoroutineTest.class) != null) {
+                this.validateCoroutineTest(eachTestMethod, errors);
+            } else {
+                eachTestMethod.validatePublicVoidNoArg(isStatic, errors);
+            }
+        }
+    }
+
+    private void validateCoroutineTest(FrameworkMethod coroutineTest, List<Throwable> errors) {
+        if (coroutineTest.getMethod().getParameterTypes().length != 1) {
+            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should have exactly one (implicit) parameter!"));
+        }
+
+        if (coroutineTest.getMethod().getParameterTypes()[0] != Continuation.class) {
+            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should have an (implicit) Continuation parameter!"));
+        }
+    }
+
+    @Override
     public void validateConstructor(List<Throwable> errors) {
         super.validateOnlyOneConstructor(errors);
         this.validateSingleArgConstructor(errors);
@@ -179,6 +205,9 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public Statement methodInvoker(FrameworkMethod method, Object test) {
+        if (method.getAnnotation(CoroutineTest.class) != null) {
+            return new CoroutineInvoker(method, test, this, this.testerManager);
+        }
         return new InvokeMethodWrapper(method, test, this);
     }
 

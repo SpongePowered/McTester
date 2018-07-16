@@ -1,7 +1,6 @@
 package org.spongepowered.mctester.internal.framework.proxy;
 
 import org.spongepowered.mctester.internal.RawClient;
-import org.spongepowered.mctester.internal.framework.Client;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.message.ResponseWrapper;

@@ -6,6 +6,7 @@ import net.minecraft.util.ScreenShotHelper;
 import org.junit.runners.model.FrameworkMethod;
 import org.spongepowered.mctester.internal.world.CurrentWorld;
 import org.spongepowered.mctester.junit.ScreenshotOptions;
+import org.spongepowered.mctester.junit.TestUtils;
 import org.spongepowered.mctester.junit.UseSeparateWorld;
 import org.spongepowered.mctester.junit.WorldOptions;
 

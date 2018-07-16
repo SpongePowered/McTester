@@ -24,6 +24,12 @@ buildscript {
     }
 }
 
+plugins {
+    id 'maven'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.51'
+    id "com.github.johnrengelman.shadow" version "2.0.4"
+}
+
 
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.plugin"
@@ -97,7 +103,26 @@ dependencies {
 
     compile 'com.google.guava:guava:21.0'
 
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.4"
+    compile "org.jetbrains.kotlin:kotlin-reflect:1.2.51"
+
 }
+
+configurations {
+    compile.extendsFrom shadow
+    compile.extendsFrom kapt
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+
+    relocate "kotlin", "pw.aaron1011.tradesystem.shaded.kotlin"
+
+    classifier = null // Removes '-all' suffix from output file name
+}
+build.dependsOn shadowJar
+install.dependsOn shadowJar
 
 /*mixin {
     add sourceSets.main, "mctester.main.refmap.json"
@@ -121,4 +146,27 @@ processResources {
         exclude "mcmod.info"
     }
 }
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+
+    relocate "kotlin", "pw.aaron1011.tradesystem.shaded.kotlin"
+
+    classifier = null // Removes '-all' suffix from output file name
+}
+build.dependsOn shadowJar
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
 
