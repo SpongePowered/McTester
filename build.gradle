@@ -24,9 +24,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "com.jfrog.bintray" version "1.7.3"
-}
 
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.plugin"
@@ -39,22 +36,6 @@ apply plugin: 'groovy'
 version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
-
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    configurations = ['archives']
-    pkg {
-        repo = 'McTester'
-        name = 'McTester'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/Aaron1011/McTester'
-        version {
-            name = version
-        }
-    }
-}
 
 minecraft {
     version = project.forgeVersion
