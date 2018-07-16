@@ -55,47 +55,57 @@ public class MinecraftServerStarter {
 	 *
 	 * This launches a background thread.
 	 *
-	 * @throws Throwable
 	 */
-	public void startServer() throws Throwable {
-	    if (this.started) {
-	        return;
-        }
-
-        this.started = true;
-
-        boolean spongeInstalled = this.isSpongeInstalled();
-        if (!spongeInstalled) {
-	    	this.installSponge();
-		}  else {
-            String existing = System.getProperty("fml.coreMods.load", "");
-            System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
-        }
-
-		System.setProperty("mixin.env.disableRefMap", "true");
-		System.setProperty("fml.readTimeout", "0");
-		//System.setProperty("mixin.debug.verbose", "true");
-
-		String[] args = new String[] { "--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir", RealJUnitRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
-		// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
-		//new GradleStartTestServer().launch(args);
-		Class clazz = Class.forName("GradleStart");
-		Thread wrapperThread = new Thread(() -> {
-			try {
-				clazz.getMethod("main", String[].class).invoke(null, (Object) args);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+	public void startServer() {
+		try {
+			if (this.started) {
+				return;
 			}
-		});
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				Minecraft.getMinecraft().shutdown();
+			this.started = true;
+
+			boolean spongeInstalled = this.isSpongeInstalled();
+			if (!spongeInstalled) {
+				this.installSponge();
+			} else {
+				String existing = System.getProperty("fml.coreMods.load", "");
+				System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
 			}
-		});
 
-		wrapperThread.start();
+			System.setProperty("mixin.env.disableRefMap", "true");
+			System.setProperty("fml.readTimeout", "0");
+			//System.setProperty("mixin.debug.verbose", "true");
+
+			String[] args = new String[] {"--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir",
+					RealJUnitRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
+			// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
+			//new GradleStartTestServer().launch(args);
+			Class clazz = Class.forName("GradleStart");
+			Thread wrapperThread = new Thread(() -> {
+				try {
+					clazz.getMethod("main", String[].class).invoke(null, (Object) args);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			});
+
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+
+				@Override
+				public void run() {
+					Minecraft.getMinecraft().shutdown();
+				}
+			});
+
+			wrapperThread.start();
+		} catch (Throwable throwable) {
+			// This method is invoked from when JUnit is just starting to build the runner.
+			// If an exception gets thrown, it would normally be captured and printed later by JUnit.
+			// However, the main thread will end up blocked forever on LaunchClassLaoder being avaialble,
+			// since the client will never start
+			throwable.printStackTrace();
+			throw new RuntimeException("Error starting Minecraft!", throwable);
+		}
 
 	}
 
