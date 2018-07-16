@@ -1,6 +1,7 @@
 package org.spongepowered.mctester.internal.coroutine
 
 import kotlinx.coroutines.experimental.*
+import org.spongepowered.api.Sponge
 import org.spongepowered.mctester.internal.framework.TesterManager
 import kotlin.coroutines.experimental.*
 
@@ -50,7 +51,16 @@ class CoroutineTestManager(val block: suspend CoroutineScope.() -> Unit, val tes
 private class MainThreadDispatcher(val testManager: TesterManager): CoroutineDispatcher() {
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        this.testManager.runOnMainThread(block)
+        try {
+            if (Sponge.getServer().isMainThread) {
+                block.run()
+            } else {
+                this.testManager.runOnMainThread(block)
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace();
+            throw RuntimeException("Exception when scheduling coroutine block on main thread!", e)
+        }
     }
 
 }

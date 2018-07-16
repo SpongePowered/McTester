@@ -22,6 +22,7 @@ suspend fun waitTicks(ticks: Int) {
 
     Sponge.getScheduler().createTaskBuilder().delayTicks(ticks.toLong()).execute(Runnable { future.complete(null) }).submit(McTesterDummy.INSTANCE)
     future.await()
+    println("Done!")
 }
 
 

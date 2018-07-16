@@ -54,6 +54,10 @@ class ServerSideClientHandler(private val proxyClient: RawClient) : Client {
         this.proxyClient.lookAt(entity.uniqueId)
     }
 
+    override suspend fun lookAtSuspend(entity: Entity) {
+        this.suspendProxyClient.lookAt(entity)
+    }
+
     override fun selectHotbarSlot(slot: Int) {
         this.proxyClient.selectHotbarSlot(slot)
     }

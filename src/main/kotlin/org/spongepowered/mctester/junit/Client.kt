@@ -65,6 +65,8 @@ interface Client {
      */
     fun lookAt(entity: Entity);
 
+    suspend fun lookAtSuspend(entity: Entity)
+
     /**
      * Causes the client to select the given hotbar slot.
      *

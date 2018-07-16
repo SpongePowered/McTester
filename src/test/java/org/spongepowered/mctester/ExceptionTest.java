@@ -10,9 +10,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.mctester.internal.BaseTest;
-import org.spongepowered.mctester.junit.TestUtils;
 import org.spongepowered.mctester.internal.event.StandaloneEventListener;
 import org.spongepowered.mctester.junit.MinecraftRunner;
+import org.spongepowered.mctester.junit.TestUtils;
 
 @RunWith(MinecraftRunner.class)
 public class ExceptionTest extends BaseTest {
