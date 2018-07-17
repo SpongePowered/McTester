@@ -156,7 +156,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         runnable.run()
 
         // Blocking
-        val result: Any
+        val result: Any?
         try {
             result = CompletableFuture.anyOf(handledFuture, timeoutFuture).get()
         } catch (e: Exception) {
@@ -213,12 +213,12 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         }
 
         if (!handledFuture.isDone) {
-            throw AssertionError("A timed listener failed to run in the alloted number of ticks!\n" +
+            throw AssertionError("A timed listener failed to run in the allotted number of ticks!\n" +
                     "A timed listener had " + ticks + " ticks to fire, but it didn't.\n" +
                     "See the nested stacktrace for the location of the timed event handler.", oneShot.fakeError)
         }
 
-        oneShot.handleFinished.get()
+        oneShot.handleFinished.await()
         this.checkErrorSlots()
 
         return Math.max(ticks - elapsedTicks, 0)
