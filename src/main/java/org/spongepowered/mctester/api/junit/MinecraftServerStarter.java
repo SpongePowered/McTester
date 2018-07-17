@@ -95,6 +95,11 @@ public class MinecraftServerStarter {
 				RunnerEvents.fatalError(throwable);
 			}));
 
+			Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
+				throwable.printStackTrace();
+				System.exit(-1);
+			});
+
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 
 				@Override

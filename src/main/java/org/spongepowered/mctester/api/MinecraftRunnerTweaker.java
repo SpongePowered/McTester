@@ -29,6 +29,7 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
+import org.spongepowered.mctester.internal.RemoveSecurityManager;
 
 import java.io.File;
 import java.util.List;
@@ -37,6 +38,7 @@ public class MinecraftRunnerTweaker implements ITweaker {
 
     @Override
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
+        RemoveSecurityManager.clearSecurityManager();
     }
 
     @Override
