@@ -1,7 +1,7 @@
 package org.spongepowered.mctester.junit
 
 /**
- * Indicagtes that the annotation test method should be run as a
+ * Indicates that the annotation test method should be run as a
  * coroutine on the main thread.
  *
  * Coroutine tests MUST be written in Kotlin - barring drastic changes to Java,
