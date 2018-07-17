@@ -39,3 +39,7 @@ Once the client response reaches the server, your method is automatically schedu
 
 For a test writer, all of this is completely transparent. If you annotate your `suspend fun` with `@CoroutineTest`,
 McTester will allow you to write ordinary Kotlin code that runs on the main server thread, without freezing the game.
+
+-------
+
+Inspired by https://github.com/vorburger/SwissKnightMinecraft/tree/master/SpongePowered/SpongeTests
