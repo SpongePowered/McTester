@@ -31,6 +31,7 @@ public class SpongeInstaller {
     public void downloadLatestSponge(File downloadDirectory) {
         JsonArray downloadList = this.getDownloadList();
         URL jarUrl = this.extractURL(downloadList);
+        System.err.println("Downloading Sponge: " + jarUrl);
         this.saveURLtoFile(jarUrl, downloadDirectory);
     }
 
