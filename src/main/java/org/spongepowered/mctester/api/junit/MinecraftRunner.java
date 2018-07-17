@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api.junit;
 
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.junit.runners.model.FrameworkMethod;
@@ -31,7 +31,8 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
-import org.spongepowered.mctester.internal.asm.MainThreadChecker;
+import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.api.WorldOptions;
 
 import java.lang.annotation.Annotation;
 import java.util.List;

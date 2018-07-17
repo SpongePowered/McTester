@@ -39,9 +39,6 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         //chatTest.runTest(fakeGame, client, this);
     }*/
 
-    override val game: Game
-        get() = Sponge.getGame()
-
     override val thePlayer: Player
         get() {
             val players = Sponge.getServer().onlinePlayers

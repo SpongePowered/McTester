@@ -2,25 +2,16 @@ package org.spongepowered.mctester.internal.framework;
 
 import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.noise.module.combiner.Min;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.entity.ai.EntityLookHelper;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.MathHelper;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.property.entity.EyeLocationProperty;
 import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.mctester.internal.RawClient;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
-import org.spongepowered.mctester.junit.RunnerEvents;
 
 import java.util.ArrayList;
 import java.util.List;

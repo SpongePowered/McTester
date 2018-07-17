@@ -22,11 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api.junit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.installer.SpongeInstaller;
 import org.spongepowered.mctester.internal.RealJUnitRunner;
 
@@ -76,7 +77,7 @@ public class MinecraftServerStarter {
 			System.setProperty("fml.readTimeout", "0");
 			//System.setProperty("mixin.debug.verbose", "true");
 
-			String[] args = new String[] {"--tweakClass", "org.spongepowered.mctester.junit.MinecraftRunnerTweaker", "--gameDir",
+			String[] args = new String[] {"--tweakClass", "org.spongepowered.mctester.api.MinecraftRunnerTweaker", "--gameDir",
 					RealJUnitRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
 			// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
 			//new GradleStartTestServer().launch(args);

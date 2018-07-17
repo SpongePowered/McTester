@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.mctester.junit.RunnerEvents;
+import org.spongepowered.mctester.api.RunnerEvents;
 
 import java.util.Queue;
 import java.util.concurrent.Callable;

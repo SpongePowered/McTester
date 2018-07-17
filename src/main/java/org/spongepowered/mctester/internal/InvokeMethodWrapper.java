@@ -2,10 +2,7 @@ package org.spongepowered.mctester.internal;
 
 import org.junit.runners.model.Statement;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.mctester.internal.appclass.ErrorSlot;
-import org.junit.internal.runners.statements.InvokeMethod;
 import org.junit.runners.model.FrameworkMethod;
-import org.spongepowered.mctester.junit.UseSeparateWorld;
 
 public class InvokeMethodWrapper extends Statement {
 

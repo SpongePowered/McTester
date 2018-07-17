@@ -1,4 +1,6 @@
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api;
+
+import org.spongepowered.mctester.api.junit.MinecraftRunner;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

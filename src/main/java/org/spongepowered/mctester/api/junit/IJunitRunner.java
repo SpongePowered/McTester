@@ -1,4 +1,4 @@
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api.junit;
 
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMethod;

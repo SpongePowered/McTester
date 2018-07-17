@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api;
 
 import com.google.common.util.concurrent.Futures;
 import net.minecraft.launchwrapper.LaunchClassLoader;

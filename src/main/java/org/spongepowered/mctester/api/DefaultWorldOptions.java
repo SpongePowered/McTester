@@ -1,4 +1,4 @@
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api;
 
 import java.lang.annotation.Annotation;
 

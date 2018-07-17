@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.junit;
+package org.spongepowered.mctester.api;
 
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
@@ -41,7 +41,7 @@ public class MinecraftRunnerTweaker implements ITweaker {
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.junit");
+        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.api.junit");
         // This is *VERY* important, because without this
         // JUnit will be vey unhappy when in MinecraftTestRunner
         // we replace the class under test with the one from the
@@ -50,6 +50,7 @@ public class MinecraftRunnerTweaker implements ITweaker {
         classLoader.addClassLoaderExclusion("junit.");
         classLoader.addClassLoaderExclusion("org.junit.");
         classLoader.addClassLoaderExclusion("org.hamcrest");
+        classLoader.addClassLoaderExclusion("kotlin");
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.mctester.json");
     }

@@ -41,20 +41,6 @@ import java.util.concurrent.Callable
 interface TestUtils {
 
     /**
-     * Gets a special [Game] suitable for use in a test
-     *
-     *
-     * You **MUST NOT** use [Sponge.getGame] in your test.
-     * All tests that use [MinecraftRunner] are run on a separate thread.
-     * [TestUtils.getGame] creates a special proxy object
-     * that transparently executes all functions calls (both for
-     * [Game] and returned objects
-     *
-     * @return
-     */
-    val game: Game
-
-    /**
      * Returns the main interface for controlling the client.
      *
      *

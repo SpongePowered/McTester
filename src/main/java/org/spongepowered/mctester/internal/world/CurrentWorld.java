@@ -4,16 +4,14 @@ import com.google.common.util.concurrent.Futures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.ISaveFormat;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
-import org.spongepowered.mctester.junit.RunnerEvents;
+import org.spongepowered.mctester.api.RunnerEvents;
 
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 

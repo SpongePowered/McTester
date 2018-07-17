@@ -53,7 +53,7 @@ import org.spongepowered.mctester.internal.message.ClientDelegateHandler;
 import org.spongepowered.mctester.internal.message.ServerDelegateHandler;
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest;
 import org.spongepowered.mctester.internal.message.toserver.MessageRPCResponse;
-import org.spongepowered.mctester.junit.RunnerEvents;
+import org.spongepowered.mctester.api.RunnerEvents;
 
 import java.util.Iterator;
 

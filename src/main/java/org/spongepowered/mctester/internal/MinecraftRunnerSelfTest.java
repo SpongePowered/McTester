@@ -27,7 +27,7 @@ package org.spongepowered.mctester.internal;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.spongepowered.mctester.junit.MinecraftRunner;
+import org.spongepowered.mctester.api.junit.MinecraftRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
