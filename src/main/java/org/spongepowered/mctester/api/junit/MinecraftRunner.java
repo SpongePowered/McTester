@@ -35,6 +35,7 @@ import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.api.WorldOptions;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**

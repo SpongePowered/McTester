@@ -11,19 +11,19 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.asm.lib.ClassReader;
+import org.spongepowered.mctester.api.DefaultScreenshotOptions;
+import org.spongepowered.mctester.api.DefaultWorldOptions;
+import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.api.ScreenshotOptions;
+import org.spongepowered.mctester.api.UseSeparateWorld;
+import org.spongepowered.mctester.api.WorldOptions;
+import org.spongepowered.mctester.api.junit.IJunitRunner;
+import org.spongepowered.mctester.api.junit.MinecraftServerStarter;
 import org.spongepowered.mctester.internal.coroutine.CoroutineInvoker;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.internal.world.CurrentWorld;
 import org.spongepowered.mctester.junit.CoroutineTest;
-import org.spongepowered.mctester.api.DefaultScreenshotOptions;
-import org.spongepowered.mctester.api.DefaultWorldOptions;
-import org.spongepowered.mctester.api.junit.IJunitRunner;
-import org.spongepowered.mctester.api.junit.MinecraftServerStarter;
-import org.spongepowered.mctester.api.RunnerEvents;
-import org.spongepowered.mctester.api.ScreenshotOptions;
 import org.spongepowered.mctester.junit.TestUtils;
-import org.spongepowered.mctester.api.UseSeparateWorld;
-import org.spongepowered.mctester.api.WorldOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,12 +146,14 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     }
 
     private void validateCoroutineTest(FrameworkMethod coroutineTest, List<Throwable> errors) {
+        // The only parameter should be the implicit Continuation
         if (coroutineTest.getMethod().getParameterTypes().length != 1) {
-            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should have exactly one (implicit) parameter!"));
+            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should have no parameters!"));
+            return;
         }
 
         if (coroutineTest.getMethod().getParameterTypes()[0] != Continuation.class) {
-            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should have an (implicit) Continuation parameter!"));
+            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should be a 'suspend' function!!"));
         }
     }
 
