@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JUnit Runner which runs tests inside the ClassLoader of the Minecraft Server.
+ * JUnit Runner which runs tests on a Minecraft singleplayer client
  *
  * The {@link WorldOptions} can be used to configure
  * the runner
@@ -61,8 +61,8 @@ import java.util.List;
  *   Defaults to 'true'
  *
  *
- * @author Michael Vorburger
  * @author Aaron1011
+ * @author Michael Vorburger
  */
 public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
