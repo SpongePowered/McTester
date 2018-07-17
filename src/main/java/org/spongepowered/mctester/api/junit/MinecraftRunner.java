@@ -70,13 +70,13 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	private IJunitRunner realJUnitRunner;
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
-		super(initializeServer(testClass));
+		super(initializeClient(testClass));
 	}
 
 	// This is done like this just so that we can run stuff before invoking the parent constructor
-	private static Class<?> initializeServer(Class<?> testClass) throws InitializationError {
+	private static Class<?> initializeClient(Class<?> testClass) throws InitializationError {
 		try {
-			starter.startServer();
+			starter.startClient();
 
 		} catch (Throwable e) {
 			throw new InitializationError(e);

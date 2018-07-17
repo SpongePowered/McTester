@@ -52,12 +52,12 @@ public class MinecraftServerStarter {
 	private MinecraftServerStarter() { }
 
 	/**
-	 * Starts Minecraft Server.
+	 * Starts the Minecraft Client
 	 *
 	 * This launches a background thread.
 	 *
 	 */
-	public void startServer() {
+	public void startClient() {
 		try {
 			if (this.started) {
 				return;
@@ -89,6 +89,11 @@ public class MinecraftServerStarter {
 					throw new RuntimeException(e);
 				}
 			});
+
+			wrapperThread.setUncaughtExceptionHandler(((thread, throwable) -> {
+				throwable.printStackTrace();
+				RunnerEvents.fatalError(throwable);
+			}));
 
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 

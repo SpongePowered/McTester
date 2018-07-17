@@ -79,4 +79,11 @@ public class RunnerEvents {
         clientInitialized.complete(null);
     }
 
+    public static void fatalError(Throwable throwable) {
+        clientInitialized.completeExceptionally(throwable);
+        playerJoined.completeExceptionally(throwable);
+        gameClosed.completeExceptionally(throwable);
+        launchClassLoaderFuture.completeExceptionally(throwable);
+    }
+
 }
