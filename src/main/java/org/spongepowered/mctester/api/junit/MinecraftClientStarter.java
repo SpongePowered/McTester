@@ -119,7 +119,6 @@ public class MinecraftClientStarter {
 					if (Minecraft.getMinecraft() != null) {
 						Minecraft.getMinecraft().shutdown();
 					}
-					RunnerEvents.setGameClosed();
 				}
 			});
 

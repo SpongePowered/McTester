@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nullable;
+import javax.security.auth.callback.Callback;
 
 // McTester always runs in a deobfuscated environment - it depends on GradleStart, after all!
 // Therefore, we disable all remapping, since we'll never need it.
@@ -68,11 +69,12 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         this.launchIntegratedServer(folderName, folderName, worldsettings);
     }*/
 
-    @Redirect(method = "shutdownMinecraftApplet", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/asm/transformers/TerminalTransformer$ExitVisitor;systemExitCalled(I)V", remap = false))
-    public void onSystemExitCalled(int code) {
+    @Inject(method = "shutdownMinecraftApplet", cancellable = true, at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;destroy()V", remap = false))
+    public void onSystemExitCalled(CallbackInfo ci) {
         // Notify any listenres that the game has closed, but don't actually
         // call System.exit here. We want to let JUnit exit cleanly.
         RunnerEvents.setGameClosed();
+        ci.cancel();
     }
 
     @Inject(method = "stopIntegratedServer", at = @At("HEAD"), cancellable = true)
