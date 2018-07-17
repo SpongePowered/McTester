@@ -27,7 +27,7 @@ buildscript {
 plugins {
     id 'maven'
     id 'org.jetbrains.kotlin.jvm' version '1.2.51'
-    id "com.github.johnrengelman.shadow" version "2.0.4"
+    //id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
 
@@ -110,19 +110,19 @@ dependencies {
 }
 
 configurations {
-    compile.extendsFrom shadow
+    //compile.extendsFrom shadow
     compile.extendsFrom kapt
 }
 
-shadowJar {
+/*shadowJar {
     configurations = [project.configurations.shadow]
 
     relocate "kotlin", "pw.aaron1011.tradesystem.shaded.kotlin"
 
     classifier = null // Removes '-all' suffix from output file name
-}
-build.dependsOn shadowJar
-install.dependsOn shadowJar
+}*/
+//build.dependsOn shadowJar
+//install.dependsOn shadowJar
 
 /*mixin {
     add sourceSets.main, "mctester.main.refmap.json"
@@ -147,14 +147,14 @@ processResources {
     }
 }
 
-shadowJar {
+/*shadowJar {
     configurations = [project.configurations.shadow]
 
     relocate "kotlin", " org.spongepowered.mctester.shaded.kotlin"
 
     classifier = null // Removes '-all' suffix from output file name
-}
-build.dependsOn shadowJar
+}*/
+//build.dependsOn shadowJar
 
 kotlin {
     experimental {
