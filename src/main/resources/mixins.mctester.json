@@ -5,6 +5,7 @@
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinMain",
     "MixinMinecraft"
   ]
 }

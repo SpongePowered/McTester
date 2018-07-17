@@ -31,7 +31,6 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.api.WorldOptions;
 
@@ -69,10 +68,12 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
 	// We deliberately don't set the type to RealJunitRunner, since we load it
 	// on the LaunchClassLoader
-	private static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
+	private static MinecraftClientStarter starter = MinecraftClientStarter.INSTANCE();
 	private IJunitRunner realJUnitRunner;
 
 	private List<Throwable> caughtInitializationErrors = new ArrayList<>();
+
+	public static TestStatus globalTestStatus = new TestStatus();
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
 		super(initializeClient(testClass));

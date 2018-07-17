@@ -24,8 +24,7 @@
  */
 package org.spongepowered.mctester.internal;
 
-import net.minecraftforge.fml.relauncher.FMLSecurityManager;
-import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.api.junit.TestStatus;
 
 // We want JUnit to shut down the VM, not Minecraft, so
 // we need to bypass FMLSecurityManager
@@ -48,7 +47,7 @@ public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-        if (throwable instanceof FMLSecurityManager.ExitTrappedException) {
+        /*if (throwable instanceof FMLSecurityManager.ExitTrappedException) {
             // Try and stop us now, FML!
             System.err.println("FMLSecurityManager tried to stop VM from exiting, bypassing...");
 
@@ -69,16 +68,13 @@ public class ForceShutdownHandler implements Thread.UncaughtExceptionHandler {
                 }
                 this.doShutdown(-2);
             }*/
-        } else {
+        /*} else {
             System.err.println("Uncaught exception!!!");
             throwable.printStackTrace();
-        }
+        }*/
     }
 
-    private void waitForClose(String message) {
-        System.err.println("Waiting for Minecraft to close because " + message);
-        RunnerEvents.waitForGameClosed();
-    }
+
 
     private void doShutdown(int code) {
         // Unfortunately, we have no way of getting the real fakeError code.

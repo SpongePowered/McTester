@@ -38,18 +38,18 @@ import java.io.File;
  *
  * @author Michael Vorburger
  */
-public class MinecraftServerStarter {
+public class MinecraftClientStarter {
 
 	private LaunchClassLoader minecraftServerClassLoader;
 
-	private static MinecraftServerStarter INSTANCE = new MinecraftServerStarter();
+	private static MinecraftClientStarter INSTANCE = new MinecraftClientStarter();
 	private boolean started;
 
-	public static MinecraftServerStarter INSTANCE() {
+	public static MinecraftClientStarter INSTANCE() {
 		return INSTANCE;
 	}
 
-	private MinecraftServerStarter() { }
+	private MinecraftClientStarter() { }
 
 	/**
 	 * Starts the Minecraft Client
@@ -106,7 +106,20 @@ public class MinecraftServerStarter {
 
 				@Override
 				public void run() {
-					Minecraft.getMinecraft().shutdown();
+					if (MinecraftRunner.globalTestStatus.succeeded()) {
+						if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnSuccess()) {
+							MinecraftClientStarter.this.waitForClose("tests succeeded");
+						}
+					} else if (MinecraftRunner.globalTestStatus.failed()) {
+						if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnFailure()) {
+							MinecraftClientStarter.this.waitForClose("tests failed");
+						}
+					}
+
+					if (Minecraft.getMinecraft() != null) {
+						Minecraft.getMinecraft().shutdown();
+					}
+					RunnerEvents.setGameClosed();
 				}
 			});
 
@@ -122,8 +135,13 @@ public class MinecraftServerStarter {
 
 	}
 
+	private void waitForClose(String message) {
+		System.err.println("Waiting for Minecraft to close because " + message);
+		RunnerEvents.waitForGameClosed();
+	}
+
 	public ClassLoader getMinecraftServerClassLoader() {
-	    RunnerEvents.waitForLaunchClassLoaderFuture();
+		RunnerEvents.waitForLaunchClassLoaderFuture();
 		return internalGetMinecraftServerClassLoader();
 	}
 
@@ -144,7 +162,7 @@ public class MinecraftServerStarter {
 		outputDir.mkdirs();
 
 		new SpongeInstaller().downloadLatestSponge(outputDir);
-        System.err.println("Downloaded latest SpongeForge!");
+		System.err.println("Downloaded latest SpongeForge!");
 
 	}
 

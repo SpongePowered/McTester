@@ -1,4 +1,4 @@
-package org.spongepowered.mctester.internal;
+package org.spongepowered.mctester.api.junit;
 
 import org.junit.runner.Description;
 import org.junit.runner.Result;
@@ -9,12 +9,8 @@ import java.util.Optional;
 
 public class TestStatus extends RunListener {
 
-    private final StatusCallback statusCallback;
     private boolean succeeded = true;
 
-    public TestStatus(StatusCallback statusCallback) {
-        this.statusCallback = statusCallback;
-    }
 
     @Override
     public void testFailure(Failure failure) throws Exception {
@@ -23,9 +19,6 @@ public class TestStatus extends RunListener {
 
     @Override
     public void testFinished(Description description) throws Exception {
-        if (this.statusCallback != null) {
-            this.statusCallback.onFinished();
-        }
     }
 
     /*@Override

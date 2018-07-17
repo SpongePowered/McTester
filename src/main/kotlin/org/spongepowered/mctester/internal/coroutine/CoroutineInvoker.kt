@@ -5,6 +5,7 @@ import org.junit.runners.model.FrameworkMethod
 import org.spongepowered.mctester.internal.InvokeMethodWrapper
 import org.spongepowered.mctester.internal.InvokerCallback
 import org.spongepowered.mctester.internal.framework.TesterManager
+import java.lang.reflect.InvocationTargetException
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.suspendCoroutine
 import kotlin.reflect.KCallable
@@ -26,7 +27,11 @@ class CoroutineInvoker(testMethod: FrameworkMethod, target: Any, callback: Invok
 
         val wrapper: suspend CoroutineScope.() -> Unit = {
             suspendCoroutine<Unit> {
-                callable.call(testClassInstance, it)
+                try {
+                    callable.call(testClassInstance, it)
+                } catch (e: InvocationTargetException) {
+                    throw e.cause ?: e;
+                }
             }
         }
 

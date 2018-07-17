@@ -18,7 +18,9 @@ import org.spongepowered.mctester.api.ScreenshotOptions;
 import org.spongepowered.mctester.api.UseSeparateWorld;
 import org.spongepowered.mctester.api.WorldOptions;
 import org.spongepowered.mctester.api.junit.IJunitRunner;
-import org.spongepowered.mctester.api.junit.MinecraftServerStarter;
+import org.spongepowered.mctester.api.junit.MinecraftRunner;
+import org.spongepowered.mctester.api.junit.MinecraftClientStarter;
+import org.spongepowered.mctester.api.junit.TestStatus;
 import org.spongepowered.mctester.internal.coroutine.CoroutineInvoker;
 import org.spongepowered.mctester.internal.framework.TesterManager;
 import org.spongepowered.mctester.internal.world.CurrentWorld;
@@ -32,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner, InvokerCallback, StatusCallback {
+public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner, InvokerCallback {
 
     public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
 
@@ -44,7 +46,6 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     private CurrentWorld tempWorld = null;
     private RunNotifier runNotifier;
 
-    private TestStatus globalTestStatus = new TestStatus(this);
     private TestStatus currentTestStatus;
 
     private WorldOptions worldOptions;
@@ -82,22 +83,14 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
 
     @Override
     public void run(RunNotifier notifier) {
-        Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.globalTestStatus));
+        //Thread.setDefaultUncaughtExceptionHandler(new ForceShutdownHandler(this.globalTestStatus));
 
-        notifier.addListener(this.globalTestStatus);
+        notifier.addListener(MinecraftRunner.globalTestStatus);
         this.runNotifier = notifier;
         super.run(notifier);
 
         this.testActions.tryDeleteWorldGlobal(this.currentWorld);
         this.testActions.tryTakeScreenShotGlobal(this.getWorldName());
-    }
-
-    @Override
-    public void onFinished() {
-        /*if (this.shouldDeleteWorldGlobal()) {
-            this.currentWorld.deleteWorld();
-        }*/
-
     }
 
 
@@ -108,7 +101,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
             RunnerEvents.waitForClientInit();
 
             this.testerManager = new TesterManager();
-            this.testActions = new TestActions(this.testerManager, this.worldOptions, this.screenshotOptions, this.globalTestStatus);
+            this.testActions = new TestActions(this.testerManager, this.worldOptions, this.screenshotOptions, MinecraftRunner.globalTestStatus);
 
             this.joinNewWorld();
 
@@ -179,7 +172,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     @Override
     public TestClass createTestClass(Class<?> testClass) {
         try {
-            ClassLoader classLoader = MinecraftServerStarter.INSTANCE().getMinecraftServerClassLoader();
+            ClassLoader classLoader = MinecraftClientStarter.INSTANCE().getMinecraftServerClassLoader();
             Class<?> testClassFromMinecraftClassLoader = Class.forName(testClass.getName(), true, classLoader);
             return super.createTestClass(testClassFromMinecraftClassLoader);
         } catch (ClassNotFoundException e) {
@@ -225,7 +218,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
             this.tempWorld.joinNewWorld(CUSTOM_WORLD_PREFIX + this.getWorldName() + method.getName() + "-");
         }
 
-        this.currentTestStatus = new TestStatus(null);
+        this.currentTestStatus = new TestStatus();
         this.testerManager.beforeTest();
     }
 
