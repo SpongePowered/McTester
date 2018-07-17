@@ -148,7 +148,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     private void validateCoroutineTest(FrameworkMethod coroutineTest, List<Throwable> errors) {
         // The only parameter should be the implicit Continuation
         if (coroutineTest.getMethod().getParameterTypes().length != 1) {
-            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should have no parameters!"));
+            errors.add(new Exception("Method " + coroutineTest.getMethod().getName() + " is a @CoroutineTest and should be a 'suspend' function with no parameters!"));
             return;
         }
 

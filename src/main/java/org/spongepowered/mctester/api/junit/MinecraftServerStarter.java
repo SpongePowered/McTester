@@ -91,11 +91,13 @@ public class MinecraftServerStarter {
 			});
 
 			wrapperThread.setUncaughtExceptionHandler(((thread, throwable) -> {
+				System.err.println("Uncaught exception for Minecraft client thread!");
 				throwable.printStackTrace();
 				RunnerEvents.fatalError(throwable);
 			}));
 
 			Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
+				System.err.println("Uncaight exception for JUnit main thread!");
 				throwable.printStackTrace();
 				System.exit(-1);
 			});

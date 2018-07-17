@@ -31,11 +31,13 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.api.WorldOptions;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,6 +71,8 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	// on the LaunchClassLoader
 	private static MinecraftServerStarter starter = MinecraftServerStarter.INSTANCE();
 	private IJunitRunner realJUnitRunner;
+
+	private List<Throwable> caughtInitializationErrors = new ArrayList<>();
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
 		super(initializeClient(testClass));
@@ -108,10 +112,33 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, classLoader);
 			this.realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			// createTestClass is called from the super() constructor, so our field initializers
+			// haven't run yet
+			if (this.caughtInitializationErrors == null) {
+				this.caughtInitializationErrors = new ArrayList<>();
+			}
+			if (e instanceof InvocationTargetException) {
+				if (e.getCause() instanceof InitializationError) {
+					this.caughtInitializationErrors.addAll(((InitializationError) e.getCause()).getCauses());
+				} else {
+					this.caughtInitializationErrors.add(((InvocationTargetException) e).getTargetException());
+				}
+			} else {
+				this.caughtInitializationErrors.add(e);
+			}
+			return null;
 		}
 
 		return realJUnitRunner.createTestClass(testClass);
+	}
+
+	@Override
+	protected void collectInitializationErrors(List<Throwable> errors) {
+		if (this.caughtInitializationErrors != null && !this.caughtInitializationErrors.isEmpty()) {
+			errors.addAll(this.caughtInitializationErrors);
+		} else {
+			super.collectInitializationErrors(errors);
+		}
 	}
 
 	@Override
