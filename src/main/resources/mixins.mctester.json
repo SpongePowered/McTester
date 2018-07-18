@@ -6,6 +6,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinMain",
-    "MixinMinecraft"
+    "MixinMinecraft",
+    "MixinNetHandlerPlayServer",
+    "MixinNetworkManager"
   ]
 }
