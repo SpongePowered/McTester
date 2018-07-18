@@ -7,6 +7,7 @@
   "mixins": [
     "MixinMain",
     "MixinMinecraft",
+    "MixinMinecraftServer",
     "MixinNetHandlerPlayServer",
     "MixinNetworkManager"
   ]

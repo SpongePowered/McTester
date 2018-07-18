@@ -1,15 +1,20 @@
 package org.spongepowered.mctester.internal.world;
 
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.Uninterruptibles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.ISaveFormat;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
+import org.spongepowered.mctester.internal.interfaces.IMixinMinecraftServer;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -52,12 +57,24 @@ public class CurrentWorld {
 
 
     public void exitToMainMenu() {
+        IMixinMinecraftServer server = (IMixinMinecraftServer) FMLCommonHandler.instance().getSidedDelegate().getServer();
+        Thread serverThread = null;
+        if (server != null) {
+            serverThread = server.getServerMainThread();
+        }
         ((IMixinMinecraft) Minecraft.getMinecraft()).setAllowPause(true);
 
         if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+            System.err.println("Server has already been stopped, waiting for server thread to exit: " + serverThread);
+            if (serverThread != null) {
+                Uninterruptibles.joinUninterruptibly(serverThread);
+                System.err.println("Server thread shutdown!");
+            }
             RunnerEvents.resetPlayerJoined();
             return;
         }
+
+
 
         // We deliberately avoid using Minecraft.addScheduledTask here.
         //
@@ -142,7 +159,13 @@ public class CurrentWorld {
             }
         });
 
+        System.err.println("Waiting on exit to main menu...");
         Futures.getUnchecked(atMainMenu);
+        System.err.println("Exited to main menu. Waiing for server thread to stop: " + serverThread);
+        if (serverThread != null) {
+            Uninterruptibles.joinUninterruptibly(serverThread);
+        }
+        System.err.println("Server thread has now exited!");
         RunnerEvents.resetPlayerJoined();
     }
 
