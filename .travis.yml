@@ -1,5 +1,7 @@
 language: java
 
+before_install:
+  - scripts/run-xvfb
 install: true
 script: ./gradlew build --stacktrace
 
