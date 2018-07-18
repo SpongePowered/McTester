@@ -1,6 +1,4 @@
 import ErrnoException = NodeJS.ErrnoException;
-import {Request} from 'express';
-
 import * as Busboy from 'busboy';
 
 const upload = require('./upload');
