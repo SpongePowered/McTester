@@ -6,7 +6,7 @@ services:
 before_install:
   - scripts/run-xvfb
 install: true
-script: ./gradlew build --stacktrace
+script: ./gradlew build --stacktrace --info
 
 
 before_cache:
