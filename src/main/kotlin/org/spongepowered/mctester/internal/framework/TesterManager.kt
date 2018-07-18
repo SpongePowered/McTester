@@ -2,11 +2,9 @@ package org.spongepowered.mctester.internal.framework
 
 import net.minecraft.client.Minecraft
 import org.junit.Assert
-import org.spongepowered.api.Game
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Event
-import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackComparators
 import org.spongepowered.mctester.internal.McTesterDummy
@@ -18,12 +16,9 @@ import org.spongepowered.mctester.internal.event.StandaloneEventListener
 import org.spongepowered.mctester.internal.framework.proxy.ProxyCallback
 import org.spongepowered.mctester.internal.framework.proxy.RemoteClientProxy
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft
-import org.spongepowered.mctester.junit.Client
 import org.spongepowered.mctester.junit.TestUtils
-import java.util.ArrayList
-import java.util.HashSet
+import java.util.*
 import java.util.concurrent.*
-import kotlin.coroutines.experimental.Continuation
 
 class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 

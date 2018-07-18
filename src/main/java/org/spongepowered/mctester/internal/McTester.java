@@ -47,13 +47,13 @@ import org.spongepowered.api.network.MessageHandler;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
+import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationData;
 import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationDataBuilder;
 import org.spongepowered.mctester.internal.message.ClientDelegateHandler;
 import org.spongepowered.mctester.internal.message.ServerDelegateHandler;
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest;
 import org.spongepowered.mctester.internal.message.toserver.MessageRPCResponse;
-import org.spongepowered.mctester.api.RunnerEvents;
 
 import java.util.Iterator;
 

@@ -8,8 +8,8 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.ISaveFormat;
-import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;

@@ -10,8 +10,6 @@ import org.spongepowered.mctester.internal.ServerOnly
 import org.spongepowered.mctester.internal.message.ResponseWrapper
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.reflect.KCallable
 
 class SuspendRemoteClientProxy(val mainThreadExecutor: SpongeExecutorService, val proxyCallback: ProxyCallback?) {
 

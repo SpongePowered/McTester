@@ -1,10 +1,10 @@
 package org.spongepowered.mctester.internal.message.toclient;
 
-import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationData;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.mctester.internal.McTester;
+import org.spongepowered.mctester.internal.framework.proxy.RemoteInvocationData;
 
 public class MessageRPCRequest extends BaseClientMessage {
 

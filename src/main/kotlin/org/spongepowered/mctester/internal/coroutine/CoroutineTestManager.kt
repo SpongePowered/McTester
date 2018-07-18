@@ -1,9 +1,13 @@
 package org.spongepowered.mctester.internal.coroutine
 
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CoroutineDispatcher
+import kotlinx.coroutines.experimental.CoroutineScope
+import kotlinx.coroutines.experimental.Runnable
+import kotlinx.coroutines.experimental.runBlocking
 import org.spongepowered.api.Sponge
 import org.spongepowered.mctester.internal.framework.TesterManager
-import kotlin.coroutines.experimental.*
+import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.experimental.CoroutineContext
 
 class CoroutineTestManager(val block: suspend CoroutineScope.() -> Unit, val testerManager: TesterManager) {
 

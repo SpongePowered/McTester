@@ -1,13 +1,13 @@
 package org.spongepowered.mctester.internal.framework.proxy;
 
-import org.spongepowered.api.util.Coerce;
-import org.spongepowered.mctester.internal.message.RPCKeys;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.util.Coerce;
 import org.spongepowered.mctester.internal.Utils;
+import org.spongepowered.mctester.internal.message.RPCKeys;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

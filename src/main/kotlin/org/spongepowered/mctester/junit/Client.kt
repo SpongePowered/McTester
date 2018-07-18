@@ -1,18 +1,11 @@
 package org.spongepowered.mctester.junit;
 
-import com.flowpowered.math.vector.Vector3d;
-import kotlin.coroutines.experimental.Continuation;
-import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.text.Text;
-
-import java.util.Optional;
+import com.flowpowered.math.vector.Vector3d
+import org.spongepowered.api.data.type.HandType
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.entity.PlayerInventory
+import java.util.*
 
 /**
  * The Client controller.

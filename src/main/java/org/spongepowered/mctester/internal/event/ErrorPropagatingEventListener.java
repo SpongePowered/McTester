@@ -1,13 +1,7 @@
 package org.spongepowered.mctester.internal.event;
 
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.EventListener;
 import org.spongepowered.mctester.internal.appclass.ErrorSlot;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ErrorPropagatingEventListener<T extends Event> extends StandaloneEventListener<T> {
 

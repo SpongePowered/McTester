@@ -4,12 +4,12 @@ import com.google.common.util.concurrent.Futures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ScreenShotHelper;
 import org.junit.runners.model.FrameworkMethod;
-import org.spongepowered.mctester.api.junit.TestStatus;
-import org.spongepowered.mctester.internal.world.CurrentWorld;
 import org.spongepowered.mctester.api.ScreenshotOptions;
-import org.spongepowered.mctester.junit.TestUtils;
 import org.spongepowered.mctester.api.UseSeparateWorld;
 import org.spongepowered.mctester.api.WorldOptions;
+import org.spongepowered.mctester.api.junit.TestStatus;
+import org.spongepowered.mctester.internal.world.CurrentWorld;
+import org.spongepowered.mctester.junit.TestUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

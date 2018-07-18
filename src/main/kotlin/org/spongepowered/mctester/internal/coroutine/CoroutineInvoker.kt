@@ -6,9 +6,7 @@ import org.spongepowered.mctester.internal.InvokeMethodWrapper
 import org.spongepowered.mctester.internal.InvokerCallback
 import org.spongepowered.mctester.internal.framework.TesterManager
 import java.lang.reflect.InvocationTargetException
-import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.suspendCoroutine
-import kotlin.reflect.KCallable
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 

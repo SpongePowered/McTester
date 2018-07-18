@@ -1,11 +1,11 @@
-package org.spongepowered.mctester;
+package org.spongepowered.mctester
 
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPluginConvention;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.testing.Test;
-import org.gradle.plugins.ide.idea.model.IdeaModel;
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.testing.Test
+import org.gradle.plugins.ide.idea.model.IdeaModel
 
 class McTesterGradlePlugin implements Plugin<Project> {
 
