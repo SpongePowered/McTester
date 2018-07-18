@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(NetworkManager.class)
 public abstract class MixinNetworkManager {
 
-    @Inject(method = "exceptionCaught", cancellable = true, at = @At(value = "NEW", target = "net/minecraft/util/text/TextComponentTranslation", ordinal = 0))
+    @Inject(method = "exceptionCaught", cancellable = true, at = @At(value = "NEW", target = "net/minecraft/util/text/TextComponentTranslation", ordinal = 0), remap = false)
     public void onTimeoutException(ChannelHandlerContext p_exceptionCaught_1_, Throwable p_exceptionCaught_2, CallbackInfo ci) {
         System.err.println("Caught timeout exception in NetworkManager - printing out exception but keeping channel open!");
         LogManager.getLogger().debug(new TextComponentTranslation("disconnect.timeout").getUnformattedText(), p_exceptionCaught_2);
