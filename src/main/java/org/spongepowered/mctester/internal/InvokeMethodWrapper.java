@@ -1,8 +1,8 @@
 package org.spongepowered.mctester.internal;
 
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.spongepowered.api.Sponge;
-import org.junit.runners.model.FrameworkMethod;
 
 public class InvokeMethodWrapper extends Statement {
 

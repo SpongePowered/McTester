@@ -1,11 +1,8 @@
 package org.spongepowered.mctester.api.junit;
 
 import org.junit.runner.Description;
-import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
-
-import java.util.Optional;
 
 public class TestStatus extends RunListener {
 

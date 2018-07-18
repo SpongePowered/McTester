@@ -1,14 +1,14 @@
 package org.spongepowered.mctester.internal.message.toserver;
 
-import org.spongepowered.mctester.internal.ServerOnly;
-import org.spongepowered.mctester.internal.Utils;
-import org.spongepowered.mctester.internal.message.RPCKeys;
-import org.spongepowered.mctester.internal.message.ResponseWrapper;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
+import org.spongepowered.mctester.internal.ServerOnly;
+import org.spongepowered.mctester.internal.Utils;
+import org.spongepowered.mctester.internal.message.RPCKeys;
+import org.spongepowered.mctester.internal.message.ResponseWrapper;
 
 public class MessageRPCResponse extends BaseServerMessage {
 

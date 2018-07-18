@@ -5,8 +5,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.mctester.internal.McTester;
 
-import java.lang.reflect.Modifier;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainThreadProxy extends BaseProxy {

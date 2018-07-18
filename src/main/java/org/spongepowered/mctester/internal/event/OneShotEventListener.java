@@ -24,9 +24,8 @@
  */
 package org.spongepowered.mctester.internal.event;
 
-import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.EventListener;
+import org.spongepowered.mctester.internal.appclass.ErrorSlot;
 
 import java.util.concurrent.CompletableFuture;
 

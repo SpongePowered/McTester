@@ -1,12 +1,12 @@
 package org.spongepowered.mctester.internal.framework.proxy;
 
-import org.spongepowered.mctester.internal.RawClient;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.mctester.internal.McTester;
+import org.spongepowered.mctester.internal.RawClient;
+import org.spongepowered.mctester.internal.ServerOnly;
 import org.spongepowered.mctester.internal.message.ResponseWrapper;
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
-import org.spongepowered.mctester.internal.ServerOnly;
 
 import java.util.concurrent.TimeUnit;
 

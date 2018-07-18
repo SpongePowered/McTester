@@ -2,14 +2,13 @@ package org.spongepowered.mctester.internal.mixin;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
-import org.apache.commons.lang3.Validate;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.world.WorldSettings;
+import org.apache.commons.lang3.Validate;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,13 +16,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nullable;
-import javax.security.auth.callback.Callback;
 
 // McTester always runs in a deobfuscated environment - it depends on GradleStart, after all!
 // Therefore, we disable all remapping, since we'll never need it.
