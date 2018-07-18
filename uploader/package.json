@@ -1,6 +1,6 @@
 {
   "name": "mctester-uploader",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Uploads test artifacts from McTester",
   "bin": {
     "mctesterupload": "./client.js"
