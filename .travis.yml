@@ -1,5 +1,8 @@
 language: java
 
+services:
+  - docker
+
 before_install:
   - scripts/run-xvfb
 install: true
