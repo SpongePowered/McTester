@@ -36,12 +36,8 @@ public class MessageRPCResponse extends BaseServerMessage {
 
         // The reason we use a scheduler at all is to ensure that all preceding packets
         // have been processed.
-        ((MinecraftServer) Sponge.getServer()).addScheduledTask(new Runnable() {
-            @Override
-            public void run() {
-                ServerOnly.INBOUND_QUEUE.add(new ResponseWrapper(MessageRPCResponse.this.response));
-            }
-        });
+        ((MinecraftServer) Sponge.getServer()).addScheduledTask(
+                () -> ServerOnly.INBOUND_QUEUE.add(new ResponseWrapper(MessageRPCResponse.this.response)));
     }
 
     @Override

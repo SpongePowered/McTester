@@ -42,7 +42,7 @@ public class MinecraftRunnerSelfTest {
 	@Test public void testTestInfrastructure() throws Throwable {
 		Assert.assertNotNull(game);
 		Assert.assertTrue(game.getPluginManager().isLoaded(TestsRunnerPlugin.ID));
-		Assert.assertTrue(game == TestsRunnerPlugin.game);
+		Assert.assertSame(game, TestsRunnerPlugin.game);
 	}
 
 }

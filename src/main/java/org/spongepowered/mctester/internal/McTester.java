@@ -96,29 +96,6 @@ public class McTester {
         if (Sponge.getPlatform().getExecutionType().equals(Platform.Type.CLIENT)) {
             Sponge.getDataManager().registerBuilder(RemoteInvocationData.class, new RemoteInvocationDataBuilder(ClientOnly.REAL_CLIENT_HANDLER));
         }
-
-        Sponge.getCommandManager().register(this, CommandSpec.builder().executor(new CommandExecutor() {
-
-            @Override
-            public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        McTester.getThePlayer().lookAt(McTester.getThePlayer().getLocation().getPosition());
-                        Iterator<Entity> creepers = McTester.getThePlayer().getNearbyEntities(e -> e instanceof Creeper).iterator();
-                        if (creepers.hasNext()) {
-                            Entity creeper = creepers.next();
-
-                            //RealJUnitRunner.manager.client.lookAt(McTester.getThePlayer());
-                        }
-                    }
-                };
-
-                thread.start();
-
-                return CommandResult.success();
-            }
-        }).build(), "creeper");
     }
 
     public void sendToPlayer(MessageRPCRequest messageRPCRequest) {
