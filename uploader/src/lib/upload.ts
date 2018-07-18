@@ -11,7 +11,7 @@ interface GithubResponse {
 
 class ImageWrapper {
     public raw: Buffer;
-    public opt: { title: string
+    public opt: { title: string }
     constructor(raw: Buffer, title: string) {
         this.raw = raw;
         this.opt = {title: title};
@@ -47,7 +47,7 @@ function uploadImages(images: ImageWrapper[]) {
 }
 
 
-function createNewStatus(images: ImageWrapper[], user: string, repoName: string, sha: string) {
+function uploadAlbumAndStatus(images: ImageWrapper[], user: string, repoName: string, sha: string) {
     if (images.length === 0) {
         return;
     }
@@ -55,7 +55,9 @@ function createNewStatus(images: ImageWrapper[], user: string, repoName: string,
 
     return imgur.uploadIntoAlbum(images, {title: 'McTester images for ' + user + "/" + repoName + "#" + sha}).then((album: Album) => {
         console.log("Made album: " + album.link);
-        return setStatus(user, repoName, sha, "Some Minecraft integration tests failed", album.link)
+        return album.link
+        // Temporarily disabled
+        //return setStatus(user, repoName, sha, "Some Minecraft integration tests failed", album.link)
     })
 };
 
@@ -79,7 +81,7 @@ module.exports.uploadAndComment = function(images: ImageWrapper[]) {
     });
 };
 
-export { ImageWrapper, createNewStatus };
+export { ImageWrapper, uploadAlbumAndStatus };
 
 //uploadAndComment([new ImageWrapper(fs.readFileSync('test1.png'), "First title"), new ImageWrapper(fs.readFileSync('test2.png'), "Second title")]).then(() => console.log("All done!"));
 

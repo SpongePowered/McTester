@@ -100,8 +100,8 @@ function handleUpload(req: RequestLike): Promise<ResponseData> {
                 })});
 
                 Promise.all(promises)
-                    .then(uploads => upload.createNewStatus(uploads, fields.user, fields.repo, fields.commitSha).then((githubData: Object) => {
-                        resolve(new ResponseData(200, "Uploaded images: " + uploads))
+                    .then(uploads => upload.uploadAlbumAndStatus(uploads, fields.user, fields.repo, fields.commitSha).then((albumLink: string) => {
+                        resolve(new ResponseData(200, "Uploaded images: " + uploads + " " + albumLink))
                     }))
                     .catch(e => {
                         reject("Internal error: " + e);
