@@ -1,4 +1,4 @@
-import {ResponseData, handleUpload} from "../lib/handleUpload";
+import {handleUpload, ResponseData} from "../lib/handleUpload";
 
 var str = require('string-to-stream');
 

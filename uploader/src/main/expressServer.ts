@@ -1,7 +1,7 @@
 'use strict';
 import * as express from 'express';
 
-import { handleUploadExpress } from '../lib/handleUploadExpress';
+import {handleUploadExpress} from '../lib/handleUploadExpress';
 
 var app = express();
 //app.use(function (req, res, next) { getRawBody(req, { limit: '10mb'}) });
