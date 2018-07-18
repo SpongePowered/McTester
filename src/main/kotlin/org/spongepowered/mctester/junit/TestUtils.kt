@@ -25,14 +25,11 @@
 package org.spongepowered.mctester.junit
 
 import org.junit.Assert
-import org.spongepowered.api.Game
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Event
 import org.spongepowered.api.event.EventManager
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.mctester.internal.event.StandaloneEventListener
-
 import java.util.concurrent.Callable
 
 /**
@@ -144,6 +141,12 @@ interface TestUtils {
     @Throws(Throwable::class)
     fun <T : Event> listenTimeout(runnable: Runnable, listener: StandaloneEventListener<T>, ticks: Int): Int
 
+    /**
+     * The same as {@link #listenTimeoet}, but desigend for @CoroutineTest methods
+     *
+     * <p>Unlike {@link #listenTimeout}, this methods suspends the coroutine until the listener
+     * execute or the time runs out, instead of blocking.</p>
+     */
     suspend fun <T: Event> listenTimeOutSuspend(block: suspend () -> Unit, listener: StandaloneEventListener<T>, ticks: Int): Int
 
     /**
@@ -255,5 +258,9 @@ interface TestUtils {
      */
     fun waitForAll()
 
+    /**
+     * Checks that the two ItemStacks are equal when compared with ItemStackComparators.ALL.
+     * If they are not equal, an AssertionError is thrown with an informative message.
+     */
     fun assertStacksEqual(serverStack: ItemStack, clientStack: ItemStack)
 }
