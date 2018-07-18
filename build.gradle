@@ -104,6 +104,15 @@ dependencies {
 
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+}
+
 configurations {
     compile.extendsFrom kapt
 }
