@@ -10,13 +10,7 @@ public abstract class BaseClientHandler<T extends Message> implements MessageHan
 
     @Override
     public final void handleMessage(T message, RemoteConnection connection, Platform.Type side) {
-        Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-
-            @Override
-            public void run() {
-                BaseClientHandler.this.properHandleMessage(message, connection, side);
-            }
-        });
+        Minecraft.getMinecraft().addScheduledTask(() -> BaseClientHandler.this.properHandleMessage(message, connection, side));
     }
 
     protected abstract void properHandleMessage(T message, RemoteConnection connection, Platform.Type side);

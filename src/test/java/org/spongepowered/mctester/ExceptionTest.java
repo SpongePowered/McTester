@@ -48,7 +48,8 @@ public class ExceptionTest extends BaseTest {
 
         this.testUtils.listenTimeout(() -> {
             this.testUtils.getClient().sendMessage("Timeout message");
-        }, new StandaloneEventListener<MessageChannelEvent.Chat>(MessageChannelEvent.Chat.class, (MessageChannelEvent.Chat event) -> Assert.fail("Got message: " + event.getRawMessage().toPlain())),
+        }, new StandaloneEventListener<>(MessageChannelEvent.Chat.class,
+                        (MessageChannelEvent.Chat event) -> Assert.fail("Got message: " + event.getRawMessage().toPlain())),
                 20);
     }
 

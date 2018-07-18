@@ -110,25 +110,21 @@ public class TestActions {
     private File takeScreenshot(String baseName, ScreenshotData data) {
         this.testUtils.sleepTicks(data.ticks);
 
-        return Futures.getUnchecked(Minecraft.getMinecraft().addScheduledTask(new Callable<File>() {
+        return Futures.getUnchecked(Minecraft.getMinecraft().addScheduledTask(() -> {
+            File outputDir = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
+            outputDir = new File(outputDir, data.getDirName());
+            outputDir.mkdirs();
 
-            @Override
-            public File call() {
-                File outputDir = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
-                outputDir = new File(outputDir, data.getDirName());
-                outputDir.mkdirs();
+            File outputFile = Utils.getTimestampedPNGFileForDirectory(baseName, outputDir);
+            BufferedImage screenshot = ScreenShotHelper
+                    .createScreenshot(Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight, Minecraft.getMinecraft().getFramebuffer());
 
-                File outputFile = Utils.getTimestampedPNGFileForDirectory(baseName, outputDir);
-                BufferedImage screenshot = ScreenShotHelper
-                        .createScreenshot(Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight, Minecraft.getMinecraft().getFramebuffer());
-
-                try {
-                    ImageIO.write(screenshot, "png", outputFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return outputFile;
+            try {
+                ImageIO.write(screenshot, "png", outputFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+            return outputFile;
         }));
     }
 

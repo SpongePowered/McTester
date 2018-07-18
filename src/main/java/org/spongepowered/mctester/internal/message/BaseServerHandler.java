@@ -21,12 +21,7 @@ public abstract class BaseServerHandler<T extends Message> implements MessageHan
         // in the proper order. If we were to use the Sponge scheduler API, our ACK
         // packet handler would run *before* the other packet handler, even though
         // it arrived *after*
-        ((MinecraftServer) Sponge.getServer()).addScheduledTask(new Runnable() {
-            @Override
-            public void run() {
-                BaseServerHandler.this.properHandleMessage(message, connection, side);
-            }
-        });
+        ((MinecraftServer) Sponge.getServer()).addScheduledTask(() -> BaseServerHandler.this.properHandleMessage(message, connection, side));
     }
 
     protected abstract void properHandleMessage(T message, RemoteConnection connection, Platform.Type side);

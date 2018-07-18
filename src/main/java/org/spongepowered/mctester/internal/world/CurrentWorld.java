@@ -28,15 +28,11 @@ public class CurrentWorld {
         this.name = baseName + String.valueOf(seed).substring(0, 5);
         System.err.println("Creating world " + this.name);
 
-        Futures.getUnchecked(Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+        Futures.getUnchecked(Minecraft.getMinecraft().addScheduledTask(() -> {
 
-            @Override
-            public void run() {
-
-                WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
-                worldsettings.enableCommands();
-                Minecraft.getMinecraft().launchIntegratedServer(CurrentWorld.this.name, CurrentWorld.this.name, worldsettings);
-            }
+            WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
+            worldsettings.enableCommands();
+            Minecraft.getMinecraft().launchIntegratedServer(CurrentWorld.this.name, CurrentWorld.this.name, worldsettings);
         }));
 
         RunnerEvents.waitForPlayerJoin();

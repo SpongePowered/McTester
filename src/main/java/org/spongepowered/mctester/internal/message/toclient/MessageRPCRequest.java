@@ -18,15 +18,11 @@ public class MessageRPCRequest extends BaseClientMessage {
 
     @Override
     public void process() {
-        Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    McTester.INSTANCE.channel.sendToServer(MessageRPCRequest.this.data.makeResponse());
-                } catch (Exception e) {
-                    throw new RuntimeException("Expcetion processing RPC request: " + MessageRPCRequest.this.data, e);
-                }
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            try {
+                McTester.INSTANCE.channel.sendToServer(MessageRPCRequest.this.data.makeResponse());
+            } catch (Exception e) {
+                throw new RuntimeException("Expcetion processing RPC request: " + MessageRPCRequest.this.data, e);
             }
         });
     }
