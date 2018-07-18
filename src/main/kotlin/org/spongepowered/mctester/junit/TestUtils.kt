@@ -91,6 +91,11 @@ interface TestUtils {
     fun <T: Event> listenOneShot(runnable: Runnable, vararg listeners: StandaloneEventListener<T>)
 
     /**
+     * Like {@link #listenOneShot}, but desgined for @CoroutineTest methods
+     */
+    suspend fun <T: Event> listenOneShotSuspend(block: suspend () -> Unit, vararg listeners: StandaloneEventListener<T>)
+
+    /**
      * Registers an event listener. This behaves like a regular Sponge event listener,
      * with one difference
      *

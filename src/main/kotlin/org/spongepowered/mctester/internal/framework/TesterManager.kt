@@ -70,6 +70,16 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         //return oneShot;
     }
 
+    override suspend fun <T : Event> listenOneShotSuspend(block: suspend () -> Unit, vararg listeners: StandaloneEventListener<T>) {
+        if (listeners.size == 0) {
+            throw IllegalArgumentException("Must provide at least one listener!")
+        }
+
+        val newListeners = this.setupOneShotListeners(*listeners)
+        block()
+        this.finishOneShotListeners(newListeners)
+    }
+
     private fun <T: Event> setupOneShotListeners(vararg listeners: StandaloneEventListener<T>): List<OneShotEventListener<out T>> {
         val newListeners = ArrayList<OneShotEventListener<out T>>(listeners.size)
         for (listener in listeners) {
