@@ -168,7 +168,6 @@ public class RealClientHandler implements RawClient {
 
     @Override
     public void onFullyLoggedIn() {
-        System.err.println("Fully logged in on client!");
         //RunnerEvents.setPlayerJoined();
     }
 }
