@@ -53,6 +53,10 @@ interface Client {
      */
     fun lookAt(targetPos: Vector3d);
 
+    /**
+     * The same as {@link lookAt}, but suspends the coroutine
+     * instead of blocking.
+     */
     suspend fun lookAtSuspend(targetPos: Vector3d);
 
     /**
@@ -65,6 +69,10 @@ interface Client {
      */
     fun lookAt(entity: Entity);
 
+    /**
+     * The same as {@link lookAt}, but suspends the coroutine
+     * instead of blocking.
+     */
     suspend fun lookAtSuspend(entity: Entity)
 
     /**
@@ -115,6 +123,10 @@ interface Client {
      */
     fun rightClick();
 
+    /**
+     * The same as {@link rightClick}, but suspends the coroutine
+     * instead of blocking.
+     */
     suspend fun rightClickSuspend();
 
     /**
@@ -157,6 +169,15 @@ interface Client {
      */
     fun getClientInventory(): PlayerInventory ;
 
+    /**
+     * Gets the class name of the GUI class currently
+     * displayed on the client, if the client is currently viewing a GUI.
+     * Otherwise, {@link Optional#empty} is returned.
+     *
+     * <p>This is different from {#link Player#getOpenInventory}. This method
+     * returns the name of a client-side GUI class, which may have no server equivalent
+     * (e.g. GuiCommandBlock)
+     */
     fun getOpenGuiClass(): Optional<String>;
 
 }
