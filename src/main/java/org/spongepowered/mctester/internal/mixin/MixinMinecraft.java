@@ -4,8 +4,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.WorldSettings;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.asm.mixin.Final;
@@ -42,6 +44,9 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
     @Shadow @Final private Queue<FutureTask<?>> scheduledTasks;
 
     @Shadow public GameSettings gameSettings;
+    @Shadow private int leftClickCounter;
+    @Shadow public RayTraceResult objectMouseOver;
+    @Shadow public WorldClient world;
     private boolean leftClicking;
     private boolean rightClicking;
 
@@ -115,7 +120,16 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
 
     @Override
     public void leftClick() {
+        this.leftClickCounter = 0;
         this.clickMouse();
+    }
+
+    @Inject(method = "clickMouse", at = @At(value = "HEAD"))
+    public void onClickMouse(CallbackInfo ci) {
+        System.err.println(String.format("Click mouse hit: %s %s", this.leftClickCounter, this.objectMouseOver));
+        if (this.objectMouseOver != null && this.objectMouseOver.getBlockPos() != null) {
+            System.err.println("Hit block type: " + this.world.getBlockState(this.objectMouseOver.getBlockPos()));
+        }
     }
 
     @Override
