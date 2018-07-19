@@ -13,6 +13,8 @@ import net.minecraft.world.storage.ISaveFormat;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.internal.McTester;
+import org.spongepowered.mctester.internal.interfaces.IMixinIntegratedServer;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraftServer;
 
@@ -153,11 +155,64 @@ public class CurrentWorld {
                                 throw new IllegalStateException("The game didn't pause for some reason");
                             }
 
-                            if (Minecraft.getMinecraft().world != null) {
+                            System.err.println("Waiting for integrated server to pause");
+                            while (!((IMixinIntegratedServer) Sponge.getServer()).isIntegratedServerPaused()) {
+                                Thread.yield();
+                            }
+                            System.err.println("Integrated server paused!");
+
+
+                            // sendQuittingDisconnectingPacket is called by GuiIngameMenu immediately
+                            // before calling Minecraft.getMinecraft().loadWorld(null);
+                            // However, we deliberately DO NOT call it.
+
+                            // sendQuittingDisconnectingPacket is uncessary - loadWorld(null)
+                            // will start the server shutdown on its own. This means that ~99% of the time,
+                            // the server will shutdown before ever processing sendQuittingDisconnectingPacket
+                            // HOWEVER, in the ~1% of cases where the server *does* process the packet before
+                            // it detects the shutdown request from Minecraft.getMinecraft().loadWorld(null), the
+                            // client thread will hang.
+
+                            // The sequence of events looks like this:
+                            // * The client thread calls sendQuittingDisconnectingPacket,
+                            //  and enters loadWorld(null). It then enters IntegratedServer.initiateShutdown
+                            // SSince the server is still running at this point, it adds and waits on a scheduled
+                            // task to kick all of the players
+                            // * Meanwhile, the server thread is in the middle of processing a tick. It has already
+                            // processed its scheduled tasks for that tick. It notices that the client connection
+                            // has closed via NetworkSystem.networkTick(). That causes it to attempt a shutdown,
+                            // calling IntegratedServer.initiateShutdown, and executes it to the end
+
+                            // * When the server thread finished running IntegratedServer.initiateShutdown, it set
+                            // serverRunning to 'false'. This means that the server won't run anymore ticks,
+                            // and will instead exit the main loop in MinecraftServer#run
+                            //
+                            // * However, the client thread is still waiting on a scheduled task. Since the server was in the middle
+                            // of its last tick when the client thread added the task, the task will never complete, because
+                            // Futures.getUnchecked will never return
+                            //
+                            // At this point, the client thread is permanently frozen, hanging the process.
+                            //
+                            // The solution to this issue has two parts. First, we always wait for two additional server
+                            // ticks after the client becomes paused, before we start the server shutdown.
+                            // We also explicitly check that the integrated server itself is actually paused
+                            // This ensures that the server thread cannot be in the middle of a tick that it started
+                            // when the game was un-paused. This prevents the server from trying to initiate a shutdown
+                            // on its own.
+
+                            // Second, we just don't call sendQuittingDisconnectingPacket. Since loadWorld(null)
+                            // calls initiateShutdown, the server will still exit normally, just as if someone had run
+                            // '/stop'.
+
+                            // These two fixes ensure that this issue should never re-occur.
+
+                            // * Before the client can call Minecraft.getMinecraft().loadWorld(null),
+                            // the server detects that the channel has closed,
+                            /*if (Minecraft.getMinecraft().world != null) {
                                 System.err.println("Sending disconnect packet");
                                 Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
 
-                            }
+                            }*/
 
                             System.err.println("Loading null world...");
                             Minecraft.getMinecraft().loadWorld(null);
@@ -168,7 +223,7 @@ public class CurrentWorld {
                         } catch (Throwable e) {
                             System.err.println("Caught exception while trying to stop server from fake gui!");
                             e.printStackTrace();
-                            throw e;
+                            throw new RuntimeException(e);
                         }
                     }
                 });

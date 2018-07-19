@@ -132,6 +132,11 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         }
     }
 
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/integrated/IntegratedServer;initiateShutdown()V"))
+    public void onBeforeInitiateShutdown(CallbackInfo ci) {
+        System.err.println("About to initiate shutdown!");
+    }
+
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/integrated/IntegratedServer;initiateShutdown()V", shift = At.Shift.AFTER))
     public void onAfterInitiateShutdown(CallbackInfo ci) {
         System.err.println("Waiting for server to shutdown to unload world!");
