@@ -113,6 +113,8 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, classLoader);
 			this.realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 		} catch (Exception e) {
+			System.err.println("Exception when creating RealJunitRunner!");
+			e.printStackTrace();
 			// createTestClass is called from the super() constructor, so our field initializers
 			// haven't run yet
 			if (this.caughtInitializationErrors == null) {

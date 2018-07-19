@@ -13,11 +13,17 @@ public class GlobalSettings {
     private boolean shutdownOnError;
 
     public GlobalSettings() {
-        INSTANCE = this;
-        this.setGameDir();
-        this.shutdownOnSuccess = Boolean.valueOf(System.getProperty("mctester.shutdownOnSuccess", "true"));
-        this.shutdownOnFailure = Boolean.valueOf(System.getProperty("mctester.shutdownOnFailure", "true"));
-        this.shutdownOnError   = Boolean.valueOf(System.getProperty("mctester.shutdownOnError", "true"));
+        try {
+            INSTANCE = this;
+            this.setGameDir();
+            this.shutdownOnSuccess = Boolean.valueOf(System.getProperty("mctester.shutdownOnSuccess", "true"));
+            this.shutdownOnFailure = Boolean.valueOf(System.getProperty("mctester.shutdownOnFailure", "true"));
+            this.shutdownOnError = Boolean.valueOf(System.getProperty("mctester.shutdownOnError", "true"));
+        } catch (Throwable e) {
+            System.err.println("Exception creating global settings!");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     private void setGameDir() {
