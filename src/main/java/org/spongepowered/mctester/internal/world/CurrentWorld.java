@@ -112,52 +112,69 @@ public class CurrentWorld {
 
                     @Override
                     public void updateScreen() {
-                        // Minecraft only pauses the game in Minecraft#runGameLoop.
-                        // However, the game (and therefore any open GuiScreen) ticks multiple
-                        // times per call to runGameLoop.
+                        try {
+                            // Minecraft only pauses the game in Minecraft#runGameLoop.
+                            // However, the game (and therefore any open GuiScreen) ticks multiple
+                            // times per call to runGameLoop.
 
-                        // To ensure that the game is actually paused, we schedule a new task
-                        // from our GuiScreen, and don't do anything until it runs.
-                        // Since all client scheduled tasks run at the start of
-                        // runGameLoop, we know that we've gone through a full
-                        // execution of runGameLoop when our second scheduled task runs
-                        // (the gui first opens in the previous set of runGameLoop
-                        // scheduled tasks).
+                            // To ensure that the game is actually paused, we schedule a new task
+                            // from our GuiScreen, and don't do anything until it runs.
+                            // Since all client scheduled tasks run at the start of
+                            // runGameLoop, we know that we've gone through a full
+                            // execution of runGameLoop when our second scheduled task runs
+                            // (the gui first opens in the previous set of runGameLoop
+                            // scheduled tasks).
 
-                        // All of this ensures that we only try to exit the game when
-                        // it's actually paused, and lets us avoid taking over
-                        // Vanilla's handling of pausing the game. Just in case,
-                        // we throw an exception if the game isn't actually paused - however,
-                        // this should never happen.
-                        if (gameLoopRuns < 1) {
-                            if (mainThreadTask == null) {
-                                mainThreadTask = ((IMixinMinecraft) Minecraft.getMinecraft()).addScheduledTaskAlwaysDelay(() -> {
-                                    gameLoopRuns++;
-                                    return null;
-                                });
+                            // All of this ensures that we only try to exit the game when
+                            // it's actually paused, and lets us avoid taking over
+                            // Vanilla's handling of pausing the game. Just in case,
+                            // we throw an exception if the game isn't actually paused - however,
+                            // this should never happen.
+                            System.err.println("Updating fake screen!");
+                            if (gameLoopRuns < 1) {
+                                System.err.println("Game loop runs < 1");
+                                if (mainThreadTask == null) {
+                                    System.err.println("We don't have a main thread task yet, creating one");
+                                    mainThreadTask = ((IMixinMinecraft) Minecraft.getMinecraft()).addScheduledTaskAlwaysDelay(() -> {
+                                        System.err.println("Incrementing game loop runs from minecraft thread");
+                                        gameLoopRuns++;
+                                        return null;
+                                    });
+                                }
+                                return;
                             }
-                            return;
+
+                            System.err.println("Closing server for real!");
+
+                            // We could forcibly pause the game ourselves, but it's better
+                            // to mimic Vanilla as closely as possible, to minimize any
+                            // unforseen problems.
+                            if (!Minecraft.getMinecraft().isGamePaused() && Minecraft.getMinecraft().isIntegratedServerRunning()) {
+                                throw new IllegalStateException("The game didn't pause for some reason");
+                            }
+
+                            if (Minecraft.getMinecraft().world != null) {
+                                System.err.println("Sending disconnect packet");
+                                Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
+
+                            }
+
+                            System.err.println("Loading null world...");
+                            Minecraft.getMinecraft().loadWorld(null);
+                            System.err.println("Displaying main menu...");
+                            Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
+                            System.err.println("We're done!");
+                            atMainMenu.complete(null);
+                        } catch (Throwable e) {
+                            System.err.println("Caught exception while trying to stop server from fake gui!");
+                            e.printStackTrace();
+                            throw e;
                         }
-
-                        // We could forcibly pause the game ourselves, but it's better
-                        // to mimic Vanilla as closely as possible, to minimize any
-                        // unforseen problems.
-                        if (!Minecraft.getMinecraft().isGamePaused() && Minecraft.getMinecraft().isIntegratedServerRunning()) {
-                            throw new IllegalStateException("The game didn't pause for some reason");
-                        }
-
-                        if (Minecraft.getMinecraft().world != null) {
-                            Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
-
-                        }
-
-                        Minecraft.getMinecraft().loadWorld(null);
-                        Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
-                        atMainMenu.complete(null);
                     }
                 });
             }
         });
+
 
         System.err.println("Waiting on exit to main menu...");
         Futures.getUnchecked(atMainMenu);
