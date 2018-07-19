@@ -9,6 +9,7 @@
     "MixinMinecraft",
     "MixinMinecraftServer",
     "MixinNetHandlerPlayServer",
-    "MixinNetworkManager"
+    "MixinNetworkManager",
+    "MixinPlayerChunkMap"
   ]
 }

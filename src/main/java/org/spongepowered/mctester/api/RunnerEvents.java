@@ -26,6 +26,7 @@ package org.spongepowered.mctester.api;
 
 import com.google.common.util.concurrent.Futures;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.spongepowered.mctester.junit.Client;
 
 import java.util.concurrent.CompletableFuture;
 

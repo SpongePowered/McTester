@@ -1,12 +1,17 @@
 package org.spongepowered.mctester.internal.framework
 
 import net.minecraft.client.Minecraft
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.management.PlayerChunkMapEntry
+import net.minecraft.world.WorldServer
+import net.minecraft.world.chunk.Chunk
 import org.junit.Assert
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Event
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackComparators
+import org.spongepowered.mctester.internal.McTester
 import org.spongepowered.mctester.internal.McTesterDummy
 import org.spongepowered.mctester.internal.appclass.ErrorSlot
 import org.spongepowered.mctester.internal.coroutine.await
@@ -16,9 +21,11 @@ import org.spongepowered.mctester.internal.event.StandaloneEventListener
 import org.spongepowered.mctester.internal.framework.proxy.ProxyCallback
 import org.spongepowered.mctester.internal.framework.proxy.RemoteClientProxy
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft
+import org.spongepowered.mctester.internal.interfaces.IMixinPlayerChunkMap
 import org.spongepowered.mctester.junit.TestUtils
 import java.util.*
 import java.util.concurrent.*
+import java.util.function.Consumer
 
 class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 
@@ -91,14 +98,69 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         return newListeners
     }
 
+
     fun beforeTest() {
         this.errorSlots.clear()
+        this.waitForFullLogin()
+        (Minecraft.getMinecraft() as IMixinMinecraft).setAllowPause(false)
+    }
+
+    // TODO: REVIST THIS IF WE EVER ADD MULTI-CLIENT SUPPORT!!!
+    // The chunk logic will need to change
+    private fun waitForFullLogin() {
+        // At this point, the player has already joined the world. This means that all of
+        // the necessary PlayerChunkMapEntry's have been created via PlayerChunkMap#addPlayer
+        // (this is called during initializeConnectionToPlayer, before ClientConnectionEvent.Join is fired)
+        // However, the chunk data is sent during the subsequent tick.
+        // We need to ensure that the client has received the chunk data packets before we start
+        // running tests. Otherwise, blocks may not yet exist on the client, which will lead to issues
+        // when a test instructs a client to click a block.
+
+        // To ensure that all of the necessary packet have been sent, we want until PlayerChunkMap
+        // has pendingSendToPlayers, entriesWithoutChunks, and dirtyEntries empty.
+        // Since all of the chunks in the player's view radius are added to this map during
+        // PlayerChunkMap#addPlayer, we know that all of the player's chunks have been sent when this is empty.
+        // Note that new entires could be added to dirtyEntires while we wait, delaying our tests further.
+        // However, all of these lists will eventually be empty. Waiting for them all to be empty
+        // guarantees that we've waited at least as long as is necessary for the client to have recxieved
+        // all of its chunk packets for its iniital spawn position.
+
+        val chunkMapEntryFuture = CompletableFuture<Void>()
+        Sponge.getScheduler().createTaskBuilder()
+                .intervalTicks(1)
+                .name("McTester chunk checker")
+                .execute { task ->
+                    val chunkMap = ((McTester.getThePlayer().world as WorldServer).playerChunkMap) as IMixinPlayerChunkMap
+
+                    // Some chunks amy be loaded without some of their neighbor chunks loaded
+                    // These chunks will set in PlayerChunkEntyMap, but won't be populated or
+                    // sent until their neighbors are loaded.
+                    // These chunks prevent pendingSendToPlayers and entriesWithoutChunks from ever
+                    // being completely empty, so we check for chuks that have isTerrainPopulated or isLightPopulated
+                    // set to false
+                    val chunkEmptyOrUnpopulated = { entry: PlayerChunkMapEntry ->
+                        val chunk = entry.chunk
+                        chunk == null || (!chunk.isTerrainPopulated || !chunk.isLightPopulated)
+                    }
+
+                    val noDirty = chunkMap.dirtyEntries.isEmpty()
+                    val noEntriesWithoutChunks = chunkMap.entriesWithoutChunks.all(chunkEmptyOrUnpopulated)
+                    val noPendigSendToPlayesr = chunkMap.pendingSendToPlayers.all(chunkEmptyOrUnpopulated)
+
+                    if (noDirty && noEntriesWithoutChunks && noPendigSendToPlayesr) {
+                        chunkMapEntryFuture.complete(null)
+                        task.cancel()
+                    }
+                }
+                .submit(McTester.INSTANCE)
+
+        chunkMapEntryFuture.get()
 
         // Wait for a packet round-trip to ensure that the client has processed previous packets,
         // like chunk data. This can help avoid race conditions later, by ensuring that client
         // ticks will be fast when a test starts executing.
         this.client.onFullyLoggedIn()
-        (Minecraft.getMinecraft() as IMixinMinecraft).setAllowPause(false)
+
     }
 
     @Throws(Throwable::class)
