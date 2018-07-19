@@ -45,4 +45,10 @@ class SuspendRemoteClientProxy(val mainThreadExecutor: SpongeExecutorService, va
         return result
     }
 
+    suspend fun onFullyLoggedIn() {
+        val method = RawClient::class.java.getMethod("onFullyLoggedIn")
+        McTester.INSTANCE.sendToPlayer(MessageRPCRequest(RemoteInvocationData(this, method, arrayListOf<Any>())))
+        val resp = getResponse()
+    }
+
 }

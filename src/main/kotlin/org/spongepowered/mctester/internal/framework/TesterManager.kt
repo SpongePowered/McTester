@@ -1,10 +1,8 @@
 package org.spongepowered.mctester.internal.framework
 
 import net.minecraft.client.Minecraft
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.management.PlayerChunkMapEntry
 import net.minecraft.world.WorldServer
-import net.minecraft.world.chunk.Chunk
 import org.junit.Assert
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
@@ -25,7 +23,6 @@ import org.spongepowered.mctester.internal.interfaces.IMixinPlayerChunkMap
 import org.spongepowered.mctester.junit.TestUtils
 import java.util.*
 import java.util.concurrent.*
-import java.util.function.Consumer
 
 class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 
@@ -101,13 +98,12 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 
     fun beforeTest() {
         this.errorSlots.clear()
-        this.waitForFullLogin()
-        (Minecraft.getMinecraft() as IMixinMinecraft).setAllowPause(false)
+        this.waitForWorldChunks()
     }
 
     // TODO: REVIST THIS IF WE EVER ADD MULTI-CLIENT SUPPORT!!!
     // The chunk logic will need to change
-    private fun waitForFullLogin() {
+    private fun waitForWorldChunksInternal(): CompletableFuture<Void> {
         // At this point, the player has already joined the world. This means that all of
         // the necessary PlayerChunkMapEntry's have been created via PlayerChunkMap#addPlayer
         // (this is called during initializeConnectionToPlayer, before ClientConnectionEvent.Join is fired)
@@ -154,13 +150,28 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
                 }
                 .submit(McTester.INSTANCE)
 
-        chunkMapEntryFuture.get()
+        return chunkMapEntryFuture
+    }
+
+
+
+    override fun waitForWorldChunks() {
+        this.waitForWorldChunksInternal().get()
 
         // Wait for a packet round-trip to ensure that the client has processed previous packets,
         // like chunk data. This can help avoid race conditions later, by ensuring that client
         // ticks will be fast when a test starts executing.
         this.client.onFullyLoggedIn()
 
+        (Minecraft.getMinecraft() as IMixinMinecraft).setAllowPause(false)
+
+    }
+
+    override suspend fun waitForWorldChunksSuspend() {
+        this.waitForWorldChunksInternal().await()
+
+        this.client.onFullyLoggedInSuspend()
+        (Minecraft.getMinecraft() as IMixinMinecraft).setAllowPause(false)
     }
 
     @Throws(Throwable::class)

@@ -264,6 +264,25 @@ interface TestUtils {
     fun waitForAll()
 
     /**
+     * Waits for all of the necessary chunk packets to be sent to the player.
+     *
+     * <p>Calling this is only necessary if you test explicitly switches the players'
+     * world via setBLocation. In that case, it should be called immediately after the
+     * setLocation call.</p>
+     *
+     * <p>If you don't switch the player's world from your test code, you don't
+     * need to call this method - it will be called for you before your test starts</p>
+     */
+    fun waitForWorldChunks();
+
+
+    /**
+     * The same as {@link #waitForWorldChunks}, but designed
+     * for a @CoroutineTest.
+     */
+    suspend fun waitForWorldChunksSuspend();
+
+    /**
      * Checks that the two ItemStacks are equal when compared with ItemStackComparators.ALL.
      * If they are not equal, an AssertionError is thrown with an informative message.
      */

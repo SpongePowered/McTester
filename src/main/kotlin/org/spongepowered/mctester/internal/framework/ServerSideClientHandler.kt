@@ -90,4 +90,8 @@ class ServerSideClientHandler(private val proxyClient: RawClient) : Client {
     fun onFullyLoggedIn() {
         this.proxyClient.onFullyLoggedIn()
     }
+
+    suspend fun onFullyLoggedInSuspend() {
+        this.suspendProxyClient.onFullyLoggedIn()
+    }
 }
