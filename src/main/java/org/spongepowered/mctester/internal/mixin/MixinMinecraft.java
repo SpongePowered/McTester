@@ -132,6 +132,26 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         }
     }
 
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/integrated/IntegratedServer;initiateShutdown()V", shift = At.Shift.AFTER))
+    public void onAfterInitiateShutdown(CallbackInfo ci) {
+        System.err.println("Waiting for server to shutdown to unload world!");
+    }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;resetData()V"))
+    public void onResetData(CallbackInfo ci) {
+        System.err.println("Sucessfully shutdown server! Calling EntityRenderer.resetdata()");
+    }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/SoundHandler;stopSounds()V"))
+    public void onStopSounds(CallbackInfo ci) {
+        System.err.println("Stopping sounds!");
+    }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/ISaveFormat;flushCache()V"))
+    public void onFlushCache(CallbackInfo ci) {
+        System.err.println("Flushing cache!");
+    }
+
     @Override
     public void holdLeftClick(boolean clicking) {
         this.leftClicking = clicking;
