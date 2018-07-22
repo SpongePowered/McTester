@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 
 import java.util.Queue;
@@ -57,22 +58,6 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         RunnerEvents.setClientInit();
     }
 
-    /*@Redirect(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;serverName:Ljava/lang/String;", ordinal = 0))
-    public String onGetServerName(Minecraft minecraft) {
-        return "blah";
-    }
-
-    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/client/FMLClientHandler;connectToServerAtStartup(Ljava/lang/String;I)V"))
-    public void onConnect(FMLClientHandler handler, String serverName, int serverPort) {
-        this.displayGuiScreen(null);
-
-        long seed = new Random().nextLong();
-        String folderName = "MCTestWorld-" + String.valueOf(seed).substring(0, 5);
-
-        WorldSettings worldsettings = new WorldSettings(seed, GameType.CREATIVE, false, false, WorldType.FLAT);
-        this.launchIntegratedServer(folderName, folderName, worldsettings);
-    }*/
-
     @Inject(method = "shutdownMinecraftApplet", cancellable = true, at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;destroy()V", remap = false))
     public void onSystemExitCalled(CallbackInfo ci) {
         // Notify any listenres that the game has closed, but don't actually
@@ -86,17 +71,6 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         // If we're already shutting down, don't try to shutdown again
         if (Minecraft.getMinecraft() != null && !((IMixinMinecraft) Minecraft.getMinecraft()).isRunning()) {
             ci.cancel();
-        }
-    }
-
-    @Inject(method = "processKeyBinds", at = @At("HEAD"))
-    public void onProcessKeyBinds(CallbackInfo ci) {
-        if (this.leftClicking) {
-
-        }
-
-        if (this.rightClicking) {
-
         }
     }
 
@@ -126,35 +100,10 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
 
     @Inject(method = "clickMouse", at = @At(value = "HEAD"))
     public void onClickMouse(CallbackInfo ci) {
-        System.err.println(String.format("Click mouse hit: %s %s", this.leftClickCounter, this.objectMouseOver));
+        McTester.INSTANCE.logger.debug(String.format("Click mouse hit: %s %s", this.leftClickCounter, this.objectMouseOver));
         if (this.objectMouseOver != null && this.objectMouseOver.getBlockPos() != null) {
-            System.err.println("Hit block type: " + this.world.getBlockState(this.objectMouseOver.getBlockPos()));
+            McTester.INSTANCE.logger.debug("Hit block type: " + this.world.getBlockState(this.objectMouseOver.getBlockPos()));
         }
-    }
-
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/integrated/IntegratedServer;initiateShutdown()V"))
-    public void onBeforeInitiateShutdown(CallbackInfo ci) {
-        System.err.println("About to initiate shutdown!");
-    }
-
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/integrated/IntegratedServer;initiateShutdown()V", shift = At.Shift.AFTER))
-    public void onAfterInitiateShutdown(CallbackInfo ci) {
-        System.err.println("Waiting for server to shutdown to unload world!");
-    }
-
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;resetData()V"))
-    public void onResetData(CallbackInfo ci) {
-        System.err.println("Sucessfully shutdown server! Calling EntityRenderer.resetdata()");
-    }
-
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/SoundHandler;stopSounds()V"))
-    public void onStopSounds(CallbackInfo ci) {
-        System.err.println("Stopping sounds!");
-    }
-
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/ISaveFormat;flushCache()V"))
-    public void onFlushCache(CallbackInfo ci) {
-        System.err.println("Flushing cache!");
     }
 
     @Override

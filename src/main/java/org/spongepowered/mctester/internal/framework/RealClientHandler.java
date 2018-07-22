@@ -77,7 +77,6 @@ public class RealClientHandler implements RawClient {
         // Copied from EntityLookHelper
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         net.minecraft.entity.Entity entity = getEntity(entityUUID).get();
-        System.err.println("Looking at: " + entity);
 
         Vector3d target = new Vector3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
         this.lookAt(target);
@@ -168,7 +167,5 @@ public class RealClientHandler implements RawClient {
 
     @Override
     public void onFullyLoggedIn() {
-        System.err.println("Processed fully logged in!");
-        //RunnerEvents.setPlayerJoined();
     }
 }
