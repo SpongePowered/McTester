@@ -148,3 +148,52 @@ compileTestKotlin {
 }
 
 
+  if(project.hasProperty('spongeRepo') && project.hasProperty('spongeUsername') && project.hasProperty('spongePassword')) {
+    uploadArchives {
+      repositories {
+        mavenDeployer {
+          repository(url: spongeRepo) {
+            authentication(userName: spongeUsername, password: spongePassword)
+          }
+
+          snapshotRepository(url: spongeRepo) {
+            authentication(userName: spongeUsername, password: spongePassword)
+          }
+
+          pom.project {
+            description 'An integration testing framework for Minecraft'
+            name project.name
+            url 'https://github.com/SpongePowered/McTester/'
+
+            inceptionYear '2018'
+
+            developers {
+              developer {
+                name 'Aaron1011'
+                email 'aa1ronham@gmail.com'
+              }
+            }
+
+            issueManagement {
+              system 'GitHub Issues'
+              url 'https://github.com/SpongePowered/McTester/issues'
+            }
+
+            licenses {
+              license {
+                name 'MIT'
+                url 'https://opensource.org/licenses/mit'
+              }
+            }
+
+            scm {
+              connection 'scm:git@github.com:SpongePowered/McTester.git'
+              developerConnection 'scm:git@github.com:SpongePowered/McTester.git'
+              url 'https://github.com/SpongePowered/McTester/'
+            }
+          }
+        }
+      }
+    }
+  }
+}
