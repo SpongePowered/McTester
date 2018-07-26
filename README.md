@@ -34,7 +34,7 @@ McTester is implemented as a Junit `@Runner`. Behind the scenes, it manages thre
 MCTester provides experimental support for writing tests using Kotlin coroutines.
 This allows your test to be run directly on the main thread, without needing to constantly wrap blocks of code in`TestUtils.runOnMainThread`.
 
-When your test performs an action that would normally be blocking - e.g. waiting for the client to perform a right click - your test methos is suspended.
+When your test performs an action that would normally be blocking - e.g. waiting for the client to perform a right click - your test method is suspended.
 Once the client response reaches the server, your method is automatically scheduled back onto the main thread.
 
 For a test writer, all of this is completely transparent. If you annotate your `suspend fun` with `@CoroutineTest`,
