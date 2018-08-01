@@ -1,6 +1,7 @@
 package org.spongepowered.mctester.internal.framework
 
 import com.flowpowered.math.vector.Vector3d
+import com.flowpowered.math.vector.Vector3i
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.InventoryPlayer
 import org.spongepowered.api.data.type.HandType
@@ -14,6 +15,7 @@ import org.spongepowered.mctester.junit.Client
 import java.util.*
 
 class ServerSideClientHandler(private val proxyClient: RawClient) : Client {
+
 
     private val suspendProxyClient = SuspendRemoteClientProxy(McTester.INSTANCE.syncExecutor, null)
 
@@ -44,6 +46,10 @@ class ServerSideClientHandler(private val proxyClient: RawClient) : Client {
 
     override fun lookAt(targetPos: Vector3d) {
         this.proxyClient.lookAt(targetPos)
+    }
+
+    override fun lookAtBlock(targetPos: Vector3i) {
+        this.proxyClient.lookAtBlock(targetPos)
     }
 
     override suspend fun lookAtSuspend(targetPos: Vector3d) {

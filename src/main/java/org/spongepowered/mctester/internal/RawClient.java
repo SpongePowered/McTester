@@ -1,6 +1,7 @@
 package org.spongepowered.mctester.internal;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -11,6 +12,8 @@ import java.util.UUID;
 public interface RawClient {
 
     void sendMessage(String text);
+
+    void lookAtBlock(Vector3i targetBlock);
 
     void lookAt(Vector3d targetPos);
 

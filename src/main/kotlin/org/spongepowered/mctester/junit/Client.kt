@@ -1,6 +1,7 @@
 package org.spongepowered.mctester.junit;
 
 import com.flowpowered.math.vector.Vector3d
+import com.flowpowered.math.vector.Vector3i
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.item.inventory.ItemStack
@@ -37,7 +38,7 @@ interface Client {
     fun sendMessage(text: String);
 
     /**
-     * Causes the client to look at the specified block.
+     * Causes the client to look at the specified location.
      *
      * <p>This is equivalent to the user moving their mouse
      * to look at the targeted block. Accordingly, it will cause
@@ -45,6 +46,16 @@ interface Client {
      * @param targetPos The position to look at
      */
     fun lookAt(targetPos: Vector3d);
+
+    /**
+     * Causes the client to look at the specified location.
+     *
+     * <p>This method should be used in preference to {@link #lookAt}
+     * if you intend to make the player interact with the block at the specified
+     * location. It adjusts the location so that the player is looking at
+     * the center of the block.
+     */
+    fun lookAtBlock(targetPos: Vector3i)
 
     /**
      * The same as {@link lookAt}, but suspends the coroutine
