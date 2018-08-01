@@ -23,13 +23,13 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class SpongeInstaller {
 
-    private static final String SPONGE_JAR_GLOB = "glob:spongeforge-*-dev.jar";
+    private static final String SPONGE_JAR_GLOB = "glob:spongeforge-*.jar";
     private static final String DOWNLOAD_LIST = "https://dl-api.spongepowered.org/v1/org.spongepowered/spongeforge/downloads?type=stable&minecraft=1.12.2";
 
     public void downloadLatestSponge(File downloadDirectory) {
         JsonArray downloadList = this.getDownloadList();
         URL jarUrl = this.extractURL(downloadList);
-        System.err.println("Downloading Sponge: " + jarUrl);
+        System.err.println("About to download Sponge jar: " + jarUrl);
         this.saveURLtoFile(jarUrl, downloadDirectory);
     }
 
@@ -44,6 +44,7 @@ public class SpongeInstaller {
         }
 
         this.removeOtherSpongeBuilds(downloadDirectory);
+        System.err.println("Downloading new Sponge build...");
 
         try {
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
@@ -85,7 +86,7 @@ public class SpongeInstaller {
 
     private URL extractURL(JsonArray downloads) {
         JsonObject artifacts = downloads.get(0).getAsJsonObject().get("artifacts").getAsJsonObject();
-        JsonObject jar = artifacts.get("dev").getAsJsonObject(); // We're in a deobufscated environment, so use the 'dev' jar
+        JsonObject jar = artifacts.get("dev").getAsJsonObject();
         try {
             return new URL(jar.get("url").getAsString());
         } catch (MalformedURLException e) {
