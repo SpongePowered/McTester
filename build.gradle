@@ -147,6 +147,10 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+test {
+    systemProperties System.properties
+}
+
 if(project.hasProperty('spongeRepo') && project.hasProperty('spongeUsername') && project.hasProperty('spongePassword')) {
   uploadArchives {
     repositories {
