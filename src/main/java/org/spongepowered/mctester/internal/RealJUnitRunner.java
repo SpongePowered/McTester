@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
 
 public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRunner, InvokerCallback {
 
-    public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
-
     private TesterManager testerManager;
     private Thread testThread = Thread.currentThread();
     private boolean initialized;

@@ -24,6 +24,8 @@
  */
 package org.spongepowered.mctester.api.junit;
 
+import static org.spongepowered.mctester.api.junit.MinecraftClientStarter.GLOBAL_SETTINGS;
+
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -33,6 +35,7 @@ import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.api.WorldOptions;
+import org.spongepowered.mctester.internal.RealJUnitRunner;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -82,12 +85,32 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	// This is done like this just so that we can run stuff before invoking the parent constructor
 	private static Class<?> initializeClient(Class<?> testClass) throws InitializationError {
 		try {
+
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				if (MinecraftRunner.globalTestStatus.succeeded()) {
+					if (!GLOBAL_SETTINGS.shutdownOnSuccess()) {
+						waitForClose("tests succeeded");
+					}
+				} else if (MinecraftRunner.globalTestStatus.failed()) {
+					if (!GLOBAL_SETTINGS.shutdownOnFailure()) {
+						waitForClose("tests failed");
+					}
+				}
+
+				RealJUnitRunner.shutDownMinecraft();
+			}));
+
 			starter.startClient();
 
 		} catch (Throwable e) {
 			throw new InitializationError(e);
 		}
 		return testClass;
+	}
+
+	private static void waitForClose(String message) {
+		System.err.println("Waiting for Minecraft to close because " + message);
+		RunnerEvents.waitForGameClosed();
 	}
 
 	@Override
