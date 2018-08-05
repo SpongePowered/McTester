@@ -10,7 +10,7 @@ install: true
 
 script:
   - DISPLAY=:99 ./gradlew build --stacktrace
-  - sonar-scanner
+    #- sonar-scanner
 
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
