@@ -54,6 +54,9 @@ public abstract class BaseProxy implements InvocationHandler {
     private void unwrapProxied(Object[] args) {
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
+            if (arg == null) {
+                continue;
+            }
             if (Proxy.isProxyClass(arg.getClass()) && Proxy.getInvocationHandler(arg) instanceof BaseProxy) {
                 args[i] = ((BaseProxy) Proxy.getInvocationHandler(arg)).realObject;
             }

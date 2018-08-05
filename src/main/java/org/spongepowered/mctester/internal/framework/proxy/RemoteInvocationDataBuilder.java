@@ -43,7 +43,13 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
 
         List<Object> rawParams = (List) container.getList(RPCKeys.PARAMS.getQuery()).get();
         List<Object> finalParams = new ArrayList<>(rawParams.size());
-        for (int i = 0; i < paramTypes.length; i++) {
+
+        int numParams = paramTypes.length;
+        if (numParams != 0 && paramTypes[numParams - 1] == ResponseCallback.class) {
+            numParams -= 1;
+        }
+
+        for (int i = 0; i < numParams; i++) {
             Class<?> paramType = paramTypes[i];
             Object rawParam = rawParams.get(i);
             if (rawParam instanceof DataView) {

@@ -5,6 +5,7 @@ import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.mctester.internal.framework.proxy.ResponseCallback;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,8 @@ public interface RawClient {
     void holdRightClick(boolean clicking);
 
     void onFullyLoggedIn();
+
+    void sleepTicksClient(int ticks, ResponseCallback callback);
 
     ItemStack getItemInHand(HandType type);
 

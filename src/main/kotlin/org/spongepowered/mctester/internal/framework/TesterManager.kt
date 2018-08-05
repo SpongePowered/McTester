@@ -26,6 +26,7 @@ import java.util.concurrent.*
 
 class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 
+
     //public Game fakeGame;
     override var client: ServerSideClientHandler = ServerSideClientHandler(RemoteClientProxy.newProxy(this))
     private val errorSlots = HashSet<ErrorSlot>()

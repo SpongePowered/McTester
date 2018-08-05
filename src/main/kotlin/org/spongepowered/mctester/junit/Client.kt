@@ -184,4 +184,15 @@ interface Client {
      */
     fun getOpenGuiClass(): Optional<String>;
 
+    /**
+     * Delays the test thread for the specified number of client ticks.
+     *
+     * Unlike sleepTicks, this method waits for 'client' ticks
+     * to elapse, not server ticks. This method should be used
+     * when waiting on a timed client action to complete (e.g. digging a block)
+     * Using 'sleepTicks' to wait for a timed client event
+     * is inherently racy, and can result in spurious test failures.
+     */
+    fun sleepTicksClient(ticks: Int)
+
 }

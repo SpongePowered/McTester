@@ -26,6 +26,7 @@ package org.spongepowered.mctester.internal;
 
 import com.google.inject.Inject;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.MinecraftForge;
 import org.slf4j.Logger;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -93,7 +94,11 @@ public class McTester {
         this.channel.registerMessage(MessageRPCRequest.class, 0, Platform.Type.CLIENT, (MessageHandler) clientDelegateHandler);
         this.channel.registerMessage(MessageRPCResponse.class, 1, Platform.Type.SERVER, (MessageHandler) serverDelegateHandler);
 
+
+
         if (Sponge.getPlatform().getExecutionType().equals(Platform.Type.CLIENT)) {
+            Sponge.getEventManager().registerListeners(this, ClientOnly.REAL_CLIENT_HANDLER);
+            MinecraftForge.EVENT_BUS.register(ClientOnly.REAL_CLIENT_HANDLER);
             Sponge.getDataManager().registerBuilder(RemoteInvocationData.class, new RemoteInvocationDataBuilder(ClientOnly.REAL_CLIENT_HANDLER));
         }
     }
