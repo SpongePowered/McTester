@@ -6,7 +6,7 @@ An integration testing framework for Minecraft
 
 McTester allows you to write fully automated integration tests against Minecraft.
 Through an easy-to-use API, you can direct a real singleplayer client to perform actions in the world (esnding commands, looking around, clicking the mouse).
-Combined with a server-side API like Sponge, McTester allows you to write automated tests that simple wouldn't be possible otherwise.
+Combined with a server-side API like Sponge, McTester allows you to write automated tests that simply wouldn't be possible otherwise.
 
 ## Why not just write unit tests, and avoid the overhead of starting a full Minecraft client? 
 
