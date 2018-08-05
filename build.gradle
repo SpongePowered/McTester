@@ -152,6 +152,14 @@ test {
     systemProperties System.properties
 }
 
+sonarqube {
+    properties {
+        property "sonar.projectName", "McTester"
+        property "sonar.organization", "aaron1011-github"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+ }
+
 if(project.hasProperty('spongeRepo') && project.hasProperty('spongeUsername') && project.hasProperty('spongePassword')) {
   uploadArchives {
     repositories {
