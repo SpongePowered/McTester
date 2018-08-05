@@ -1,21 +1,30 @@
 language: java
 jdk:
-  - openjdk8
-  - oraclejdk8
-
+- openjdk8
+- oraclejdk8
 services:
-  - docker
-
+- docker
 before_install:
-  - scripts/run-xvfb
+- scripts/run-xvfb
 install: true
-script: DISPLAY=:99 ./gradlew build --stacktrace --info
 
+script:
+  - DISPLAY=:99 ./gradlew build --stacktrace --info
+  - sonar-scanner
 
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+
+addons:
+  sonarcloud:
+    organization: "aaron1011-github" # the key of the org you chose at step #3
+
+
+env:
+  global:
+    secure: fZZKRiVwFj0thE+h/zhwy/9GI+NFWiMVktAfvY0PMse/m7qTwnvOuYGFprGmXscWaPfTGvJ0RTjs866GMQhs4RDo6AX8QbwJ65wUHHasECLtv79JZjCq5XSjj53SbNj5OuUI/wjLjx4sPvnVS+yC9GE05xOiOl96ZN76XDV3S9ZLSdDNH8s54gMRpcqrYTXam3kaltH8i49BQeywOACaqCWVGgxpoQBNPs4JIi6ovOvaH9OcuKYMgSP/LexNttVry18xArhwEQPUZJy+yQZ3CIAnuKuxiGG+X+7Z01GMaM4CufyGPdq6ReAEIdhRsNoJnli/DjlVmSIDWKnzCfXSmam+YafFC8cZslGabZ+uwSt94j+0UL39Et4jJw1FP/qkul8nhRZODWw4/6VQ1fP3Pg/bFDiWl/OKqPxKv2r6wcIfhl5gumjjyNjl6ehqfHBpirUPP1Ur7hHF1xW9ph3Qx79dFN8JUnAb8DDLSwKGyg0+KqwraUICDq1ZijLmCW2sOYK/AXsnxUP06XjiWkOaIppQHquKIe1gJ5j5Z3j7r8f8J0cJYO9jPzhybB5A1mFbMvi3lc76EYEyrlm3sW3YD+d/cU/vuU6a5EDqkBDs5chXk4mWuAacaaY4G+m2ELcDsnqXJqUGT0HV0oP0oepAIPz3Ze3qIFNmiTsn+LZBYZo=
