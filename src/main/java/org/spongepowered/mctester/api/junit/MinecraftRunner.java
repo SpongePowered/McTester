@@ -26,6 +26,7 @@ package org.spongepowered.mctester.api.junit;
 
 import static org.spongepowered.mctester.api.junit.MinecraftClientStarter.GLOBAL_SETTINGS;
 
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -96,8 +97,15 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 						waitForClose("tests failed");
 					}
 				}
-
-				RealJUnitRunner.shutDownMinecraft();
+				if (Launch.classLoader != null) {
+					try {
+						Class<?> runnerClass = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, Launch.classLoader);
+						runnerClass.getMethod("shutDownMinecraft").invoke(null);
+					} catch (Exception e) {
+						e.printStackTrace();;
+						throw new RuntimeException("Failed to shut down Minecraft!", e);
+					}
+				}
 			}));
 
 			starter.startClient();
