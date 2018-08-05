@@ -106,6 +106,13 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         }
     }
 
+    @Redirect(method = "setIngameFocus", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;isActive()Z"))
+    public boolean onDisplayIsActive() {
+        // Force Display.isActive() to always return 'true'.
+        // This allows McTester to work properly in headless environemnts (e.g. with XVFB)
+        return true;
+    }
+
     @Override
     public void holdLeftClick(boolean clicking) {
         this.leftClicking = clicking;
