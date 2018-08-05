@@ -116,9 +116,11 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         this.currentWorld.joinNewWorld(base);
     }
 
-    private void shutDownMinecraft() {
+    public static void shutDownMinecraft() {
         try {
-            Minecraft.getMinecraft().shutdown();
+            if (Minecraft.getMinecraft() != null) {
+                Minecraft.getMinecraft().shutdown();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

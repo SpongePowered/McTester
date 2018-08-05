@@ -102,24 +102,18 @@ public class MinecraftClientStarter {
 				System.exit(-1);
 			});
 
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					if (MinecraftRunner.globalTestStatus.succeeded()) {
-						if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnSuccess()) {
-							MinecraftClientStarter.this.waitForClose("tests succeeded");
-						}
-					} else if (MinecraftRunner.globalTestStatus.failed()) {
-						if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnFailure()) {
-							MinecraftClientStarter.this.waitForClose("tests failed");
-						}
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				if (MinecraftRunner.globalTestStatus.succeeded()) {
+					if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnSuccess()) {
+						MinecraftClientStarter.this.waitForClose("tests succeeded");
 					}
-
-					if (Minecraft.getMinecraft() != null) {
-						Minecraft.getMinecraft().shutdown();
+				} else if (MinecraftRunner.globalTestStatus.failed()) {
+					if (!RealJUnitRunner.GLOBAL_SETTINGS.shutdownOnFailure()) {
+						MinecraftClientStarter.this.waitForClose("tests failed");
 					}
 				}
+
+				RealJUnitRunner.shutDownMinecraft();
 			}));
 
 			wrapperThread.start();
