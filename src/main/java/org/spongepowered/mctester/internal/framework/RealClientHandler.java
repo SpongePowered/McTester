@@ -188,13 +188,15 @@ public class RealClientHandler implements RawClient {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        this.clientTick++;
-        Iterator<Map.Entry<Long, ResponseCallback>> it = this.endTicks.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Long, ResponseCallback> entry = it.next();
-            if (entry.getKey() == this.clientTick) {
-                entry.getValue().sendResponse(null);
-                it.remove();
+        if (event.phase == TickEvent.Phase.START) {
+            this.clientTick++;
+            Iterator<Map.Entry<Long, ResponseCallback>> it = this.endTicks.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<Long, ResponseCallback> entry = it.next();
+                if (entry.getKey() == this.clientTick) {
+                    entry.getValue().sendResponse(null);
+                    it.remove();
+                }
             }
         }
     }
