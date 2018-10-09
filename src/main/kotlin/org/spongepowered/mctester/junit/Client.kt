@@ -128,7 +128,7 @@ interface Client {
     fun rightClick()
 
     /**
-     * The same as {@link rightClick}, but suspends the coroutine
+     * The same as {@link rightClick}, but susapends the coroutine
      * instead of blocking.
      */
     suspend fun rightClickSuspend()
@@ -137,7 +137,7 @@ interface Client {
      * Causes the client to start or stop holding a right click.
      *
      * <p>If {@param clicking} is <code>true</code>, the client
-     * will hold down right click until {@link #holdRightClick(boolean)}
+     * will hold down right click untnil {@link #holdRightClick(boolean)}
      * is called with <code>false</code>.</p>
      *
      * @param clicking The clicking state

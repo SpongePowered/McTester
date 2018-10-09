@@ -39,18 +39,14 @@ import java.io.File;
  */
 public class MinecraftClientStarter {
 
-	private LaunchClassLoader minecraftServerClassLoader;
-
-	private static MinecraftClientStarter INSTANCE = new MinecraftClientStarter();
-	public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
+	private ClassLoader rootClaassloader;
 
 	private boolean started;
 
-	public static MinecraftClientStarter INSTANCE() {
-		return INSTANCE;
-	}
 
-	private MinecraftClientStarter() { }
+	public MinecraftClientStarter(ClassLoader classLoader) {
+		this.rootClaassloader = classLoader;
+	}
 
 	/**
 	 * Starts the Minecraft Client
@@ -78,11 +74,11 @@ public class MinecraftClientStarter {
 			System.setProperty("fml.readTimeout", "0");
 			//System.setProperty("mixin.debug.verbose", "true");
 
-			String[] args = new String[] {"--tweakClass", "org.spongepowered.mctester.api.MinecraftRunnerTweaker", "--gameDir",
-					GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
+			String[] args = new String[] {"--tweakClass", "org.spongepowered.mctester.api.junit.clientmanager.wrapper.MinecraftRunnerTweaker", "--gameDir",
+					MinecraftRunner.GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
 			// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
 			//new GradleStartTestServer().launch(args);
-			Class<?> clazz = Class.forName("GradleStart");
+			Class<?> clazz = Class.forName("GradleStart", true, this.rootClaassloader);
 			Thread wrapperThread = new Thread(() -> {
 				try {
 					clazz.getMethod("main", String[].class).invoke(null, (Object) args);
@@ -114,17 +110,6 @@ public class MinecraftClientStarter {
 
 	}
 
-	public ClassLoader getMinecraftServerClassLoader() {
-		RunnerEvents.waitForLaunchClassLoaderFuture();
-		return internalGetMinecraftServerClassLoader();
-	}
-
-	private ClassLoader internalGetMinecraftServerClassLoader() {
-		if (minecraftServerClassLoader == null) {
-			minecraftServerClassLoader = Launch.classLoader;
-		}
-		return minecraftServerClassLoader;
-	}
 
 	private boolean isSpongeInstalled() {
 		return this.getClass().getClassLoader().getResource("org/spongepowered/mod/SpongeCoremod.class") != null;
@@ -132,7 +117,7 @@ public class MinecraftClientStarter {
 
 	private void installSponge() {
 		System.err.println("Downloading latest SpongeForge!");
-		File outputDir = new File(GLOBAL_SETTINGS.getGameDir(), "mods");
+		File outputDir = new File(MinecraftRunner.GLOBAL_SETTINGS.getGameDir(), "mods");
 		outputDir.mkdirs();
 
 		new SpongeInstaller().downloadLatestSponge(outputDir);

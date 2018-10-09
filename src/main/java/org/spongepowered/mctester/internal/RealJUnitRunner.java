@@ -173,7 +173,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     @Override
     public TestClass createTestClass(Class<?> testClass) {
         try {
-            ClassLoader classLoader = MinecraftClientStarter.INSTANCE().getMinecraftServerClassLoader();
+            ClassLoader classLoader = RunnerEvents.getLaunchClassLoader(MinecraftRunner.rootClassLoader);
             Class<?> testClassFromMinecraftClassLoader = Class.forName(testClass.getName(), true, classLoader);
             return super.createTestClass(testClassFromMinecraftClassLoader);
         } catch (ClassNotFoundException e) {

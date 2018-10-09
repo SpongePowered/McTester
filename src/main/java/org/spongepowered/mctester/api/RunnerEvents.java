@@ -25,17 +25,19 @@
 package org.spongepowered.mctester.api;
 
 import com.google.common.util.concurrent.Futures;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.spongepowered.mctester.junit.Client;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class RunnerEvents {
 
     private static CompletableFuture<Void> clientInitialized = new CompletableFuture<>();
     private static CompletableFuture<Void> playerJoined = new CompletableFuture<>();
     private static CompletableFuture<Void> gameClosed = new CompletableFuture<>();
-    private static CompletableFuture<LaunchClassLoader> launchClassLoaderFuture = new CompletableFuture<>();
+    private static Map<ClassLoader, CompletableFuture<ClassLoader>> launchClassLoaders = new HashMap<>();
+    //private static CompletableFuture<LaunchClassLoader> launchClassLoaderFuture = new CompletableFuture<>();
 
     public static void waitForPlayerJoin() {
         Futures.getUnchecked(playerJoined);
@@ -64,12 +66,41 @@ public class RunnerEvents {
         gameClosed.complete(null);
     }
 
-    public static LaunchClassLoader waitForLaunchClassLoaderFuture() {
-        return Futures.getUnchecked(launchClassLoaderFuture);
+    public static void initNewInstance(ClassLoader wrapperClassLoader) {
+        CompletableFuture<ClassLoader> old = launchClassLoaders.get(wrapperClassLoader);
+        if (old != null) {
+            throw new IllegalStateException(String.format("Already registered CompletableFuture %s for wrapper %s", old, wrapperClassLoader));
+        }
+        launchClassLoaders.put(wrapperClassLoader, new CompletableFuture<>());
     }
 
-    public static void setLaunchClassLoaderFuture(LaunchClassLoader launchClassLoader) {
-        launchClassLoaderFuture.complete(launchClassLoader);
+    /**
+     *
+     * @param wrapperClassloader - The class loader used to load a game instance
+     * @return
+     */
+    public static ClassLoader getLaunchClassLoader(ClassLoader wrapperClassloader) {
+        Future<ClassLoader> future = launchClassLoaders.get(wrapperClassloader);
+        if (future == null) {
+            throw new IllegalStateException("Initialization not performed for wrapper we're trying to get " + wrapperClassloader);
+        }
+        return Futures.getUnchecked(future);
+        //return Futures.getUnchecked(launchClassLoaderFuture);
+    }
+
+    /**
+     * We deliberately set a paremter type of ClassLoader, not LaunchClassLoader.
+     * Each game instance will have its own LaunchClassLoader class, loaded by its
+     * WrapperClassLoader. If we were to specify a type of LaunchClassLoader in this class,
+     * it would not be the same class as any of the game instances use.
+     * @param launchClassLoader
+     */
+    public static void setLaunchClassLoader(ClassLoader launchClassLoader) {
+        ClassLoader wrapperClassloader = launchClassLoader.getParent();
+        if (!launchClassLoaders.containsKey(wrapperClassloader)) {
+            throw new IllegalStateException("Initialization not performed for wrapper " + wrapperClassloader);
+        }
+        launchClassLoaders.get(wrapperClassloader).complete(launchClassLoader);
     }
 
     public static void waitForClientInit() {
@@ -84,7 +115,9 @@ public class RunnerEvents {
         clientInitialized.completeExceptionally(throwable);
         playerJoined.completeExceptionally(throwable);
         gameClosed.completeExceptionally(throwable);
-        launchClassLoaderFuture.completeExceptionally(throwable);
+        for (CompletableFuture<ClassLoader> future: launchClassLoaders.values()) {
+            future.completeExceptionally(throwable);
+        }
     }
 
 }

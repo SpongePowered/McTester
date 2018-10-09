@@ -24,10 +24,7 @@
  */
 package org.spongepowered.mctester.api.junit;
 
-import static org.spongepowered.mctester.api.junit.MinecraftClientStarter.GLOBAL_SETTINGS;
-
 import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -36,7 +33,7 @@ import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.api.WorldOptions;
-import org.spongepowered.mctester.internal.RealJUnitRunner;
+import org.spongepowered.mctester.internal.GlobalSettings;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -70,14 +67,17 @@ import java.util.List;
  */
 public class MinecraftRunner extends BlockJUnit4ClassRunner {
 
+	public static ClassLoader rootClassLoader = MinecraftRunner.class.getClassLoader();
+
 	// We deliberately don't set the type to RealJunitRunner, since we load it
 	// on the LaunchClassLoader
-	private static MinecraftClientStarter starter = MinecraftClientStarter.INSTANCE();
+	private static MinecraftClientStarter baseStarter = new MinecraftClientStarter(rootClassLoader);
 	private IJunitRunner realJUnitRunner;
 
 	private List<Throwable> caughtInitializationErrors = new ArrayList<>();
 
 	public static TestStatus globalTestStatus = new TestStatus();
+	public static GlobalSettings GLOBAL_SETTINGS = new GlobalSettings();
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {
 		super(initializeClient(testClass));
@@ -108,7 +108,7 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 				}
 			}));
 
-			starter.startClient();
+			baseStarter.startClient();
 
 		} catch (Throwable e) {
 			throw new InitializationError(e);
@@ -140,8 +140,8 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	@Override
 	public TestClass createTestClass(Class<?> testClass) {
 		try {
-			LaunchClassLoader classLoader = RunnerEvents.waitForLaunchClassLoaderFuture();
-			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, classLoader);
+			ClassLoader launchClassLoader = RunnerEvents.getLaunchClassLoader(rootClassLoader);
+			Class<?> realJUnit = Class.forName("org.spongepowered.mctester.internal.RealJUnitRunner", true, launchClassLoader);
 			this.realJUnitRunner = (IJunitRunner) realJUnit.getConstructor(Class.class).newInstance(testClass);
 		} catch (Exception e) {
 			System.err.println("Exception when creating RealJunitRunner!");

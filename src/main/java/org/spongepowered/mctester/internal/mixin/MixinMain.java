@@ -14,7 +14,7 @@ public abstract class MixinMain {
 
     @Inject(method = "main", at = @At("HEAD"), remap = false)
     private static void onMain(CallbackInfo ci) {
-        RunnerEvents.setLaunchClassLoaderFuture(Launch.classLoader);
+        RunnerEvents.setLaunchClassLoader(Launch.classLoader);
     }
 
     @Redirect(method = "main", at = @At(value = "INVOKE", target = "Ljava/lang/Runtime;addShutdownHook(Ljava/lang/Thread;)V"))

@@ -39,6 +39,7 @@ public class ExceptionTest extends BaseTest {
 
         this.testUtils.listen(new StandaloneEventListener<>(MessageChannelEvent.Chat.class, (MessageChannelEvent.Chat event) -> Assert.fail("Got message: " + event.getRawMessage().toPlain())));
         this.testUtils.getClient().sendMessage("Permanent message");
+        this.testUtils.getClient().rightClickSuspend(null);
     }
 
     @Test
