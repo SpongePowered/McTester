@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.mctester.api.RunnerEvents;
+import org.spongepowered.mctester.api.junit.RunnerEvents;
 import org.spongepowered.mctester.internal.McTester;
 import org.spongepowered.mctester.internal.interfaces.IMixinMinecraft;
 

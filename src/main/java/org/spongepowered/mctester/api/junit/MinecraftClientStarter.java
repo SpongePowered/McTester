@@ -26,9 +26,9 @@ package org.spongepowered.mctester.api.junit;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.installer.SpongeInstaller;
 import org.spongepowered.mctester.internal.GlobalSettings;
+import org.spongepowered.mctester.installer.SpongeInstaller;
 
 import java.io.File;
 

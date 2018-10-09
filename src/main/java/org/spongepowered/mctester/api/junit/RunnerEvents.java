@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.api;
+package org.spongepowered.mctester.api.junit;
 
 import com.google.common.util.concurrent.Futures;
 
@@ -96,7 +96,7 @@ public class RunnerEvents {
      * @param launchClassLoader
      */
     public static void setLaunchClassLoader(ClassLoader launchClassLoader) {
-        ClassLoader wrapperClassloader = launchClassLoader.getParent();
+        ClassLoader wrapperClassloader = launchClassLoader.getClass().getClassLoader();
         if (!launchClassLoaders.containsKey(wrapperClassloader)) {
             throw new IllegalStateException("Initialization not performed for wrapper " + wrapperClassloader);
         }
