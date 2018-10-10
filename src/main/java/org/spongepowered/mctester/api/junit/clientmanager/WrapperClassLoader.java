@@ -63,7 +63,7 @@ public class WrapperClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        synchronized (this.getClassLoadingLock(name)) {
+        /*synchronized (this.getClassLoadingLock(name)) {
             Class<?> clazz = this.findLoadedClass(name);
             if (clazz == null) {
                 if (this.shouldLoad(name)) {
@@ -76,6 +76,45 @@ public class WrapperClassLoader extends URLClassLoader {
                 this.resolveClass(clazz);
             }
             return clazz;
+        }*/
+
+        // Take two - let's try loading *everything* in this classloader,
+        // as long as w can find a URL for it
+        synchronized (this.getClassLoadingLock(name)) {
+            Class<?> clazz = this.findLoadedClass(name);
+
+            boolean fromRT = this.fromRTJar(name);
+            boolean shouldParent = this.shouldUseParent(name);
+
+            if (clazz == null && !fromRT && !shouldParent /*!name.startsWith("java") && !name.startsWith("sun") && !name.startsWith("org.xml")*/) {
+                try {
+                    clazz = this.findClass(name);
+                } catch (ClassNotFoundException e) {
+                }
+            }
+
+            // If didn't have any luck with findClass,
+            // check the parent
+            if (clazz == null) {
+                clazz = this.getParent().loadClass(name);
+            }
+
+            if (resolve) {
+                this.resolveClass(clazz);
+            }
+            return clazz;
         }
+    }
+
+    boolean shouldUseParent(String className) {
+        return className.equals("org.spongepowered.mctester.api.junit.RunnerEvents");
+    }
+
+    boolean fromRTJar(String className) {
+        URL url = this.findResource(className.replace(".", "/").concat(".class"));
+        if (url == null) {
+            return false;
+        }
+        return url.getPath().split("!")[0].endsWith("rt.jar");
     }
 }

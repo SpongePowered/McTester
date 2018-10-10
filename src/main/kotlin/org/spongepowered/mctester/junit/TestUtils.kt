@@ -288,4 +288,6 @@ interface TestUtils {
      * If they are not equal, an AssertionError is thrown with an informative message.
      */
     fun assertStacksEqual(serverStack: ItemStack, clientStack: ItemStack)
+
+    fun startClient();
 }

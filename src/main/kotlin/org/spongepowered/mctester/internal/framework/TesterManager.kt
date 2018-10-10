@@ -31,6 +31,8 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
     override var client: ServerSideClientHandler = ServerSideClientHandler(RemoteClientProxy.newProxy(this))
     private val errorSlots = HashSet<ErrorSlot>()
 
+    private var otherClients: MutableList<ClientInstance> = ArrayList()
+
     /*@Override
     public void run() {
 
@@ -376,6 +378,10 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 
     override fun assertStacksEqual(serverStack: ItemStack, clientStack: ItemStack) {
         Assert.assertEquals("Itemstacks are not equal! Server: $serverStack client $clientStack", 0, ItemStackComparators.ALL.compare(serverStack, clientStack).toLong())
+    }
+
+    override fun startClient() {
+        this.otherClients.add(ClientInstance())
     }
 
 }

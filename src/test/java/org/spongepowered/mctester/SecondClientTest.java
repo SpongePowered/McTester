@@ -22,21 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.api.junit.clientmanager;
+package org.spongepowered.mctester;
 
-public class ClientManager {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.spongepowered.mctester.api.junit.MinecraftRunner;
+import org.spongepowered.mctester.internal.BaseTest;
+import org.spongepowered.mctester.junit.TestUtils;
 
-    static class ClientInstance {
-        private ClassLoader rootClassloader;
+@RunWith(MinecraftRunner.class)
+public class SecondClientTest extends BaseTest {
 
-        private void extractLaunchClassLoader() {
-            try {
-                Class launchClass = Class.forName("net.minecraft.launchwrapper.Launch", true, this.rootClassloader);
-                ClassLoader launchClassLoader = (ClassLoader) launchClass.getField("classLoader").get(null);
-            } catch (Exception e) {
-                e.printStackTrace();;
-            }
-        }
+    public SecondClientTest(TestUtils testUtils) {
+        super(testUtils);
+    }
+
+    @Test
+    public void testSecondClient() throws Throwable {
+        System.err.println("Starting second client!");
+        // Big bet...
+        this.testUtils.startClient();
+        Thread.currentThread().join();
     }
 
 }
