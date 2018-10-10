@@ -24,13 +24,17 @@
  */
 package org.spongepowered.mctester.api.junit.clientmanager;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 public class WrapperClassLoader extends URLClassLoader {
 
@@ -48,8 +52,26 @@ public class WrapperClassLoader extends URLClassLoader {
             "org.spongepowered.mctester.api.junit.clientmanager"
     );
 
-    public WrapperClassLoader(URL[] urls) {
+    public WrapperClassLoader(URL[] urls, LaunchClassLoader baseLaunchClassloader) {
         super(urls, WrapperClassLoader.class.getClassLoader());
+        this.copyResources(WrapperClassLoader.class.getClassLoader());
+    }
+
+    private void copyResources(ClassLoader otherClassloader) {
+        try {
+            Field nativeLibrariesField = ClassLoader.class.getDeclaredField("nativeLibraries");
+            nativeLibrariesField.setAccessible(true);
+
+            // ClassLoader.NativeLibrary is private
+            Vector<Object> ourNativeLibraries = (Vector<Object>) nativeLibrariesField.get(this);
+            Vector<Object> theirNativeLibraries = (Vector<Object>) nativeLibrariesField.get(otherClassloader);
+
+            ourNativeLibraries.addAll(theirNativeLibraries);
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new Error("Failed to copy classloader resources!", e);
+        }
     }
 
     private boolean shouldLoad(String name) {
@@ -117,4 +139,6 @@ public class WrapperClassLoader extends URLClassLoader {
         }
         return url.getPath().split("!")[0].endsWith("rt.jar");
     }
+
+
 }

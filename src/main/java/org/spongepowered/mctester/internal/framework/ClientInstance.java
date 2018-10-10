@@ -24,6 +24,7 @@
  */
 package org.spongepowered.mctester.internal.framework;
 
+import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.spongepowered.mctester.api.junit.MinecraftClientStarter;
 import org.spongepowered.mctester.api.junit.MinecraftRunner;
 import org.spongepowered.mctester.api.junit.RunnerEvents;
@@ -43,7 +44,7 @@ public class ClientInstance {
         if (classLoader.getClass().getName().equals("net.minecraft.launchwrapper.LaunchClassLoader")) {
             throw new IllegalStateException("ClientInstance created from LaunchClassLoader!");
         }
-        this.classLoader = new WrapperClassLoader(classLoader.getURLs());
+        this.classLoader = new WrapperClassLoader(classLoader.getURLs(), (LaunchClassLoader) RunnerEvents.getLaunchClassLoader(MinecraftRunner.rootClassLoader));
         RunnerEvents.initNewInstance(this.classLoader);
         this.starter = new MinecraftClientStarter(this.classLoader);
         starter.startClient();
