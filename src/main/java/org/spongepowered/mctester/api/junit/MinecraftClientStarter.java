@@ -129,7 +129,7 @@ public class MinecraftClientStarter {
 	}
 
 	private boolean isSpongeInstalled() {
-		return this.getClass().getClassLoader().getResource("org/spongepowered/common/launch/SpongeLaunch.class") != null;
+		return this.getClass().getClassLoader().getResource("org/spongepowered/mod/SpongeCoremod.class") != null;
 	}
 
 	private void installSponge() {
