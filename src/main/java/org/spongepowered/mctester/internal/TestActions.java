@@ -111,7 +111,7 @@ public class TestActions {
         this.testUtils.sleepTicks(data.ticks);
 
         return Futures.getUnchecked(Minecraft.getMinecraft().addScheduledTask(() -> {
-            File outputDir = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
+            File outputDir = new File(Minecraft.getMinecraft().gameDir, "screenshots");
             outputDir = new File(outputDir, data.getDirName());
             outputDir.mkdirs();
 
