@@ -91,7 +91,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:7.2.0-SNAPSHOT'
     compile 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
