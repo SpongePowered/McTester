@@ -158,6 +158,14 @@ sonarqube {
     }
  }
 
+// Supresses warnings about using Unsafe
+// https://discuss.gradle.org/t/gradle-2-10-cant-suppress-java-1-8-compiler-warnings/13921/5
+compileJava {
+  options.compilerArgs << '-XDignore.symbol.file'
+  options.fork = true 
+  options.forkOptions.executable = 'javac'
+}
+
 if(project.hasProperty('spongeRepo') && project.hasProperty('spongeUsername') && project.hasProperty('spongePassword')) {
   uploadArchives {
     repositories {
