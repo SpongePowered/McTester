@@ -7,4 +7,4 @@ package org.spongepowered.mctester.junit
  * Coroutine tests MUST be written in Kotlin - barring drastic changes to Java,
  * it will never be possible to write them in Java.
  */
-annotation class CoroutineTest;
+annotation class CoroutineTest

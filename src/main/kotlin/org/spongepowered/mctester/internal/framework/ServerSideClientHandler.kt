@@ -10,7 +10,6 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.entity.PlayerInventory
 import org.spongepowered.mctester.internal.McTester
 import org.spongepowered.mctester.internal.RawClient
-import org.spongepowered.mctester.internal.framework.proxy.ResponseCallback
 import org.spongepowered.mctester.internal.framework.proxy.SuspendRemoteClientProxy
 import org.spongepowered.mctester.junit.Client
 import java.util.*
@@ -19,7 +18,7 @@ class ServerSideClientHandler(private val proxyClient: RawClient) : Client {
 
 
 
-    private val suspendProxyClient = SuspendRemoteClientProxy(McTester.INSTANCE.syncExecutor, null)
+    private val suspendProxyClient = SuspendRemoteClientProxy(null)
 
 
 

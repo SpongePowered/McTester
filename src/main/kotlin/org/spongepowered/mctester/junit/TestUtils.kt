@@ -273,14 +273,14 @@ interface TestUtils {
      * <p>If you don't switch the player's world from your test code, you don't
      * need to call this method - it will be called for you before your test starts</p>
      */
-    fun waitForWorldChunks();
+    fun waitForWorldChunks()
 
 
     /**
      * The same as {@link #waitForWorldChunks}, but designed
      * for a @CoroutineTest.
      */
-    suspend fun waitForWorldChunksSuspend();
+    suspend fun waitForWorldChunksSuspend()
 
     /**
      * Checks that the two ItemStacks are equal when compared with ItemStackComparators.ALL.

@@ -27,10 +27,8 @@ package org.spongepowered.mctester.internal
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.spongepowered.mctester.internal.message.ResponseWrapper
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.BlockingQueue
 
-public object ServerOnly {
+object ServerOnly {
 
     @JvmField val INBOUND_QUEUE: Channel<ResponseWrapper> = Channel(1)
 
@@ -44,10 +42,3 @@ public object ServerOnly {
 
 }
 
-fun <T> Channel<T>.takeBlocking(): T {
-    return runBlocking { receive() }
-}
-
-fun <T> Channel<T>.addBlocking(value: T) {
-    runBlocking { send(value) }
-}

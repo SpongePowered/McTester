@@ -33,8 +33,6 @@ import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 import org.spongepowered.mctester.api.WorldOptions
 import org.spongepowered.mctester.api.junit.MinecraftRunner
 import org.spongepowered.mctester.internal.BaseTest
@@ -50,7 +48,7 @@ class SimpleBlockTestKotlinI (testUtils: TestUtils) : BaseTest(testUtils) {
     @CoroutineTest
     suspend fun testPlaceBlock() {
         val location = this.testUtils.thePlayer.location
-        val target = location.add(0.0, -1.0, 1.0).getPosition()
+        val target = location.add(0.0, -1.0, 1.0).position
         this.testUtils.client.lookAtSuspend(target)
 
         this.testUtils.thePlayer.setItemInHand(HandTypes.MAIN_HAND, ItemStack.of(ItemTypes.DIAMOND_BLOCK, 1))

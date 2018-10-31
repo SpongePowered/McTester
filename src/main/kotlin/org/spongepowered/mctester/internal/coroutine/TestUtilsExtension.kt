@@ -9,15 +9,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class CoroutineTestUtils {
-    companion object {
-        suspend fun waitForInventoryPropagation() {
-            waitTicks(TickConstants.INVENTORY_PROPAGATION_TICKS)
-        }
-    }
-}
-
-
 
 suspend fun waitTicks(ticks: Int) {
     val future = CompletableFuture<Void>()

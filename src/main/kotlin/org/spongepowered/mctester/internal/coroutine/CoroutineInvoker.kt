@@ -10,7 +10,7 @@ import kotlin.coroutines.suspendCoroutine
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
-class CoroutineInvoker(testMethod: FrameworkMethod, target: Any, callback: InvokerCallback, val testerManager: TesterManager) : InvokeMethodWrapper(testMethod, target, callback) {
+class CoroutineInvoker(testMethod: FrameworkMethod, target: Any, callback: InvokerCallback, private val testerManager: TesterManager) : InvokeMethodWrapper(testMethod, target, callback) {
     private var coroutineTestManager = CoroutineTestManager(this.getMethodAsSuspendBlock(this.target), this.testerManager)
 
     override fun doInvocation() {
@@ -23,16 +23,14 @@ class CoroutineInvoker(testMethod: FrameworkMethod, target: Any, callback: Invok
             function.javaMethod == this.method.method
         }
 
-        val wrapper: suspend CoroutineScope.() -> Unit = {
+        return {
             suspendCoroutine<Unit> {
                 try {
                     callable.call(testClassInstance, it)
                 } catch (e: InvocationTargetException) {
-                    throw e.cause ?: e;
+                    throw e.cause ?: e
                 }
             }
         }
-
-        return wrapper
     }
 }

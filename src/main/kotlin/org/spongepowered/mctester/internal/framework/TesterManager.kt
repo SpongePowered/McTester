@@ -59,7 +59,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         /*AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
         error.fillInStackTrace();*/
 
-        if (listeners == null || listeners.size == 0) {
+        if (listeners == null || listeners.isEmpty()) {
             throw IllegalArgumentException("Must provide at least one listener!")
         }
 
@@ -76,7 +76,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     override suspend fun <T : Event> listenOneShotSuspend(block: suspend () -> Unit, vararg listeners: StandaloneEventListener<T>) {
-        if (listeners.size == 0) {
+        if (listeners.isEmpty()) {
             throw IllegalArgumentException("Must provide at least one listener!")
         }
 
@@ -196,7 +196,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         return newListener
     }
 
-    fun makeErrorSlot(): ErrorSlot {
+    private fun makeErrorSlot(): ErrorSlot {
         val slot = ErrorSlot()
         this.errorSlots.add(slot)
         return slot
@@ -301,22 +301,6 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         this.checkErrorSlots()
 
         return Math.max(ticks - elapsedTicks, 0)
-    }
-
-    private fun makeFakeException(message: String): AssertionError {
-        val assertionError = AssertionError(message)
-        assertionError.fillInStackTrace()
-
-        // We remove the first two StackTraceElements, which correspond to the invocation
-        // of this method and its caller. This causes the first element to point
-        // to the user's code (e.g. an invocation of listenTimeout)
-        val shortLength = assertionError.stackTrace.size - 2
-        val modified = arrayOfNulls<StackTraceElement>(shortLength)
-        System.arraycopy(assertionError.stackTrace, 2, modified, 0, shortLength)
-
-        assertionError.stackTrace = modified
-
-        return assertionError
     }
 
     @Throws(Throwable::class)
