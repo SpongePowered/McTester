@@ -28,11 +28,12 @@ plugins {
 }
 
 
+apply plugin: 'groovy'
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "org.spongepowered.plugin"
 apply plugin: 'idea'
 apply plugin: "maven"
-apply plugin: 'groovy'
+
 
 
 version = modVersion
@@ -50,6 +51,7 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = project.mcpVersion // Must be the same as SpongeForge
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    replaceIn "McTesterGradlePlugin.groovy"
     replace '@@MCTESTER_VERSION@@', "${project.group}:${project.archivesBaseName}:${project.version}"
 }
 
