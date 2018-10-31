@@ -81,8 +81,8 @@ interface TestUtils {
      * a block) causes a Sponge event to be fired.
      *
      *
-     * @param eventClass The event class to listen for
-     * @param listener The event listener to register
+     * @param runnable The runnable to run after registering the listener
+     * @param listeners The event listeners to register
      * @return The event listener that was registerd with Sponge. This is *not* the same
      * as {@param listener}. If you want to unregister your listener early, use the return
      * value of this method with [EventManager.unregisterListeners].
@@ -137,7 +137,7 @@ interface TestUtils {
      *
      * The specified listener is automatically unregistered before this method returns./p>
      *
-     * @param eventClass The class of the event to listen for
+     * @param runnable The runnable to run after registering the listener
      * @param listener The listener to register
      * @param ticks The maximum number of ticks to wait for the listener to fire
      * @return The number of ticks remaining when the listener returned. This will be at most,

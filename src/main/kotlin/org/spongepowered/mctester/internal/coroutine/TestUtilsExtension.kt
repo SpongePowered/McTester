@@ -2,7 +2,6 @@ package org.spongepowered.mctester.internal.coroutine
 
 import org.spongepowered.api.Sponge
 import org.spongepowered.mctester.internal.McTesterDummy
-import org.spongepowered.mctester.internal.TickConstants
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume

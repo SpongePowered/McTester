@@ -9,7 +9,7 @@ import org.spongepowered.mctester.internal.message.ResponseWrapper
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest
 import java.util.*
 
-class SuspendRemoteClientProxy(val proxyCallback: ProxyCallback?) {
+class SuspendRemoteClientProxy(private val proxyCallback: ProxyCallback?) {
 
     suspend fun lookAt(targetPos: Vector3d) {
         val method = RawClient::class.java.getMethod("lookAt", Vector3d::class.java)

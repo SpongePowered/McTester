@@ -7,7 +7,7 @@ import org.spongepowered.api.Sponge
 import org.spongepowered.mctester.internal.framework.TesterManager
 import kotlin.coroutines.CoroutineContext
 
-class CoroutineTestManager(private val block: suspend CoroutineScope.() -> Unit, val testerManager: TesterManager) {
+class CoroutineTestManager(private val block: suspend CoroutineScope.() -> Unit, private val testerManager: TesterManager) {
 
     fun runToCompletion() {
         runBlocking(context = MainThreadDispatcher(this.testerManager), block = this.block)
