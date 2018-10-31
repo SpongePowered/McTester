@@ -42,7 +42,7 @@ class McTesterGradlePlugin implements Plugin<Project> {
     }
 
     private void addDependency(Project project) {
-        version = "@@MCTESTER_VERSION@@"
+        def version = "@@MCTESTER_VERSION@@"
         project.getLogger().warn("Adding dependency on McTester: " + version);
         project.getDependencies().add("testCompile", version);
     }
