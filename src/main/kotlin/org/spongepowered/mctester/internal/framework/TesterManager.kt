@@ -59,7 +59,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         /*AssertionError error = new AssertionError("The one shot event listener registered here failed to run in time!\n");
         error.fillInStackTrace();*/
 
-        if (listeners == null || listeners.isEmpty()) {
+        if (listeners.isEmpty()) {
             throw IllegalArgumentException("Must provide at least one listener!")
         }
 
@@ -318,13 +318,13 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     @Throws(Throwable::class)
-    override fun runOnMainThread(runnable: Runnable) {
+    override fun runOnMainThread(callable: Runnable) {
         if (Sponge.getServer().isMainThread) {
             throw IllegalStateException("Calling runOnMainThread from the main thread is pointless!")
         }
 
         this.runOnMainThread(Callable<Void> {
-            runnable.run()
+            callable.run()
             null
         })
     }
