@@ -63,6 +63,7 @@ public abstract class BaseProxy implements InvocationHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     <T> T makeProxy(Class<T> type, Class<?>[] interfaces) {
         return (T) Proxy.newProxyInstance(McTester.class.getClassLoader(), interfaces, this);
     }

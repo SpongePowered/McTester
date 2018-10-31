@@ -74,6 +74,7 @@ public class McTester {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Listener
     public void onInit(GameInitializationEvent event) {
         this.channel = Sponge.getChannelRegistrar().createChannel(this, "mctester");

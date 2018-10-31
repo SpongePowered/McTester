@@ -24,13 +24,11 @@
  */
 package org.spongepowered.mctester.api.junit;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.installer.SpongeInstaller;
 import org.spongepowered.mctester.internal.GlobalSettings;
-import org.spongepowered.mctester.internal.RealJUnitRunner;
 
 import java.io.File;
 
@@ -84,7 +82,7 @@ public class MinecraftClientStarter {
 					GLOBAL_SETTINGS.getGameDir().getAbsolutePath()};
 			// TODO instead ch.vorburger.minecraft.testsinfra.GradleStartTestServer.getTweakClass()
 			//new GradleStartTestServer().launch(args);
-			Class clazz = Class.forName("GradleStart");
+			Class<?> clazz = Class.forName("GradleStart");
 			Thread wrapperThread = new Thread(() -> {
 				try {
 					clazz.getMethod("main", String[].class).invoke(null, (Object) args);

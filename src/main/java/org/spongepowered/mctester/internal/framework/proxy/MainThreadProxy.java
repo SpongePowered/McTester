@@ -23,6 +23,7 @@ public class MainThreadProxy extends BaseProxy {
                 //&& !Modifier.isFinal(object.getClass().getModifiers());
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T newProxy(T object, Class<?> realType, ProxyCallback callback) {
         if (object == null) {
             return null;
@@ -32,7 +33,7 @@ public class MainThreadProxy extends BaseProxy {
         boolean doProxy = shouldProxy(object, realType, interfaces);
         if (doProxy) {
             MainThreadProxy proxy = new MainThreadProxy(object, McTester.INSTANCE.syncExecutor, callback);
-            return (T) proxy.makeProxy(object.getClass(), interfaces);
+            return proxy.makeProxy((Class<T>) object.getClass(), interfaces);
         }
         return object;
     }

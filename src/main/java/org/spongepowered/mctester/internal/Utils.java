@@ -41,6 +41,7 @@ import java.util.Optional;
 
 public class Utils {
 
+    @SuppressWarnings("unchecked")
     public static DataContainer arbitraryToData(Object object) {
         if (object instanceof DataSerializable) {
             return ((DataSerializable) object).toContainer();
@@ -49,6 +50,7 @@ public class Utils {
         return translator.translate(object);
     }
 
+    @SuppressWarnings("unchecked")
     public static Optional<Object> dataToArbitrary(DataView view, Class<?> type) {
         Optional<DataBuilder<?>> builder = (Optional) Sponge.getDataManager().getBuilder((Class<DataSerializable>) type);
         Optional<DataTranslator<?>> translator = (Optional) Sponge.getDataManager().getTranslator(type);

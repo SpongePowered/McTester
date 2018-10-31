@@ -22,6 +22,7 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
         this.realObject = realObject;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Optional<RemoteInvocationData> build(DataView container) throws InvalidDataException {
         if (!(RPCKeys.ALL_KEYS.stream().allMatch(container::contains))) {
@@ -41,7 +42,7 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
             throw new InvalidDataException(e);
         }
 
-        List<Object> rawParams = (List) container.getList(RPCKeys.PARAMS.getQuery()).get();
+        List<Object> rawParams = (List<Object>) container.getList(RPCKeys.PARAMS.getQuery()).get();
         List<Object> finalParams = new ArrayList<>(rawParams.size());
 
         int numParams = paramTypes.length;
@@ -55,7 +56,7 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
             if (rawParam instanceof DataView) {
                 finalParams.add(Utils.dataToArbitrary((DataView) rawParam, paramType).get());
             } else if (CatalogType.class.isAssignableFrom(paramType)) {
-                finalParams.add(Sponge.getRegistry().getType((Class) paramType, (String) rawParam).get());
+                finalParams.add(Sponge.getRegistry().getType((Class<? extends CatalogType>) paramType, (String) rawParam).get());
             } else {
                 finalParams.add(this.tryCoerce(rawParam, paramType));
             }
@@ -66,6 +67,7 @@ public class RemoteInvocationDataBuilder implements DataBuilder<RemoteInvocation
         return Optional.of(new RemoteInvocationData(this.realObject, method, finalParams));
     }
 
+    @SuppressWarnings("unchecked")
     private Object tryCoerce(Object object, Class<?> clazz) {
         if (clazz.equals(boolean.class)) {
             return ((Optional) Coerce.asBoolean(object)).orElse(object);

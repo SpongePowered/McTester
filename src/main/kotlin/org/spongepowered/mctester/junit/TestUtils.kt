@@ -88,6 +88,7 @@ interface TestUtils {
      * value of this method with [EventManager.unregisterListeners].
      */
     @Throws(Throwable::class)
+    @SafeVarargs
     fun <T: Event> listenOneShot(runnable: Runnable, vararg listeners: StandaloneEventListener<T>)
 
     /**
