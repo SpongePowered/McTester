@@ -4,8 +4,10 @@ import org.spongepowered.api.Sponge
 import org.spongepowered.mctester.internal.McTesterDummy
 import org.spongepowered.mctester.internal.TickConstants
 import java.util.concurrent.CompletableFuture
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class CoroutineTestUtils {
     companion object {

@@ -1,12 +1,12 @@
 package org.spongepowered.mctester.internal.coroutine
 
-import kotlinx.coroutines.experimental.CoroutineScope
+import kotlinx.coroutines.CoroutineScope
 import org.junit.runners.model.FrameworkMethod
 import org.spongepowered.mctester.internal.InvokeMethodWrapper
 import org.spongepowered.mctester.internal.InvokerCallback
 import org.spongepowered.mctester.internal.framework.TesterManager
 import java.lang.reflect.InvocationTargetException
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.suspendCoroutine
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
