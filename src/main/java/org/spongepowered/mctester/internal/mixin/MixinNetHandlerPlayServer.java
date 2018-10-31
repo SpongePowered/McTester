@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.mctester.internal.McTester;
 
-@Mixin(NetHandlerPlayServer.class)
+@Mixin(value = NetHandlerPlayServer.class, remap = false)
 public abstract class MixinNetHandlerPlayServer {
 
     @Shadow private boolean field_194403_g;

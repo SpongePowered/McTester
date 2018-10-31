@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.mctester.internal.interfaces.IMixinIntegratedServer;
 
-@Mixin(IntegratedServer.class)
+@Mixin(value = IntegratedServer.class, remap = false)
 public abstract class MixinIntegratedServer implements IMixinIntegratedServer {
 
     @Shadow private boolean isGamePaused;

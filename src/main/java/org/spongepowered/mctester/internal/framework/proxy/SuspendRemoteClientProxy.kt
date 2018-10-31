@@ -43,7 +43,7 @@ class SuspendRemoteClientProxy(private val proxyCallback: ProxyCallback?) {
     suspend fun onFullyLoggedIn() {
         val method = RawClient::class.java.getMethod("onFullyLoggedIn")
         McTester.INSTANCE.sendToPlayer(MessageRPCRequest(RemoteInvocationData(this, method, arrayListOf<Any>())))
-        val resp = getResponse()
+        getResponse()
     }
 
 }

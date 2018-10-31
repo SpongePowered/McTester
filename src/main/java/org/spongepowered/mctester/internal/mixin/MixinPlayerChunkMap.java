@@ -10,7 +10,7 @@ import org.spongepowered.mctester.internal.interfaces.IMixinPlayerChunkMap;
 import java.util.List;
 import java.util.Set;
 
-@Mixin(PlayerChunkMap.class)
+@Mixin(value = PlayerChunkMap.class, remap = false)
 public abstract class MixinPlayerChunkMap implements IMixinPlayerChunkMap {
 
     @Shadow @Final private Set<PlayerChunkMapEntry> dirtyEntries;

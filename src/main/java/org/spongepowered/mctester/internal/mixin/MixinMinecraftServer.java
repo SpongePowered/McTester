@@ -7,7 +7,7 @@ import org.spongepowered.mctester.internal.interfaces.IMixinMinecraftServer;
 
 import javax.annotation.Nullable;
 
-@Mixin(MinecraftServer.class)
+@Mixin(value = MinecraftServer.class, remap = false)
 public class MixinMinecraftServer implements IMixinMinecraftServer {
 
     @Shadow private Thread serverThread;

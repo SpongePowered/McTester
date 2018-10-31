@@ -10,6 +10,7 @@ public class RemoveSecurityManager {
 
     // Horrendously awful hack, needed until
     // https://github.com/gradle/gradle/issues/5305 is resolved
+    @SuppressWarnings("deprecation")
     public static void clearSecurityManager() {
         if (System.getSecurityManager() == null) {
             return;
