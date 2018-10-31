@@ -18,11 +18,13 @@ public @interface WorldOptions {
 
     /**
      * Whether or not to delete the world if all associated tests succeeded
+     * @return The value
      */
     boolean deleteWorldOnSuccess() default true;
 
     /**
      * Where or not to delete the world if at least one associated test failed
+     * @return The value
      */
     boolean deleteWorldOnFailure() default false;
 

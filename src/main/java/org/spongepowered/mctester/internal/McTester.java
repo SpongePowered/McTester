@@ -30,14 +30,6 @@ import net.minecraftforge.common.MinecraftForge;
 import org.slf4j.Logger;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.monster.Creeper;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -55,8 +47,6 @@ import org.spongepowered.mctester.internal.message.ClientDelegateHandler;
 import org.spongepowered.mctester.internal.message.ServerDelegateHandler;
 import org.spongepowered.mctester.internal.message.toclient.MessageRPCRequest;
 import org.spongepowered.mctester.internal.message.toserver.MessageRPCResponse;
-
-import java.util.Iterator;
 
 @Plugin(
         id = "mctester",
@@ -111,7 +101,7 @@ public class McTester {
 
     /**
      * For internal use only
-     * @return
+     * @return The first (only) online player
      */
     public static Player getThePlayer() {
         return Sponge.getServer().getOnlinePlayers().iterator().next();

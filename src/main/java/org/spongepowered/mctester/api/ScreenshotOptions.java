@@ -13,11 +13,13 @@ public @interface ScreenshotOptions {
 
     /**
      * Whether or not to take a screenshot of the world if all associated tests succeeded
+     * @return The value
      */
     boolean takeScreenshotOnSuccess() default false;
 
     /**
      * Where or not to take a screenshot of the world if at least one associated test failed
+     * @return The value
      */
     boolean takeScreenshotOnFailure() default true;
 
@@ -28,7 +30,7 @@ public @interface ScreenshotOptions {
      * your changes to the world might not have fully rendered by the time
      * thew screenshot is taken. If your screenshot doesn't look right,
      * try increasing this value.</p>
-     * @return
+     * @return The number of ticks to delay
      */
     int delayTicks() default 20;
 

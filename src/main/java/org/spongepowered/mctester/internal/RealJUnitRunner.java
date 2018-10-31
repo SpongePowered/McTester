@@ -56,8 +56,9 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     private static final String CUSTOM_WORLD_PREFIX = MCTESTER_WORLD_BASE + "Custom-";
 
     /**
-     * Creates a BlockJUnit4ClassRunner to run {@code klass}
+     * Creates a BlockJUnit4ClassRunner to run the specified class
      *
+     * @param testClass The class to run
      * @throws InitializationError if the test class is malformed.
      */
     public RealJUnitRunner(Class<?> testClass) throws InitializationError {

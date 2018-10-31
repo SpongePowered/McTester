@@ -49,7 +49,7 @@ public abstract class BaseProxy implements InvocationHandler {
      * If we're invoking a proxied method, we've already taken
      * care of setting up the proper environemt (e.g running on the main thread)
      * This allows us to unwrap any proxied objects that may have been passed as arguments.
-     * @param args
+     * @param args The arguments to unwrap
      */
     private void unwrapProxied(Object[] args) {
         for (int i = 0; i < args.length; i++) {
