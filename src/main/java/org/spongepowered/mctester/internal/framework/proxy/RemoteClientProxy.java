@@ -30,12 +30,8 @@ public class RemoteClientProxy extends BaseProxy {
 
         this.mainThreadExecutor.schedule(() -> McTester.INSTANCE.sendToPlayer(new MessageRPCRequest(new RemoteInvocationData(data))), 0, TimeUnit.SECONDS);
 
-        try {
-            // Blocking
-            ResponseWrapper result = ServerOnly.INBOUND_QUEUE.take();
-            return result.inner;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        // Blocking
+        ResponseWrapper result = ServerOnly.INSTANCE.takeResponseBlocking();
+        return result.inner;
     }
 }

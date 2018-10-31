@@ -1,7 +1,7 @@
 package org.spongepowered.mctester.internal;
 
 import com.google.common.collect.Lists;
-import kotlin.coroutines.experimental.Continuation;
+import kotlin.coroutines.Continuation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.launchwrapper.Launch;
 import org.junit.runner.notification.RunNotifier;

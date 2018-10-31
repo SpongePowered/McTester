@@ -22,15 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mctester.internal;
+package org.spongepowered.mctester.internal
 
-import org.spongepowered.mctester.internal.message.ResponseWrapper;
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.runBlocking
+import org.spongepowered.mctester.internal.message.ResponseWrapper
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.BlockingQueue
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+public object ServerOnly {
 
-public class ServerOnly {
+    @JvmField val INBOUND_QUEUE: Channel<ResponseWrapper> = Channel(1)
 
-    public static final BlockingQueue<ResponseWrapper> INBOUND_QUEUE = new ArrayBlockingQueue(1);
+    fun takeResponseBlocking(): ResponseWrapper {
+        return runBlocking { INBOUND_QUEUE.receive() }
+    }
 
+    fun addResonseBlocking(value: ResponseWrapper) {
+        runBlocking { INBOUND_QUEUE.send(value) }
+    }
+
+}
+
+fun <T> Channel<T>.takeBlocking(): T {
+    return runBlocking { receive() }
+}
+
+fun <T> Channel<T>.addBlocking(value: T) {
+    runBlocking { send(value) }
 }

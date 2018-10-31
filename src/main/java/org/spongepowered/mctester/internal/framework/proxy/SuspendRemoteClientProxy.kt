@@ -6,6 +6,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.spongepowered.api.entity.Entity
 import kotlinx.coroutines.launch;
+import org.spongepowered.api.Server
 import org.spongepowered.api.scheduler.SpongeExecutorService
 import org.spongepowered.mctester.internal.McTester
 import org.spongepowered.mctester.internal.RawClient
@@ -40,14 +41,7 @@ class SuspendRemoteClientProxy(val mainThreadExecutor: SpongeExecutorService, va
 
 
     private suspend fun getResponse(): ResponseWrapper {
-        val result = coroutineScope {
-            ServerOnly.INBOUND_QUEUE
-            async(block =  {
-                ServerOnly.INBOUND_QUEUE.take()
-            }).await()
-        }
-
-
+        val result = ServerOnly.INBOUND_QUEUE.receive()
         this.proxyCallback?.afterInvoke()
         return result
     }
