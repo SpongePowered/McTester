@@ -92,13 +92,16 @@ repositories {
         name = 'sponge'
         url = 'https://repo.spongepowered.org/maven'
     }
+
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'org.spongepowered:spongeapi:7.2.0-SNAPSHOT'
-    compile 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    compile 'com.github.Aaron1011:Mixin:deobf-SNAPSHOT'
+    //compile 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
     compile 'junit:junit:4.12'
