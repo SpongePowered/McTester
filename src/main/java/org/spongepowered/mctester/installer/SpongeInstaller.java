@@ -85,8 +85,10 @@ public class SpongeInstaller {
     }
 
     private URL extractURL(JsonArray downloads) {
+        String DEV = "dev";
+        String PROD = "";
         JsonObject artifacts = downloads.get(0).getAsJsonObject().get("artifacts").getAsJsonObject();
-        JsonObject jar = artifacts.get("dev").getAsJsonObject();
+        JsonObject jar = artifacts.get(PROD).getAsJsonObject();
         try {
             return new URL(jar.get("url").getAsString());
         } catch (MalformedURLException e) {

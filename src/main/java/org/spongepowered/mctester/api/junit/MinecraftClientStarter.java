@@ -74,7 +74,8 @@ public class MinecraftClientStarter {
 				System.setProperty("fml.coreMods.load", existing + "," + "org.spongepowered.mod.SpongeCoremod");
 			}
 
-			System.setProperty("mixin.env.disableRefMap", "true");
+			//System.setProperty("mixin.env.disableRefMap", "true");
+			System.setProperty("mixin.env.remapRefMap", "true");
 			System.setProperty("fml.readTimeout", "0");
 			//System.setProperty("mixin.debug.verbose", "true");
 

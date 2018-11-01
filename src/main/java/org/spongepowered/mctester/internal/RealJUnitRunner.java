@@ -10,7 +10,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
-import org.spongepowered.asm.lib.ClassReader;
+import org.objectweb.asm.ClassReader;
 import org.spongepowered.mctester.api.DefaultScreenshotOptions;
 import org.spongepowered.mctester.api.DefaultWorldOptions;
 import org.spongepowered.mctester.api.RunnerEvents;
