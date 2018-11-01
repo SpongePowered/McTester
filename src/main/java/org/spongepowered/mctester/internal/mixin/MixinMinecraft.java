@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ListenableFutureTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.RayTraceResult;
@@ -72,6 +73,14 @@ public abstract class MixinMinecraft implements IMixinMinecraft {
         if (Minecraft.getMinecraft() != null && !((IMixinMinecraft) Minecraft.getMinecraft()).isRunning()) {
             ci.cancel();
         }
+    }
+
+    @Redirect(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/NetHandlerPlayClient;cleanup()V"))
+    public void cleanupNetHandlerPlayClient(NetHandlerPlayClient client) {
+        // We deliberately do nothing, as calling cleanup() here can cause a race condition.
+        // Instead, we move the call to the onDisconnect handler. This ensures that we're able
+        // to process any packets sent by the server during shutdown, or that are already waiting
+        // in our local queue.
     }
 
     @Override
