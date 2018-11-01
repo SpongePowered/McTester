@@ -9,7 +9,7 @@ before_install:
 install: true
 
 script:
-  - xvfb-run ./gradlew setupDecompWorkspace build --stacktrace --scan
+  - xvfb-run ./gradlew setupDecompWorkspace build --stacktrace --info
     #- sonar-scanner
 
 before_cache:
