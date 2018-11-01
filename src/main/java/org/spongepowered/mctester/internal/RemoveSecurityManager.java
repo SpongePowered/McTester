@@ -3,6 +3,7 @@ package org.spongepowered.mctester.internal;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 // Inspired by http://weblog.ikvm.net/2011/08/01/HowToDisableTheJavaSecurityManager.aspx
 public class RemoveSecurityManager {
@@ -17,7 +18,22 @@ public class RemoveSecurityManager {
         }
 
         Unsafe unsafe = getUnsafe();
-        Object systemBase = unsafe.staticFieldBase(System.class);
+
+        Object systemBase = null;
+
+        // Copied from Unsafe#staticFieldBase, since OracleJDK
+        // seems to lack the staticFieldBase(Class) overload
+        Field[] fields = System.class.getDeclaredFields();
+        for(int i = 0; i < fields.length; i++) {
+            if (Modifier.isStatic(fields[i].getModifiers())) {
+                systemBase = unsafe.staticFieldBase(fields[i]);
+                break;
+            }
+        }
+        if (systemBase == null) {
+            // lol what
+            throw new IllegalStateException("Failed to find static field for System!?!?!?");
+        }
         long securityOffset = calcSecurityOffset(unsafe);
 
         Object manager = unsafe.getObject(systemBase, securityOffset);
