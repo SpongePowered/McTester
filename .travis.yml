@@ -9,7 +9,7 @@ before_install:
 install: true
 
 script:
-  - DISPLAY=:99 ./gradlew build --stacktrace --debug
+  - DISPLAY=:99 ./gradlew build --stacktrace --info
     #- sonar-scanner
 
 before_cache:
