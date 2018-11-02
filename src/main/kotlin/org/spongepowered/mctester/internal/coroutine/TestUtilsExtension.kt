@@ -2,12 +2,20 @@ package org.spongepowered.mctester.internal.coroutine
 
 import org.spongepowered.api.Sponge
 import org.spongepowered.mctester.internal.McTesterDummy
+import org.spongepowered.mctester.internal.TickConstants
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+class CoroutineTestUtils {
+    companion object {
+        suspend fun waitForInventoryPropagation() {
+            waitTicks(TickConstants.INVENTORY_PROPAGATION_TICKS)
+        }
+    }
+}
 
 suspend fun waitTicks(ticks: Int) {
     val future = CompletableFuture<Void>()
