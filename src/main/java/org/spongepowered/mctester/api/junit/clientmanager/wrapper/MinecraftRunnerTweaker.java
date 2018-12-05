@@ -65,6 +65,7 @@ public class MinecraftRunnerTweaker implements ITweaker {
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
         classLoader.addClassLoaderExclusion("org.spongepowered.mctester.api.junit");
+        classLoader.addClassLoaderExclusion("org.spongepowered.mctester.internal.junit");
         // This is *VERY* important, because without this
         // JUnit will be vey unhappy when in MinecraftTestRunner
         // we replace the class under test with the one from the

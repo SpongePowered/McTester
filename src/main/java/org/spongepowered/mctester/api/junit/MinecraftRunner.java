@@ -32,7 +32,7 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.api.WorldOptions;
-import org.spongepowered.mctester.internal.GlobalSettings;
+import org.spongepowered.mctester.internal.junit.GlobalSettings;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -113,7 +113,7 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 				}
 			}));
 
-			baseStarter.startClient();
+			baseStarter.startClient(0);
 
 		} catch (Throwable e) {
 			throw new InitializationError(e);

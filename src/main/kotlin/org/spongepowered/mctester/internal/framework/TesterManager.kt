@@ -1,5 +1,6 @@
 package org.spongepowered.mctester.internal.framework
 
+import com.google.common.collect.Sets
 import net.minecraft.client.Minecraft
 import net.minecraft.server.management.PlayerChunkMapEntry
 import net.minecraft.world.WorldServer
@@ -32,6 +33,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
     private val errorSlots = HashSet<ErrorSlot>()
 
     private var otherClients: MutableList<ClientInstance> = ArrayList()
+    private var resolvedLibraries: Map<String, String>? = null
 
     /*@Override
     public void run() {
@@ -55,6 +57,43 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         thread.setName("Tester-thread");
         thread.start();
     }*/
+
+    private fun resolveNativeLibraries(): Map<String, String> {
+        if (this.resolvedLibraries != null) {
+            return this.resolvedLibraries!!
+        }
+
+        val librariesToCopy = Sets.newHashSet("lwjgl", "lwjgl64", "openal")
+        val resolvedLibraries = HashMap<String, String>()
+        try {
+            val loadedLibraryNamesField = ClassLoader::class.java.getDeclaredField("loadedLibraryNames")
+            loadedLibraryNamesField.isAccessible = true
+
+            val nativeLibraryClass = Class.forName("java.lang.ClassLoader\$NativeLibrary")
+            val nameField = nativeLibraryClass.getDeclaredField("name")
+            nameField.isAccessible = true
+
+            // ClassLoader.NativeLibrary is private
+            val allNativeLibraries = loadedLibraryNamesField.get(null) as Vector<String>
+            synchronized(allNativeLibraries) {
+                for (loadedName in allNativeLibraries) {
+                    for (library in librariesToCopy) {
+                        val mappedLibrary = System.mapLibraryName(library)
+                        if (loadedName.endsWith(mappedLibrary)) {
+                            resolvedLibraries[library] = loadedName
+                            break
+                        }
+                    }
+                }
+
+                this.resolvedLibraries = resolvedLibraries
+                return resolvedLibraries
+            }
+        } catch (e: Exception) {
+            throw RuntimeException("Error trying to resolve loaded native libraries!", e)
+        }
+
+    }
 
     @Throws(Throwable::class)
     override fun <T: Event> listenOneShot(runnable: Runnable, vararg listeners: StandaloneEventListener<T>) {
@@ -381,7 +420,8 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
     }
 
     override fun startClient() {
-        this.otherClients.add(ClientInstance())
+        val resolved = this.resolveNativeLibraries()
+        this.otherClients.add(ClientInstance(resolved))
     }
 
 }

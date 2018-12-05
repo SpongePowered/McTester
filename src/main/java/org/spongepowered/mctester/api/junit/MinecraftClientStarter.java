@@ -24,10 +24,6 @@
  */
 package org.spongepowered.mctester.api.junit;
 
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.spongepowered.mctester.installer.SpongeInstaller;
-import org.spongepowered.mctester.internal.GlobalSettings;
 import org.spongepowered.mctester.installer.SpongeInstaller;
 
 import java.io.File;
@@ -40,7 +36,7 @@ import java.io.File;
 public class MinecraftClientStarter {
 
 	private ClassLoader rootClaassloader;
-
+	private static int clientNum = 1;
 	private boolean started;
 
 
@@ -54,7 +50,7 @@ public class MinecraftClientStarter {
 	 * This launches a background thread.
 	 *
 	 */
-	public void startClient() {
+	public void startClient(int id) {
 		try {
 			if (this.started) {
 				return;
@@ -92,6 +88,8 @@ public class MinecraftClientStarter {
 				throwable.printStackTrace();
 				RunnerEvents.fatalError(throwable);
 			}));
+
+			wrapperThread.setName("New client thread #" + id);
 
 			Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
 				System.err.println("Uncaight exception for JUnit main thread!");

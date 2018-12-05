@@ -13,12 +13,12 @@ import org.junit.runners.model.TestClass;
 import org.spongepowered.asm.lib.ClassReader;
 import org.spongepowered.mctester.api.DefaultScreenshotOptions;
 import org.spongepowered.mctester.api.DefaultWorldOptions;
-import org.spongepowered.mctester.api.junit.RunnerEvents;
 import org.spongepowered.mctester.api.ScreenshotOptions;
 import org.spongepowered.mctester.api.UseSeparateWorld;
 import org.spongepowered.mctester.api.WorldOptions;
 import org.spongepowered.mctester.api.junit.IJunitRunner;
 import org.spongepowered.mctester.api.junit.MinecraftRunner;
+import org.spongepowered.mctester.api.junit.RunnerEvents;
 import org.spongepowered.mctester.api.junit.TestStatus;
 import org.spongepowered.mctester.internal.coroutine.CoroutineInvoker;
 import org.spongepowered.mctester.internal.framework.TesterManager;
@@ -53,6 +53,7 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
     private static final String MCTESTER_WORLD_BASE = "MCTester-";
     private static final String NORMAL_WORLD_PREFIX = MCTESTER_WORLD_BASE + "Normal-";
     private static final String CUSTOM_WORLD_PREFIX = MCTESTER_WORLD_BASE + "Custom-";
+
 
     /**
      * Creates a BlockJUnit4ClassRunner to run the specified class
@@ -90,6 +91,8 @@ public class RealJUnitRunner extends BlockJUnit4ClassRunner implements IJunitRun
         this.testActions.tryDeleteWorldGlobal(this.currentWorld);
         this.testActions.tryTakeScreenShotGlobal(this.getWorldName());
     }
+
+
 
 
     private void performInit() {

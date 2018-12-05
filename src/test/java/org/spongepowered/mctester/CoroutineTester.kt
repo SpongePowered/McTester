@@ -24,8 +24,9 @@
  */
 package org.spongepowered.mctester
 
-import kotlinx.coroutines.experimental.runBlocking
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.suspendCoroutine
+
 
 fun main(args : Array<String>) {
     println("Hello, world!")

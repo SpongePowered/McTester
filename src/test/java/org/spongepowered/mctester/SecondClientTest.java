@@ -35,7 +35,7 @@ public class SecondClientTest extends BaseTest {
 
     public SecondClientTest(TestUtils testUtils) {
         super(testUtils);
-    }
+    }   
 
     @Test
     public void testSecondClient() throws Throwable {

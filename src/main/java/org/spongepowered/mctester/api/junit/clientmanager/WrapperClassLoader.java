@@ -24,16 +24,17 @@
  */
 package org.spongepowered.mctester.api.junit.clientmanager;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.Vector;
 
 public class WrapperClassLoader extends URLClassLoader {
@@ -52,9 +53,40 @@ public class WrapperClassLoader extends URLClassLoader {
             "org.spongepowered.mctester.api.junit.clientmanager"
     );
 
-    public WrapperClassLoader(URL[] urls, LaunchClassLoader baseLaunchClassloader) {
+    private final File ourLibDir;
+    private final int id;
+    private Map<String, String> resolvedLibraries;
+
+    public WrapperClassLoader(URL[] urls, LaunchClassLoader baseLaunchClassloader, File rootLibDir, int id, Map<String, String> resolvedLibraries) {
         super(urls, WrapperClassLoader.class.getClassLoader());
-        this.copyResources(WrapperClassLoader.class.getClassLoader());
+
+        this.ourLibDir = new File(rootLibDir, "client" + id);
+        this.ourLibDir.mkdir();
+
+        this.id = id;
+        this.resolvedLibraries = resolvedLibraries;
+
+
+        //this.copyResources(WrapperClassLoader.class.getClassLoader());
+    }
+
+    @Override
+    protected String findLibrary(String libname) {
+        String path = this.resolvedLibraries.get(libname);
+        if (path != null) {
+            File target = new File(this.ourLibDir, System.mapLibraryName(libname));
+            if (target.exists()) {
+                return target.getAbsolutePath();
+            }
+            try {
+                Files.copy(Paths.get(path), target.toPath());
+            } catch (Exception e) {
+                throw new RuntimeException("Exception copying library " + libname, e);
+            }
+            return target.getAbsolutePath();
+
+        }
+        return null;
     }
 
     private void copyResources(ClassLoader otherClassloader) {

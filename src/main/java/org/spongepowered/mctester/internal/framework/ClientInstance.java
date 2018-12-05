@@ -32,22 +32,29 @@ import org.spongepowered.mctester.api.junit.clientmanager.WrapperClassLoader;
 
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
+import java.util.Map;
 
 public class ClientInstance {
 
     private WrapperClassLoader classLoader;
     private MinecraftClientStarter starter;
+    private Map<String, String> resolvedLibraries;
+    private static int nextId = 1;
+    private int id;
 
 
-    public ClientInstance() {
+    public ClientInstance(Map<String, String> resolvedLibraries) {
+        this.id = nextId++;
+        this.resolvedLibraries = resolvedLibraries;
         URLClassLoader classLoader = (URLClassLoader) MinecraftRunner.rootClassLoader;
         if (classLoader.getClass().getName().equals("net.minecraft.launchwrapper.LaunchClassLoader")) {
             throw new IllegalStateException("ClientInstance created from LaunchClassLoader!");
         }
-        this.classLoader = new WrapperClassLoader(classLoader.getURLs(), (LaunchClassLoader) RunnerEvents.getLaunchClassLoader(MinecraftRunner.rootClassLoader));
+        this.classLoader = new WrapperClassLoader(classLoader.getURLs(), (LaunchClassLoader) RunnerEvents.getLaunchClassLoader(MinecraftRunner.rootClassLoader),
+                MinecraftRunner.GLOBAL_SETTINGS.getRootLibDir(), this.id, this.resolvedLibraries);
         RunnerEvents.initNewInstance(this.classLoader);
         this.starter = new MinecraftClientStarter(this.classLoader);
-        starter.startClient();
+        starter.startClient(id);
     }
 
     public void shutdown() {
