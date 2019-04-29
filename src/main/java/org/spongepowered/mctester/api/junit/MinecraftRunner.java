@@ -36,7 +36,6 @@ import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 import org.spongepowered.mctester.api.RunnerEvents;
 import org.spongepowered.mctester.api.WorldOptions;
-import org.spongepowered.mctester.internal.RealJUnitRunner;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -76,7 +75,6 @@ public class MinecraftRunner extends BlockJUnit4ClassRunner {
 	private IJunitRunner realJUnitRunner;
 
 	private List<Throwable> caughtInitializationErrors = new ArrayList<>();
-
 	public static TestStatus globalTestStatus = new TestStatus();
 
 	public MinecraftRunner(Class<?> testClass) throws InitializationError {

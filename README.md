@@ -40,6 +40,18 @@ Once the client response reaches the server, your method is automatically schedu
 For a test writer, all of this is completely transparent. If you annotate your `suspend fun` with `@CoroutineTest`,
 McTester will allow you to write ordinary Kotlin code that runs on the main server thread, without freezing the game.
 
+### Custom Mixins
+
+McTester allows custom Mixin classses to be applied before any tests are run.
+To use this feature, create the file `META-INF/mctester/custom-mixins.properties` in your project's
+`test/resources` directory. This file has one property: `mixins`, which is a comma-separated list of Mixin json config files. For example:
+
+`mixins=config1.json,config2.json` 
+
+These mixin configs will be applied during startup, and will remain in affect for *all* JUnit tests classes run.
+
+For an example, see CustomMixinsTest in this repository.
+
 -------
 
 Inspired by https://github.com/vorburger/SwissKnightMinecraft/tree/master/SpongePowered/SpongeTests

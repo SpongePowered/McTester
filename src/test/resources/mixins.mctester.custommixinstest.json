@@ -1,0 +1,11 @@
+{
+  "package": "org.spongepowered.mctester.testmixins",
+  "required": true,
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.7",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinEntitySheep_CustomMixins"
+
+  ]
+}
