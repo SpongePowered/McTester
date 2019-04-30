@@ -64,11 +64,6 @@ public class CustomMixinsTest extends BaseTest {
         UUID playerUUID = this.testUtils.runOnMainThread(() -> {
             Player player = this.testUtils.getThePlayer();
             player.offer(Keys.GAME_MODE, GameModes.CREATIVE);
-
-            ((Hotbar) player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).setSelectedSlotIndex(0);
-            player.setItemInHand(
-                    HandTypes.MAIN_HAND, ItemStack.builder().itemType(ItemTypes.SPAWN_EGG).quantity(1).add(Keys.SPAWNABLE_ENTITY_TYPE, EntityTypes.SHEEP).build());
-
             return player.getUniqueId();
         });
 
@@ -89,7 +84,6 @@ public class CustomMixinsTest extends BaseTest {
             this.testUtils.getThePlayer().getWorld().spawnEntity(sheep);
 
             Player player = this.testUtils.getThePlayer();
-            player.offer(Keys.GAME_MODE, GameModes.CREATIVE);
 
             ((Hotbar) player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).setSelectedSlotIndex(0);
             player.setItemInHand(
@@ -100,6 +94,7 @@ public class CustomMixinsTest extends BaseTest {
 
         testUtils.waitForAll();
 
+        this.client.lookAt(entitySheep);
         client.rightClick();
 
         Optional<UUID> shearedBy = ((IMixinEntitySheep) entitySheep).getShearedBy();
