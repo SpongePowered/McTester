@@ -2,6 +2,7 @@ package org.spongepowered.mctester.internal.event;
 
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.event.Order;
 
 public class StandaloneEventListener<T extends Event> implements EventListener<T> {
 
@@ -15,6 +16,14 @@ public class StandaloneEventListener<T extends Event> implements EventListener<T
 
     public Class<T> getEventClass() {
         return this.eventClass;
+    }
+
+    public boolean beforeModifications() {
+        return false;
+    }
+
+    public Order order() {
+        return Order.DEFAULT;
     }
 
     @Override

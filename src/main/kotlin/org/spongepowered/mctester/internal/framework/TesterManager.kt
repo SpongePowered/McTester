@@ -89,7 +89,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         val newListeners = ArrayList<OneShotEventListener<out T>>(listeners.size)
         for (listener in listeners) {
             val newListener = OneShotEventListener(listener, this.makeErrorSlot())
-            Sponge.getEventManager().registerListener<T>(McTesterDummy.INSTANCE, newListener.eventClass, newListener)
+            Sponge.getEventManager().registerListener<T>(McTesterDummy.INSTANCE, newListener.eventClass, listener.order(), listener.beforeModifications(), newListener)
             newListeners.add(newListener)
         }
 
@@ -192,7 +192,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
 
     override fun <T : Event> listen(listener: StandaloneEventListener<T>): StandaloneEventListener<T> {
         val newListener = ErrorPropagatingEventListener(listener, this.makeErrorSlot())
-        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, newListener.eventClass, newListener)
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, newListener.eventClass, newListener.order(), newListener.beforeModifications(), newListener)
         return newListener
     }
 
@@ -221,7 +221,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
         /*AssertionError error = this.makeFakeException(String.format("The one shot event listener registered here failed to run in %s ticks!\n", ticks));*/
 
         val oneShot = OneShotEventListener(listener, this.makeErrorSlot())
-        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, oneShot.eventClass, oneShot)
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, oneShot.eventClass, oneShot.order(), oneShot.beforeModifications(), oneShot)
 
         // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
         // At the end of this method, we wait for handleFinished to ensure
@@ -268,7 +268,7 @@ class TesterManager :/*Runnable,*/ TestUtils, ProxyCallback {
     // We also can't call 'listenTimeoutSuspend' from 'listenTimeout', since 'listenTimeout' isn't suspendable
     override suspend fun <T : Event> listenTimeOutSuspend(block: suspend () -> Unit, listener: StandaloneEventListener<T>, ticks: Int): Int {
         val oneShot = OneShotEventListener(listener, this.makeErrorSlot())
-        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, oneShot.eventClass, oneShot)
+        Sponge.getEventManager().registerListener(McTesterDummy.INSTANCE, oneShot.eventClass, oneShot.order(), oneShot.beforeModifications(), oneShot)
 
         // We use handleStarted, so that a long-running event listener doesn't trip the timeout.
         // At the end of this method, we wait for handleFinished to ensure
